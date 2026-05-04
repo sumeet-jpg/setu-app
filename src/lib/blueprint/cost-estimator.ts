@@ -1,17 +1,13 @@
 // @ts-nocheck
 /**
  * SETU — Cost Estimator
- *
- * Maps agent metadata to pricing bands.
- * Uses the catalog pricing_band field as source of truth.
- * Does NOT make pricing promises — all estimates are ranges.
+ * Maps agent catalog pricing_band to structured ranges.
  */
 
 import type { Agent } from "@/types/agent";
 import type { CostEstimate } from "@/types/blueprint";
 import type { RequirementExtraction } from "@/types/blueprint";
 
-// Pricing packages
 const PRICING_PACKAGES = {
   blueprint_only: "Instant Agent Blueprint (Free)",
   workflow_blueprint: "Workflow Blueprint ($1.5k–$10k)",
@@ -20,8 +16,8 @@ const PRICING_PACKAGES = {
 };
 
 /**
- * Parse a pricing band string like "Pilot $10k–$25k; Prod $25k–$75k setup; $5k–$20k/mo"
- * into structured numbers.
+ * Parse pricing band like "Pilot $10k–$25k; Prod $25k–$75k setup; $5k–$20k/mo"
+ * Correctly separates setup vs monthly ranges.
  */
 function parsePricingBand(pricingBand: string): {
   setupLow: number;
@@ -29,50 +25,35 @@ function parsePricingBand(pricingBand: string): {
   monthlyLow: number;
   monthlyHigh: number;
 } {
-  // Extract numbers in k (thousands)
-  const kNumbers = [...pricingBand.matchAll(/\$(\d+)k/gi)].map((m) =>
-    parseInt(m[1], 10) * 1000
-  );
+  // Extract /mo numbers first (monthly)
+  const monthlyMatch = pricingBand.match(/\$(\d+)k[–-]\$(\d+)k\/mo/i);
+  const monthlyLow = monthlyMatch ? parseInt(monthlyMatch[1], 10) * 1000 : null;
+  const monthlyHigh = monthlyMatch ? parseInt(monthlyMatch[2], 10) * 1000 : null;
 
-  if (kNumbers.length >= 2) {
-    // First two numbers = setup range, next two = monthly range (if present)
-    return {
-      setupLow: kNumbers[0],
-      setupHigh: kNumbers[1],
-      monthlyLow: kNumbers[2] ?? Math.round(kNumbers[0] * 0.1),
-      monthlyHigh: kNumbers[3] ?? Math.round(kNumbers[1] * 0.2),
-    };
-  }
+  // Extract setup numbers (not /mo) — take first k–k range that isn't monthly
+  const setupMatches = [...pricingBand.matchAll(/\$(\d+)k[–-]\$(\d+)k(?!\/mo)/gi)];
+  const setupLow = setupMatches[0] ? parseInt(setupMatches[0][1], 10) * 1000 : 5000;
+  const setupHigh = setupMatches[0] ? parseInt(setupMatches[0][2], 10) * 1000 : 25000;
 
-  // Fallback defaults
-  return { setupLow: 5000, setupHigh: 20000, monthlyLow: 1000, monthlyHigh: 5000 };
+  return {
+    setupLow,
+    setupHigh,
+    monthlyLow: monthlyLow ?? Math.round(setupLow * 0.15),
+    monthlyHigh: monthlyHigh ?? Math.round(setupHigh * 0.25),
+  };
 }
 
 export function estimateCost(
   agent: Agent,
   req: Partial<RequirementExtraction>
 ): CostEstimate {
-  // Use the catalog pricing_band as the primary source
   if (agent.pricing_band) {
     const parsed = parsePricingBand(agent.pricing_band);
 
-    // Bump ranges for high-risk or enterprise complexity
-    const complexityMultiplier =
-      agent.complexity === "enterprise"
-        ? 1.0
-        : agent.complexity === "growth"
-        ? 0.85
-        : 0.6;
-
     const riskMultiplier =
-      req.financial_sensitive ||
-      req.legal_sensitive ||
-      req.healthcare_sensitive ||
-      req.compliance_sensitive
-        ? 1.3
+      req.financial_sensitive || req.legal_sensitive || req.healthcare_sensitive || req.compliance_sensitive
+        ? 1.2
         : 1.0;
-
-    const multiplier = complexityMultiplier * riskMultiplier;
 
     const pricingPackage =
       agent.readiness_tier === "tier_1_pilot_ready"
@@ -80,19 +61,18 @@ export function estimateCost(
         : PRICING_PACKAGES.workflow_blueprint;
 
     return {
-      setup_range_low: Math.round((parsed.setupLow * multiplier) / 1000) * 1000,
-      setup_range_high: Math.round((parsed.setupHigh * multiplier) / 1000) * 1000,
-      monthly_range_low: Math.round((parsed.monthlyLow * multiplier) / 500) * 500,
-      monthly_range_high: Math.round((parsed.monthlyHigh * multiplier) / 500) * 500,
+      setup_range_low: Math.round((parsed.setupLow * riskMultiplier) / 1000) * 1000,
+      setup_range_high: Math.round((parsed.setupHigh * riskMultiplier) / 1000) * 1000,
+      monthly_range_low: Math.round((parsed.monthlyLow * riskMultiplier) / 500) * 500,
+      monthly_range_high: Math.round((parsed.monthlyHigh * riskMultiplier) / 500) * 500,
       currency: "USD",
       complexity_driver: agent.complexity,
       pricing_package: pricingPackage,
       notes:
-        "These are indicative ranges. Final pricing is determined after a Workflow Audit call. Setu does not make binding pricing commitments in this blueprint.",
+        "Indicative ranges only. Final pricing confirmed after Workflow Audit. Not a binding commitment.",
     };
   }
 
-  // Generic fallback
   return {
     setup_range_low: 5000,
     setup_range_high: 25000,
@@ -101,7 +81,6 @@ export function estimateCost(
     currency: "USD",
     complexity_driver: agent.complexity ?? "growth",
     pricing_package: PRICING_PACKAGES.workflow_blueprint,
-    notes:
-      "Pricing will be confirmed after a Workflow Audit. These are indicative ranges only.",
+    notes: "Pricing confirmed after Workflow Audit.",
   };
 }

@@ -1,66 +1,58 @@
 // @ts-nocheck
 /**
  * SETU — Agent Matcher
- *
- * Matches user requirements to the agent catalog using a deterministic
- * scoring algorithm. LLM is used only to assist with semantic similarity —
- * the actual selection is score-driven, not freeform LLM invention.
- *
- * Score components:
- * - Category match: 30 pts
- * - Pain point keyword match: 25 pts
- * - Tool match: 20 pts
- * - Readiness tier boost: 15 pts (Tier 1 > Tier 2 > Tier 3)
- * - Flagship boost: 10 pts
- * - Commercial priority boost: 5 pts
+ * Deterministic scoring against the agent catalog.
  */
 
 import type { Agent } from "@/types/agent";
-import type { RequirementExtraction } from "@/types/blueprint";
-import type { AgentRecommendation, AlternativeAgent } from "@/types/blueprint";
+import type { RequirementExtraction, AgentRecommendation, AlternativeAgent } from "@/types/blueprint";
 
-// Category keyword maps — used for fuzzy category matching
 const CATEGORY_KEYWORDS: Record<string, string[]> = {
   "Revenue Operations & Sales": [
-    "sales", "crm", "pipeline", "leads", "deals", "revenue", "forecast",
-    "outbound", "quota", "proposals", "follow-up", "revops", "sdr", "ae",
+    "sales", "crm", "pipeline", "leads", "lead", "deals", "deal", "revenue",
+    "forecast", "outbound", "quota", "proposals", "follow-up", "followup",
+    "follow up", "revops", "sdr", "ae", "hubspot", "salesforce", "sfdc",
+    "meetings", "meeting", "demo", "demos", "close", "closing", "prospect",
+    "inbound", "outreach", "cold", "sequence", "cadence", "rep", "reps",
   ],
   "Customer Support & CX": [
-    "support", "tickets", "helpdesk", "zendesk", "intercom", "customer",
-    "complaints", "refund", "escalation", "cx", "service desk", "freshdesk",
+    "support", "ticket", "tickets", "helpdesk", "zendesk", "intercom",
+    "customer", "complaint", "refund", "escalation", "cx", "service desk",
+    "freshdesk", "response time", "backlog", "sla", "resolution",
   ],
   "Finance & Accounting": [
-    "finance", "accounting", "invoices", "payments", "reconciliation",
-    "quickbooks", "xero", "netsuite", "billing", "ar", "ap", "close",
-    "reconcile", "expense", "cash", "revenue recognition",
+    "finance", "accounting", "invoice", "invoices", "payment", "payments",
+    "reconciliation", "quickbooks", "xero", "netsuite", "billing", "ar",
+    "ap", "close", "reconcile", "expense", "cash", "revenue recognition",
+    "stripe", "bank", "transaction",
   ],
   "Operations & Procurement": [
-    "operations", "ops", "procurement", "vendor", "supply chain", "contracts",
-    "onboarding", "scheduling", "order", "inventory", "facilities",
+    "operations", "ops", "procurement", "vendor", "supply chain", "contract",
+    "onboarding", "scheduling", "order", "inventory", "facilities", "process",
   ],
   "Compliance, Risk & Legal Ops": [
     "compliance", "soc2", "audit", "risk", "legal", "gdpr", "privacy",
-    "security questionnaire", "access review", "policy", "regulation",
+    "security questionnaire", "access review", "policy", "regulation", "iso",
   ],
   "Executive Intelligence & Reporting": [
     "executive", "ceo", "coo", "cfo", "reporting", "kpi", "dashboard",
-    "board", "forecast", "briefing", "okr", "weekly digest",
+    "board", "forecast", "briefing", "okr", "weekly", "digest", "leadership",
   ],
   "HR & Internal Operations": [
     "hr", "people ops", "onboarding", "recruiting", "hiring", "employee",
-    "offboarding", "performance review", "hris", "benefits",
+    "offboarding", "performance review", "hris", "benefits", "payroll",
   ],
   "IT & Security Operations": [
     "it", "security", "helpdesk", "access", "saas license", "incident",
-    "servicedesk", "jira", "bug", "engineering",
+    "servicedesk", "jira", "bug", "engineering", "infrastructure",
   ],
   "Marketing & Growth": [
     "marketing", "campaign", "content", "seo", "ads", "social", "brand",
-    "growth", "leads", "webinar", "email marketing",
+    "growth", "webinar", "email marketing", "demand gen", "leads",
   ],
   "Customer Success & Retention": [
     "customer success", "renewal", "churn", "expansion", "qbr", "nps",
-    "health score", "retention", "onboarding risk",
+    "health score", "retention", "onboarding risk", "csm",
   ],
 };
 
@@ -79,26 +71,13 @@ const CONFIDENCE_SCORE: Record<string, number> = {
   low: 0,
 };
 
-const PRIORITY_SCORE: Record<string, number> = {
-  A: 5,
-  B: 3,
-  C: 1,
-};
-
 export interface MatchResult {
   agent: Agent;
   score: number;
   matchReasons: string[];
 }
 
-/**
- * Score a single agent against extracted requirements.
- * Returns null if score is 0 (no relevant match at all).
- */
-export function scoreAgent(
-  agent: Agent,
-  req: Partial<RequirementExtraction>
-): MatchResult | null {
+export function scoreAgent(agent: Agent, req: Partial<RequirementExtraction>): MatchResult | null {
   let score = 0;
   const matchReasons: string[] = [];
 
@@ -109,54 +88,57 @@ export function scoreAgent(
     req.desired_outcome ?? "",
     ...(req.systems_involved ?? []),
     ...(req.tools_mentioned ?? []),
-  ]
-    .join(" ")
-    .toLowerCase();
+  ].join(" ").toLowerCase();
 
-  // ── Category match (30 pts) ──────────────────────────────────
+  // ── Category match (30 pts) ──────────────────────
   const catKeywords = CATEGORY_KEYWORDS[agent.category] ?? [];
   const catHits = catKeywords.filter((kw) => textToMatch.includes(kw));
   if (catHits.length > 0) {
-    const catScore = Math.min(30, catHits.length * 8);
+    const catScore = Math.min(30, catHits.length * 6);
     score += catScore;
     matchReasons.push(`Category match: ${agent.category}`);
   }
 
-  // ── Pain point keyword match (25 pts) ───────────────────────
-  const painText = agent.pain_problem.toLowerCase();
-  const outcomeText = agent.business_outcome.toLowerCase();
-  const capText = agent.core_capabilities.join(" ").toLowerCase();
-  const agentText = `${painText} ${outcomeText} ${capText}`;
+  // ── Pain point match (30 pts) ────────────────────
+  const agentText = [
+    agent.pain_problem,
+    agent.business_outcome,
+    agent.core_capabilities.join(" "),
+    agent.name,
+  ].join(" ").toLowerCase();
 
-  let painHits = 0;
-  for (const pain of req.pain_points ?? []) {
-    const painWords = pain.toLowerCase().split(/\W+/).filter((w) => w.length > 3);
-    const hit = painWords.some((w) => agentText.includes(w));
-    if (hit) painHits++;
-  }
-  if (painHits > 0) {
-    const painScore = Math.min(25, painHits * 10);
+  const userWords = textToMatch
+    .split(/\W+/)
+    .filter((w) => w.length > 3)
+    .filter((w) => !["that", "with", "this", "have", "they", "their", "from", "want", "need", "also", "just", "very", "more", "some", "into", "been", "will", "your", "team", "able"].includes(w));
+
+  const painHits = userWords.filter((w) => agentText.includes(w));
+  const uniquePainHits = [...new Set(painHits)];
+
+  if (uniquePainHits.length > 0) {
+    const painScore = Math.min(30, uniquePainHits.length * 5);
     score += painScore;
-    matchReasons.push(`Pain point alignment: ${painHits} matching signals`);
+    matchReasons.push(`Pain point alignment: ${uniquePainHits.length} matching signals`);
   }
 
-  // ── Tool match (20 pts) ──────────────────────────────────────
+  // ── Tool match (20 pts) ──────────────────────────
   const userTools = (req.tools_mentioned ?? []).map((t) => t.toLowerCase());
-  const agentTools = [
-    ...agent.required_tools,
-    ...agent.optional_tools,
-  ].map((t) => t.toLowerCase());
+  const agentTools = [...agent.required_tools, ...agent.optional_tools].map((t) => t.toLowerCase());
 
   const toolHits = userTools.filter((ut) =>
-    agentTools.some((at) => at.includes(ut) || ut.includes(at.split("/")[0]))
+    agentTools.some((at) => {
+      const atParts = at.split(/[\/,\s]+/);
+      return atParts.some((part) => part.length > 2 && (ut.includes(part) || part.includes(ut)));
+    })
   );
+
   if (toolHits.length > 0) {
-    const toolScore = Math.min(20, toolHits.length * 7);
+    const toolScore = Math.min(20, toolHits.length * 8);
     score += toolScore;
     matchReasons.push(`Tool overlap: ${toolHits.slice(0, 3).join(", ")}`);
   }
 
-  // ── Readiness tier boost ─────────────────────────────────────
+  // ── Readiness tier boost ─────────────────────────
   const tierScore = TIER_SCORE[agent.readiness_tier] ?? 0;
   if (tierScore > 0) {
     score += tierScore;
@@ -165,46 +147,26 @@ export function scoreAgent(
     }
   }
 
-  // ── Flagship boost ───────────────────────────────────────────
+  // ── Flagship boost ───────────────────────────────
   if (agent.is_flagship) {
-    score += 10;
+    score += 8;
     matchReasons.push("Flagship agent: proven demo and sales path");
   }
 
-  // ── Commercial priority boost ────────────────────────────────
-  if (agent.commercial_priority) {
-    score += PRIORITY_SCORE[agent.commercial_priority] ?? 0;
-  }
+  // ── Sales confidence boost ───────────────────────
+  score += CONFIDENCE_SCORE[agent.sales_confidence ?? ""] ?? 0;
 
-  // ── Confidence boost ─────────────────────────────────────────
-  if (agent.sales_confidence) {
-    score += CONFIDENCE_SCORE[agent.sales_confidence] ?? 0;
-  }
+  // ── Sensitivity boosts ───────────────────────────
+  if (req.financial_sensitive && agent.category === "Finance & Accounting") score += 8;
+  if (req.compliance_sensitive && agent.category === "Compliance, Risk & Legal Ops") score += 8;
+  if (req.hr_sensitive && agent.category === "HR & Internal Operations") score += 8;
 
-  // ── Risk sensitivity penalty ─────────────────────────────────
-  // If user flagged financial/legal sensitivity and agent is in finance,
-  // boost it (correct match). If mismatch, no penalty (we don't know enough).
-  if (req.financial_sensitive && agent.category === "Finance & Accounting") {
-    score += 5;
-  }
-  if (req.compliance_sensitive && agent.category === "Compliance, Risk & Legal Ops") {
-    score += 5;
-  }
-
-  // Require minimum meaningful score
-  if (score < 10) return null;
+  if (score < 12) return null;
 
   return { agent, score, matchReasons };
 }
 
-/**
- * Match requirements against the full catalog.
- * Returns top recommendation + alternatives.
- */
-export function matchAgents(
-  catalog: Agent[],
-  req: Partial<RequirementExtraction>
-): AgentRecommendation | null {
+export function matchAgents(catalog: Agent[], req: Partial<RequirementExtraction>): AgentRecommendation | null {
   const results: MatchResult[] = [];
 
   for (const agent of catalog) {
@@ -215,16 +177,15 @@ export function matchAgents(
 
   if (results.length === 0) return null;
 
-  // Sort descending
   results.sort((a, b) => b.score - a.score);
 
   const top = results[0];
-  const maxPossibleScore = 30 + 25 + 20 + 15 + 10 + 5 + 5 + 5; // 115
+  const maxPossibleScore = 30 + 30 + 20 + 15 + 8 + 5 + 8;
   const confidenceScore = Math.min(95, Math.round((top.score / maxPossibleScore) * 100));
 
   const alternatives: AlternativeAgent[] = results
     .slice(1, 4)
-    .filter((r) => r.score >= top.score * 0.6) // only show close alternatives
+    .filter((r) => r.score >= top.score * 0.55)
     .map((r) => ({
       agent_id: r.agent.agent_id,
       agent_name: r.agent.name,
@@ -241,21 +202,13 @@ export function matchAgents(
   };
 }
 
-/**
- * Build a compact catalog summary string for injection into the system prompt.
- * Keeps token count manageable.
- */
 export function buildCatalogSummary(agents: Agent[]): string {
   const byCategory: Record<string, string[]> = {};
 
   for (const agent of agents.filter((a) => a.is_public)) {
     if (!byCategory[agent.category]) byCategory[agent.category] = [];
-    const tier =
-      agent.readiness_tier === "tier_1_pilot_ready"
-        ? "[T1]"
-        : agent.readiness_tier === "tier_2_packaged_offer"
-        ? "[T2]"
-        : "[T3]";
+    const tier = agent.readiness_tier === "tier_1_pilot_ready" ? "[T1]"
+      : agent.readiness_tier === "tier_2_packaged_offer" ? "[T2]" : "[T3]";
     byCategory[agent.category].push(
       `${tier} ${agent.agent_id}: ${agent.name} — ${agent.pain_problem}`
     );

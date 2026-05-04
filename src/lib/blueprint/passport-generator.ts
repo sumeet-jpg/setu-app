@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SETU — Agent Passport Generator
  *
