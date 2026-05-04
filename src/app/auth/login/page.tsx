@@ -5,10 +5,12 @@ export const metadata: Metadata = {
   title: "Admin Login",
 };
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { redirect?: string; error?: string };
+  searchParams: Promise<{ redirect?: string; error?: string }>;
+}) {
+  const { redirect, error } = await searchParams;
 }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -25,7 +27,8 @@ export default function LoginPage({
         </div>
 
         {/* Error message */}
-        {searchParams.error && (
+        {error && (
+{redirect}
           <div className="mb-4 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3">
             <p className="text-sm text-destructive">
               {searchParams.error === "unauthorized"
