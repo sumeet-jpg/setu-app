@@ -39,7 +39,7 @@ export default async function ApprovalsPage({ searchParams }: { searchParams: Pr
                 <div className="min-w-0">
                   <p className="font-medium text-sm">{ap.action_description as string}</p>
                   <p className="text-xs text-muted-foreground mt-1">Type: {ap.action_type as string}</p>
-                  {ap.requested_by_email && <p className="text-xs text-muted-foreground">Requested by: {ap.requested_by_email as string}</p>}
+                  {ap.requested_by_email ? <p className="text-xs text-muted-foreground">Requested by: {String(ap.requested_by_email)}</p> : null}
                   <p className="text-xs text-muted-foreground">{new Date(ap.created_at as string).toLocaleString()}</p>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
