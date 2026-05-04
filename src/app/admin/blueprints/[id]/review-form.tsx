@@ -42,7 +42,7 @@ export function BlueprintReviewForm({ blueprintId }: { blueprintId: string }) {
           Request Changes
         </button>
         <button onClick={() => submit("reject")} disabled={loading}
-          className="rounded-lg bg-destructive px-4 py-2 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50">
+          className="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50">
           Reject
         </button>
       </div>

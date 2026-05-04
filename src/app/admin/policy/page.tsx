@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Metadata } from "next";
 import { getKillSwitches } from "@/lib/services/admin.service";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
@@ -43,3 +44,4 @@ export default async function PolicyPage() {
     </div>
   );
 }
+

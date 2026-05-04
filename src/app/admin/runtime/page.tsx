@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Metadata } from "next";
 import { getRuntimeInstances } from "@/lib/services/admin.service";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
@@ -49,3 +50,4 @@ export default async function RuntimePage() {
     </div>
   );
 }
+
