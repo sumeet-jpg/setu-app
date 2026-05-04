@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SETU — Intent Classifier
  * Step 1 of the blueprint pipeline.

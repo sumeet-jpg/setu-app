@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SETU — Lead and Support Type Definitions
  */

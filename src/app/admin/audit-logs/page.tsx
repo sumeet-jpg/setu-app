@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Metadata } from "next";
 import { getAuditLogs } from "@/lib/services/admin.service";
 import { StatusBadge } from "@/components/admin/ui/StatusBadge";

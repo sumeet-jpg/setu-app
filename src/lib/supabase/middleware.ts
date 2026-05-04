@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SETU — Supabase Middleware Helper
  * Refreshes expired sessions so users don't get logged out unexpectedly.

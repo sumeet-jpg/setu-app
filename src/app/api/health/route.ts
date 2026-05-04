@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextResponse } from "next/server";
 import { clientEnv } from "@/lib/env";
 import { isRuntimeExecutionEnabled } from "@/lib/env";

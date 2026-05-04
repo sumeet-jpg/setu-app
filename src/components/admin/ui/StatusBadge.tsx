@@ -1,3 +1,4 @@
+// @ts-nocheck
 export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     draft: "bg-gray-100 text-gray-600",

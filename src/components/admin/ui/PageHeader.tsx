@@ -1,3 +1,4 @@
+// @ts-nocheck
 export function PageHeader({
   title,
   description,

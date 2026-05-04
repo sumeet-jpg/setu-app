@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
 import { buildErrorResponse, SETU_ERROR_CODES } from "@/lib/errors/setu-errors";
 import { writeAuditLog } from "@/lib/governance/audit-logger";

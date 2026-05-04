@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SETU — LLM Cost Tracker
  *

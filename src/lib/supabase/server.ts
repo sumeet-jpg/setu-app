@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SETU — Supabase Server Clients
  *

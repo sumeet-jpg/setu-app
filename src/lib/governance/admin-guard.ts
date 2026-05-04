@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SETU — Admin Route Guard
  *

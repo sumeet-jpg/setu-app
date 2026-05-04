@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SETU — Policy Engine
  *

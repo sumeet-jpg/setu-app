@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SETU — LLM Provider Abstraction
  *

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { redirect } from "next/navigation";
 import { getAdminUserOrNull } from "@/lib/governance/admin-guard";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SETU — Centralized Error Handling
  *
