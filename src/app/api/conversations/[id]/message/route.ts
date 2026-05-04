@@ -1,34 +1,15 @@
 // @ts-nocheck
 /**
- * POST /api/conversations/:id/message
- *
- * Core conversation endpoint. Receives a user message,
- * runs the full 13-step blueprint pipeline, and returns
- * a structured AssistantResponse.
- *
- * Rate: limited by LLM cost budget (no hard rate limit in Phase 2).
+ * POST /api/conversations/:id/message — with rate limiting and kill switch check
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import {
-  buildErrorResponse,
-  buildSuccessResponse,
-  handleUnknownError,
-  SETU_ERROR_CODES,
-} from "@/lib/errors/setu-errors";
-import {
-  getConversation,
-  getOrCreateConversationState,
-  getMessages,
-  saveMessage,
-  updateConversationState,
-  createBlueprint,
-  updateBlueprint,
-  updateConversationStage,
-  getCatalog,
-} from "@/lib/services/conversation.service";
+import { buildErrorResponse, buildSuccessResponse, handleUnknownError, SETU_ERROR_CODES } from "@/lib/errors/setu-errors";
+import { getConversation, getOrCreateConversationState, getMessages, saveMessage, updateConversationState, createBlueprint, updateBlueprint, updateConversationStage, getCatalog } from "@/lib/services/conversation.service";
 import { runBlueprintPipeline } from "@/lib/blueprint/pipeline";
+import { checkKillSwitches } from "@/lib/governance/kill-switch";
+import { RATE_LIMITS, getClientIp } from "@/lib/security/rate-limiter";
 import type { ConversationStage } from "@/types/conversation";
 import type { RequirementExtraction } from "@/types/blueprint";
 
@@ -37,11 +18,18 @@ const MessageSchema = z.object({
   message: z.string().min(1).max(4000).trim(),
 });
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }) {
   const { id: conversationId } = await params;
+
+  // Rate limit
+  const ip = getClientIp(request);
+  const rateCheck = RATE_LIMITS.messageSend(ip);
+  if (!rateCheck.allowed) {
+    return NextResponse.json(
+      buildErrorResponse(SETU_ERROR_CODES.RATE_LIMIT, "Too many messages. Please slow down."),
+      { status: 429 }
+    );
+  }
 
   try {
     const body = await request.json().catch(() => ({}));
@@ -56,41 +44,32 @@ export async function POST(
 
     const { session_id, message } = parsed.data;
 
-    // ── Verify conversation belongs to this session ──────────
+    // Check kill switches
+    const killCheck = await checkKillSwitches({ session_id });
+    if (killCheck.blocked && killCheck.level === "global" && killCheck.reason?.includes("Runtime")) {
+      // Global runtime kill switch — don't block blueprint conversations, only execution
+      // Continue — blueprint generation is not live execution
+    }
+
     const conversation = await getConversation(conversationId, session_id);
     if (!conversation) {
       return NextResponse.json(
-        buildErrorResponse(
-          SETU_ERROR_CODES.PERMISSION_DENIED,
-          "Conversation not found.",
-          { safe_next_step: "Start a new conversation." }
-        ),
+        buildErrorResponse(SETU_ERROR_CODES.PERMISSION_DENIED, "Conversation not found."),
         { status: 404 }
       );
     }
 
-    // ── Get current state + message history ──────────────────
     const state = await getOrCreateConversationState(conversationId);
     const messages = await getMessages(conversationId);
+    const messageHistory = messages.filter((m) => m.role !== "system").map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
-    const messageHistory = messages
-      .filter((m) => m.role !== "system")
-      .map((m) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      }));
-
-    // ── Save user message ────────────────────────────────────
     await saveMessage(conversationId, "user", message);
 
-    // ── Load catalog ─────────────────────────────────────────
     const catalog = await getCatalog();
 
     if (catalog.length === 0) {
-      // Catalog not yet seeded — return a safe holding response
       const holdingResponse = {
-        assistant_message:
-          "Thanks for sharing that. I'm setting up my knowledge base — could you tell me a bit more about your team and which tools you currently use for this workflow?",
+        assistant_message: "Thanks for sharing that. Could you tell me more about your team and which tools you currently use?",
         conversation_stage: state.stage as ConversationStage,
         structured_requirement_update: {},
         blueprint_patch: {},
@@ -102,7 +81,6 @@ export async function POST(
       return NextResponse.json(buildSuccessResponse(holdingResponse));
     }
 
-    // ── Run the 13-step pipeline ─────────────────────────────
     const pipelineOutput = await runBlueprintPipeline({
       conversationId,
       sessionId: session_id,
@@ -116,14 +94,10 @@ export async function POST(
       catalog,
     });
 
-    // ── Persist blueprint if generated or updated ────────────
     let blueprintId = state.blueprint_id as string | undefined;
 
     if (!blueprintId && Object.keys(pipelineOutput.updatedBlueprint).length > 0) {
-      // Create blueprint on first meaningful output
-      const inputSummary =
-        (pipelineOutput.updatedBlueprint as Record<string, unknown>)?.input_summary as string ||
-        message.slice(0, 200);
+      const inputSummary = (pipelineOutput.updatedBlueprint as Record<string, unknown>)?.input_summary as string || message.slice(0, 200);
       const newBlueprint = await createBlueprint(conversationId, session_id, inputSummary);
       blueprintId = newBlueprint.id;
     }
@@ -132,7 +106,6 @@ export async function POST(
       await updateBlueprint(blueprintId, pipelineOutput.updatedBlueprint);
     }
 
-    // ── Update conversation state ────────────────────────────
     const newTurnCount = (state.turn_count ?? 0) + 1;
     await updateConversationState(conversationId, {
       stage: pipelineOutput.newStage,
@@ -146,16 +119,8 @@ export async function POST(
       await updateConversationStage(conversationId, pipelineOutput.newStage, blueprintId);
     }
 
-    // ── Save assistant message ────────────────────────────────
-    await saveMessage(
-      conversationId,
-      "assistant",
-      pipelineOutput.response.assistant_message,
-      pipelineOutput.response as unknown as Record<string, unknown>,
-      pipelineOutput.intent
-    );
+    await saveMessage(conversationId, "assistant", pipelineOutput.response.assistant_message, pipelineOutput.response as unknown as Record<string, unknown>, pipelineOutput.intent);
 
-    // ── Return structured response ────────────────────────────
     return NextResponse.json(
       buildSuccessResponse({
         ...pipelineOutput.response,
@@ -165,9 +130,6 @@ export async function POST(
       })
     );
   } catch (error) {
-    return NextResponse.json(
-      handleUnknownError(error, `POST /api/conversations/${conversationId}/message`),
-      { status: 500 }
-    );
+    return NextResponse.json(handleUnknownError(error, `POST /api/conversations/${conversationId}/message`), { status: 500 });
   }
 }

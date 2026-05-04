@@ -1,16 +1,12 @@
 // @ts-nocheck
 /**
  * SETU — LLM Cost Tracker
- *
- * Logs cost events after every LLM call.
- * Checks against configured cost limits.
- * Never exposes raw pricing data to clients.
+ * Logs cost events to Supabase cost_events table.
  */
 
 import type { LLMResult } from "./provider";
 import { writeAuditLog } from "@/lib/governance/audit-logger";
 
-// Approximate costs per 1k tokens (USD) — update as pricing changes
 const COST_PER_1K_TOKENS: Record<string, { input: number; output: number }> = {
   "gpt-4o": { input: 0.0025, output: 0.01 },
   "gpt-4o-mini": { input: 0.00015, output: 0.0006 },
@@ -33,23 +29,15 @@ export interface CostEventContext {
   eventType: string;
 }
 
-/**
- * Log a cost event after an LLM call.
- * Phase 1: logs to console only.
- * Phase 2: writes to cost_events table.
- */
-export async function logCostEvent(
-  result: LLMResult,
-  ctx: CostEventContext
-): Promise<void> {
+export async function logCostEvent(result: LLMResult, ctx: CostEventContext): Promise<void> {
   const estimatedCost = estimateCostUsd(result);
 
-  // Console log only — no secrets in metadata
+  // Write to audit log
   await writeAuditLog({
-    event_type: "blueprint_generated", // closest audit event for now
+    event_type: "blueprint_generated",
     severity: "info",
     session_id: ctx.conversationId,
-    description: `LLM call completed: ${ctx.eventType}`,
+    description: `LLM call: ${ctx.eventType}`,
     metadata: {
       provider: result.provider,
       model: result.model,
@@ -60,5 +48,23 @@ export async function logCostEvent(
     },
   });
 
-  // TODO Phase 2: insert into cost_events table
+  // Write to cost_events table
+  try {
+    const { createAdminClient } = await import("@/lib/supabase/server");
+    const db = createAdminClient();
+    await db.from("cost_events").insert({
+      conversation_id: ctx.conversationId ?? null,
+      blueprint_id: ctx.blueprintId ?? null,
+      agent_id: null,
+      tenant_id: ctx.tenantId ?? null,
+      event_type: ctx.eventType,
+      provider: result.provider,
+      model: result.model,
+      tokens_used: (result.inputTokens ?? 0) + (result.outputTokens ?? 0),
+      estimated_cost_usd: estimatedCost,
+      threshold_reached: false,
+    });
+  } catch (err) {
+    console.error("[Setu] Failed to write cost event to DB:", err instanceof Error ? err.message : "unknown");
+  }
 }
