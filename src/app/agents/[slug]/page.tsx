@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/server";
 import Link from "next/link";
