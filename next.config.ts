@@ -6,12 +6,7 @@ const nextConfig: NextConfig = {
 
   // Server-side env validation — crash fast if required vars missing
   // (detailed validation is in src/lib/env.ts)
-  serverRuntimeConfig: {
-    // These are server-only; never exposed to client bundle
-  },
-
-  // Only NEXT_PUBLIC_* vars are safe for client
-  publicRuntimeConfig: {},
+ 
 
   // Disable X-Powered-By header
   poweredByHeader: false,
