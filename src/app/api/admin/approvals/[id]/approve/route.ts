@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/governance/admin-guard";
 import { resolveApproval } from "@/lib/services/admin.service";
