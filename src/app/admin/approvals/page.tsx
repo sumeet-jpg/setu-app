@@ -31,7 +31,7 @@ export default async function ApprovalsPage({
       <PageHeader title="Approvals" description={`${approvals.length} requests`} />
       <div className="mb-4 flex gap-2">
         {filters.map((f) => (
-          
+          <a
             key={f.value}
             href={`/admin/approvals?status=${f.value}`}
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${

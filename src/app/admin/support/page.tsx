@@ -8,7 +8,11 @@ export const metadata: Metadata = { title: "Support" };
 
 export default async function SupportPage() {
   let tickets: Array<Record<string, unknown>> = [];
-  try { tickets = await getSupportTickets(); } catch { tickets = []; }
+  try {
+    tickets = await getSupportTickets();
+  } catch {
+    tickets = [];
+  }
 
   return (
     <div>
@@ -18,21 +22,25 @@ export default async function SupportPage() {
       ) : (
         <div className="space-y-3">
           {tickets.map((ticket) => (
-            <div key={ticket.id as string} className="rounded-xl border border-border bg-card p-4">
+            <div key={String(ticket.id)} className="rounded-xl border border-border bg-card p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium">{ticket.subject as string}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{ticket.category as string}</p>
+                  <p className="text-sm font-medium">{String(ticket.subject ?? "")}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{String(ticket.category ?? "")}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <StatusBadge status={ticket.priority as string} />
-                  <StatusBadge status={ticket.status as string} />
+                  <StatusBadge status={String(ticket.priority ?? "")} />
+                  <StatusBadge status={String(ticket.status ?? "")} />
                 </div>
               </div>
-              {ticket.escalation_required && (
-                <p className="mt-2 text-xs text-red-600">⚠️ Escalation required: {ticket.escalation_reason as string}</p>
-              )}
-              <p className="mt-2 text-xs text-muted-foreground">{new Date(ticket.created_at as string).toLocaleString()}</p>
+              {ticket.escalation_required ? (
+                <p className="mt-2 text-xs text-red-600">
+                  ⚠️ Escalation required: {String(ticket.escalation_reason ?? "")}
+                </p>
+              ) : null}
+              <p className="mt-2 text-xs text-muted-foreground">
+                {new Date(String(ticket.created_at)).toLocaleString()}
+              </p>
             </div>
           ))}
         </div>

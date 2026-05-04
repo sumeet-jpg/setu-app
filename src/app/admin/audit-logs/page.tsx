@@ -5,10 +5,18 @@ import { PageHeader } from "@/components/admin/ui/PageHeader";
 
 export const metadata: Metadata = { title: "Audit Logs" };
 
-export default async function AuditLogsPage({ searchParams }: { searchParams: Promise<{ severity?: string; event_type?: string }> }) {
+export default async function AuditLogsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ severity?: string; event_type?: string }>;
+}) {
   const { severity, event_type } = await searchParams;
   let logs: Array<Record<string, unknown>> = [];
-  try { logs = await getAuditLogs({ severity, event_type, limit: 100 }); } catch { logs = []; }
+  try {
+    logs = await getAuditLogs({ severity, event_type, limit: 100 });
+  } catch {
+    logs = [];
+  }
 
   return (
     <div>
@@ -24,14 +32,22 @@ export default async function AuditLogsPage({ searchParams }: { searchParams: Pr
           </thead>
           <tbody className="divide-y divide-border">
             {logs.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">No audit logs yet.</td></tr>
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  No audit logs yet.
+                </td>
+              </tr>
             ) : logs.map((log) => (
-              <tr key={log.id as string} className="hover:bg-muted/30">
-                <td className="px-4 py-2 text-xs text-muted-foreground whitespace-nowrap">{new Date(log.created_at as string).toLocaleString()}</td>
-                <td className="px-4 py-2 text-xs font-mono">{log.event_type as string}</td>
-                <td className="px-4 py-2"><StatusBadge status={log.severity as string} /></td>
-                <td className="px-4 py-2 max-w-sm"><p className="truncate text-xs">{log.description as string}</p></td>
-                <td className="px-4 py-2 text-xs text-muted-foreground">{log.entity_type ? `${log.entity_type}:${String(log.entity_id ?? "").slice(0, 8)}` : "—"}</td>
+              <tr key={String(log.id)} className="hover:bg-muted/30">
+                <td className="px-4 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                  {new Date(String(log.created_at)).toLocaleString()}
+                </td>
+                <td className="px-4 py-2 text-xs font-mono">{String(log.event_type ?? "")}</td>
+                <td className="px-4 py-2"><StatusBadge status={String(log.severity ?? "info")} /></td>
+                <td className="px-4 py-2 max-w-sm"><p className="truncate text-xs">{String(log.description ?? "")}</p></td>
+                <td className="px-4 py-2 text-xs text-muted-foreground">
+                  {log.entity_type ? `${String(log.entity_type)}:${String(log.entity_id ?? "").slice(0, 8)}` : "—"}
+                </td>
               </tr>
             ))}
           </tbody>

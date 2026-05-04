@@ -6,10 +6,18 @@ import { EmptyState } from "@/components/admin/ui/EmptyState";
 
 export const metadata: Metadata = { title: "Leads" };
 
-export default async function LeadsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+export default async function LeadsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   const { status } = await searchParams;
   let leads: Array<Record<string, unknown>> = [];
-  try { leads = await getLeads({ status }); } catch { leads = []; }
+  try {
+    leads = await getLeads({ status });
+  } catch {
+    leads = [];
+  }
 
   const filters = [
     { label: "All", value: "" },
@@ -23,8 +31,15 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
       <PageHeader title="Leads" description={`${leads.length} leads`} />
       <div className="mb-4 flex gap-2 flex-wrap">
         {filters.map((f) => (
-          <a key={f.value} href={f.value ? `/admin/leads?status=${f.value}` : "/admin/leads"}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${(status ?? "") === f.value ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-primary/10"}`}>
+          <a
+            key={f.value}
+            href={f.value ? `/admin/leads?status=${f.value}` : "/admin/leads"}
+            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              (status ?? "") === f.value
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-primary/10"
+            }`}
+          >
             {f.label}
           </a>
         ))}
@@ -43,15 +58,24 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
             </thead>
             <tbody className="divide-y divide-border">
               {leads.map((lead) => (
-                <tr key={lead.id as string} className="hover:bg-muted/30">
-                  <td className="px-4 py-3"><p className="text-sm font-medium">{lead.email as string}</p>{lead.name && <p className="text-xs text-muted-foreground">{lead.name as string}</p>}</td>
-                  <td className="px-4 py-3 text-sm">{(lead.company as string) || "—"}</td>
-                  <td className="px-4 py-3 text-sm">{(lead.role as string) || "—"}</td>
-                  <td className="px-4 py-3"><StatusBadge status={lead.status as string} /></td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{lead.source as string}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(lead.created_at as string).toLocaleDateString()}</td>
+                <tr key={String(lead.id)} className="hover:bg-muted/30">
                   <td className="px-4 py-3">
-                    {lead.blueprint_id && <a href={`/admin/blueprints/${lead.blueprint_id as string}`} className="text-xs font-medium text-primary hover:underline">Blueprint →</a>}
+                    <p className="text-sm font-medium">{String(lead.email ?? "")}</p>
+                    {lead.name ? <p className="text-xs text-muted-foreground">{String(lead.name)}</p> : null}
+                  </td>
+                  <td className="px-4 py-3 text-sm">{lead.company ? String(lead.company) : "—"}</td>
+                  <td className="px-4 py-3 text-sm">{lead.role ? String(lead.role) : "—"}</td>
+                  <td className="px-4 py-3"><StatusBadge status={String(lead.status ?? "")} /></td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">{String(lead.source ?? "")}</td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
+                    {new Date(String(lead.created_at)).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3">
+                    {lead.blueprint_id ? (
+                      <a href={`/admin/blueprints/${String(lead.blueprint_id)}`} className="text-xs font-medium text-primary hover:underline">
+                        Blueprint →
+                      </a>
+                    ) : null}
                   </td>
                 </tr>
               ))}

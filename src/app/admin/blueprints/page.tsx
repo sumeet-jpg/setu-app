@@ -6,10 +6,18 @@ import { EmptyState } from "@/components/admin/ui/EmptyState";
 
 export const metadata: Metadata = { title: "Blueprints" };
 
-export default async function BlueprintsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+export default async function BlueprintsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   const { status } = await searchParams;
   let blueprints: Array<Record<string, unknown>> = [];
-  try { blueprints = await getBlueprints({ status }); } catch { blueprints = []; }
+  try {
+    blueprints = await getBlueprints({ status });
+  } catch {
+    blueprints = [];
+  }
 
   const filters = [
     { label: "All", value: "" },
@@ -24,8 +32,15 @@ export default async function BlueprintsPage({ searchParams }: { searchParams: P
       <PageHeader title="Blueprints" description={`${blueprints.length} blueprints`} />
       <div className="mb-4 flex gap-2 flex-wrap">
         {filters.map((f) => (
-          <a key={f.value} href={f.value ? `/admin/blueprints?status=${f.value}` : "/admin/blueprints"}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${(status ?? "") === f.value ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-primary/10"}`}>
+          <a
+            key={f.value}
+            href={f.value ? `/admin/blueprints?status=${f.value}` : "/admin/blueprints"}
+            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              (status ?? "") === f.value
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-primary/10"
+            }`}
+          >
             {f.label}
           </a>
         ))}
@@ -47,13 +62,37 @@ export default async function BlueprintsPage({ searchParams }: { searchParams: P
                 const rec = bp.recommendation as Record<string, unknown> | null;
                 const risk = bp.risk_assessment as Record<string, unknown> | null;
                 return (
-                  <tr key={bp.id as string} className="hover:bg-muted/30">
-                    <td className="px-4 py-3 max-w-xs"><p className="truncate text-sm">{(bp.input_summary as string) || "—"}</p><p className="text-xs text-muted-foreground">v{bp.version as number}</p></td>
-                    <td className="px-4 py-3">{rec ? <div><p className="text-xs font-medium">{rec.agent_name as string}</p><p className="text-xs text-muted-foreground">{rec.confidence_score as number}%</p></div> : <span className="text-xs text-muted-foreground">—</span>}</td>
-                    <td className="px-4 py-3">{risk ? <StatusBadge status={String(risk.overall_risk)} /> : "—"}</td>
-                    <td className="px-4 py-3"><StatusBadge status={bp.status as string} /></td>
-                    <td className="px-4 py-3"><p className="text-xs text-muted-foreground">{new Date(bp.created_at as string).toLocaleDateString()}</p></td>
-                    <td className="px-4 py-3"><a href={`/admin/blueprints/${bp.id as string}`} className="text-xs font-medium text-primary hover:underline">Review →</a></td>
+                  <tr key={String(bp.id)} className="hover:bg-muted/30">
+                    <td className="px-4 py-3 max-w-xs">
+                      <p className="truncate text-sm">{String(bp.input_summary ?? "—")}</p>
+                      <p className="text-xs text-muted-foreground">v{String(bp.version ?? 1)}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      {rec ? (
+                        <div>
+                          <p className="text-xs font-medium">{String(rec.agent_name ?? "")}</p>
+                          <p className="text-xs text-muted-foreground">{String(rec.confidence_score ?? "")}%</p>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      {risk ? <StatusBadge status={String(risk.overall_risk ?? "")} /> : "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={String(bp.status ?? "")} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(String(bp.created_at)).toLocaleDateString()}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <a href={`/admin/blueprints/${String(bp.id)}`} className="text-xs font-medium text-primary hover:underline">
+                        Review →
+                      </a>
+                    </td>
                   </tr>
                 );
               })}
