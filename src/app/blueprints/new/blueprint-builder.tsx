@@ -33,7 +33,7 @@ export function BlueprintBuilder() {
       !leadCaptured &&
       messages.length >= 2
     ) {
-      const timer = setTimeout(() => setShowLeadModal(true), 1500);
+      const timer = setTimeout(() => setShowLeadModal(true), 5000);
       return () => clearTimeout(timer);
     }
   }, [stage, blueprintId, leadDone, leadCaptured, messages.length]);
