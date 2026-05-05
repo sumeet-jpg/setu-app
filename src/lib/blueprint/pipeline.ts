@@ -100,8 +100,15 @@ export async function runBlueprintPipeline(
 
   // ── Step 5: Agent catalog matching ──────────────────────────
   const catalogSummary = buildCatalogSummary(catalog);
-  const existingReqs = currentState.requirements;
-  const recommendation = matchAgents(catalog, existingReqs);
+// ── Step 5: Agent catalog matching ──────────────────────────
+// Only match after turn 3+ and when we have meaningful requirements
+const existingReqs = currentState.requirements;
+const hasEnoughInfo =
+  (input.messageHistory.length >= 4) &&
+  (existingReqs.pain_points?.length > 0 || existingReqs.tools_mentioned?.length > 0) &&
+  currentState.stage !== "problem_discovery";
+
+const recommendation = hasEnoughInfo ? matchAgents(catalog, existingReqs) : null;
 
   // ── Step 6: Tool requirement mapping ────────────────────────
   let toolRequirements: ToolRequirement[] = [];
