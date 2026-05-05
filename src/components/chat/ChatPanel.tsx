@@ -195,19 +195,7 @@ function AssistantMessage({ message }: { message: Message }) {
     <div className="flex flex-col gap-2">
       <AssistantBubble content={message.content} />
 
-      {/* Next question chips */}
-      {nextQuestions.length > 0 && (
-        <div className="ml-9 flex flex-wrap gap-1.5">
-          {nextQuestions.map((q, i) => (
-            <span
-              key={i}
-              className="inline-block rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground"
-            >
-              {q}
-            </span>
-          ))}
-        </div>
-      )}
+
 
       {/* CTA */}
       {structured?.cta && structured.conversation_stage === "conversion" && (
