@@ -27,6 +27,11 @@ const NAV_ITEMS = [
     icon: "👤",
   },
   {
+    label: "Employee Hires",
+    href: "/admin/hires",
+    icon: "🤝",
+  },
+  {
     label: "Agent Catalog",
     href: "/admin/agents",
     icon: "🤖",

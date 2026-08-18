@@ -96,6 +96,28 @@ export async function resolveApproval(id: string, action: "approved" | "rejected
   await db.from("approval_requests").update({ status: action, reviewed_by: adminId, reviewed_at: new Date().toISOString(), review_notes: notes }).eq("id", id);
 }
 
+export async function getEmployeeHires(opts?: { status?: string; employee_slug?: string }) {
+  const db = createAdminClient();
+  let query = db
+    .from("employee_hires")
+    .select("id, created_at, name, email, company, role, company_size, use_case, timeline, employee_slug, employee_name, employee_title, status, admin_notes")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (opts?.status) query = query.eq("status", opts.status);
+  if (opts?.employee_slug) query = query.eq("employee_slug", opts.employee_slug);
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function updateHireStatus(id: string, status: string, admin_notes?: string) {
+  const db = createAdminClient();
+  const updates: Record<string, string> = { status };
+  if (admin_notes !== undefined) updates.admin_notes = admin_notes;
+  const { error } = await db.from("employee_hires").update(updates).eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
 export async function getAuditLogs(opts?: { event_type?: string; severity?: string; limit?: number }) {
   const db = createAdminClient();
   let query = db.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(opts?.limit ?? 100);
