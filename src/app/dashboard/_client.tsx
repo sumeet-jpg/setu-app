@@ -160,7 +160,7 @@ export default function DashboardClient({ user }: { user: UserInfo }) {
           </h1>
           <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>
             {hires.length === 0
-              ? 'You haven't hired any AI Employees yet. Browse the team and hire your first one.'
+              ? "You haven't hired any AI Employees yet. Browse the team and hire your first one."
               : `You have ${hires.length} hire request${hires.length > 1 ? 's' : ''} — ${activeHires.length} active.`}
           </p>
         </div>
