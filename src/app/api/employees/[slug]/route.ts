@@ -2,8 +2,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getEmployee } from '@/lib/employees/profiles'
 
-export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
-  const e = getEmployee(params.slug)
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const e = getEmployee(slug)
 
   if (!e) {
     return NextResponse.json({ error: 'Employee not found' }, { status: 404 })

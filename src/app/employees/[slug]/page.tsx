@@ -7,8 +7,9 @@ export async function generateStaticParams() {
   return EMPLOYEES.map(e => ({ slug: e.slug }))
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const e = getEmployee(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const e = getEmployee(slug)
   if (!e) return {}
   const BASE = 'https://setuagents.com'
   return {
@@ -31,8 +32,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default function EmployeeProfilePage({ params }: { params: { slug: string } }) {
-  const e = getEmployee(params.slug)
+export default async function EmployeeProfilePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const e = getEmployee(slug)
   if (!e) notFound()
 
   const BG = '#0F172A'

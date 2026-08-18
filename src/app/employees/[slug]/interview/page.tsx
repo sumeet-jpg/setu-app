@@ -8,8 +8,9 @@ export async function generateStaticParams() {
   return EMPLOYEES.map(e => ({ slug: e.slug }))
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const e = getEmployee(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const e = getEmployee(slug)
   if (!e) return {}
   const BASE = 'https://setuagents.com'
   return {
@@ -30,8 +31,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default function InterviewPage({ params }: { params: { slug: string } }) {
-  const e = getEmployee(params.slug)
+export default async function InterviewPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const e = getEmployee(slug)
   if (!e) notFound()
-  return <InterviewClient slug={params.slug} />
+  return <InterviewClient slug={slug} />
 }
