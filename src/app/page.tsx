@@ -73,8 +73,8 @@ const homeJsonLd = {
       name: 'AI Employees',
       description: '20 AI Employees available to hire, each commanding a fleet of specialized agents',
       url: `${BASE}/employees`,
-      numberOfItems: 20,
-      itemListElement: EMPLOYEES.slice(0, 10).map((e, i) => ({
+      numberOfItems: EMPLOYEES.length,
+      itemListElement: EMPLOYEES.map((e, i) => ({
         '@type': 'ListItem',
         position: i + 1,
         name: `${e.name} — ${e.title}`,

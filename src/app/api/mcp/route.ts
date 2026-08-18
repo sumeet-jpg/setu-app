@@ -347,13 +347,18 @@ export async function POST(req: NextRequest) {
         case 'get_hiring_info':
           result = callGetHiringInfo(args)
           break
-        default:
-          response = rpcError(id, -32601, `Unknown tool: ${name}`)
-          return Object.assign(response, { headers: { ...response.headers, ...corsHeaders } })
+        default: {
+          const errResp = rpcError(id, -32601, `Unknown tool: ${name}`)
+          const errHeaders = new Headers(errResp.headers)
+          Object.entries(corsHeaders).forEach(([k, v]) => errHeaders.set(k, v))
+          return new NextResponse(errResp.body, { status: errResp.status, headers: errHeaders })
+        }
       }
     } catch (err: any) {
-      response = rpcError(id, -32000, err.message ?? 'Tool execution failed')
-      return Object.assign(response, { headers: { ...response.headers, ...corsHeaders } })
+      const errResp = rpcError(id, -32000, err.message ?? 'Tool execution failed')
+      const errHeaders = new Headers(errResp.headers)
+      Object.entries(corsHeaders).forEach(([k, v]) => errHeaders.set(k, v))
+      return new NextResponse(errResp.body, { status: errResp.status, headers: errHeaders })
     }
 
     response = rpcOk(id, {

@@ -58,8 +58,7 @@ export default function EmployeeProfilePage({ params }: { params: { slug: string
         },
         offers: {
           '@type': 'Offer',
-          price: e.pricing.monthly,
-          priceCurrency: 'USD',
+          ...(typeof e.pricing.monthly === 'number' ? { price: e.pricing.monthly, priceCurrency: 'USD' } : {}),
           priceSpecification: { '@type': 'UnitPriceSpecification', billingIncrement: 1, unitCode: 'MON' },
         },
         serviceType: 'AI Employee',

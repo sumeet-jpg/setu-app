@@ -27,8 +27,10 @@ export async function POST(req: NextRequest) {
       content: m.content,
     }))
 
+    const model = process.env.FALLBACK_REASONING_MODEL ?? 'claude-sonnet-4-6'
+
     const stream = await client.messages.stream({
-      model: 'claude-sonnet-4-6',
+      model,
       max_tokens: 1024,
       system: employee.systemPrompt,
       messages: anthropicMessages,

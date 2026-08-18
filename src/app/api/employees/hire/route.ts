@@ -24,6 +24,10 @@ export async function POST(req: NextRequest) {
     if (!name || !email || !company || !use_case || !employee_slug) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRx.test(email)) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
+    }
 
     // Save to Supabase
     const supabase = getSupabase()
@@ -46,8 +50,9 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (dbErr) {
-      console.error('[Setu hire DB]', dbErr)
-      // Don't block — still send emails
+      console.error('[Setu hire DB] FAILED TO SAVE — hire lost from DB:', dbErr.message, { name, email, company, employee_slug })
+      // Continue sending emails so the prospect gets a response,
+      // but admin email subject will flag the DB failure
     }
 
     const fromEmail = process.env.FROM_EMAIL ?? 'hello@setuagents.com'
@@ -143,7 +148,7 @@ export async function POST(req: NextRequest) {
       `,
     }).catch(err => console.error('[Setu hire prospect email]', err))
 
-    return NextResponse.json({ success: true, id: hire?.id })
+    return NextResponse.json({ success: true, id: hire?.id ?? null, db_saved: !dbErr })
   } catch (err: any) {
     console.error('[Setu hire API]', err)
     return NextResponse.json({ error: err.message ?? 'Internal error' }, { status: 500 })

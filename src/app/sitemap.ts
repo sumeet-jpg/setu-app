@@ -9,8 +9,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: BASE, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
     { url: `${BASE}/employees`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-    { url: `${BASE}/agents`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-    { url: `${BASE}/flows`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE}/mcp`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/agents`, lastModified: now, changeFrequency: 'daily', priority: 0.75 },
+    { url: `${BASE}/flows`, lastModified: now, changeFrequency: 'monthly', priority: 0.65 },
   ]
 
   const employeeRoutes: MetadataRoute.Sitemap = EMPLOYEES.flatMap(e => [
