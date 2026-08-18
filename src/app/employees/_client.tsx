@@ -66,6 +66,7 @@ export default function EmployeesClient() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Link href="/flows" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Build your own</Link>
           <Link href="/mcp" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>MCP</Link>
+          <Link href="/signin" style={{ fontSize: 13, color: '#c7d2fe', textDecoration: 'none', padding: '8px 16px', borderRadius: 8, letterSpacing: '-0.01em', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', fontFamily: 'var(--font-space)', fontWeight: 600 }}>Sign in</Link>
         </div>
       </nav>
 
