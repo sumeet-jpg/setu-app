@@ -11,14 +11,25 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Setu — AI Operations Control Plane",
+    default: "Setu — Hire AI Employees for Your Business",
     template: "%s | Setu",
   },
   description:
-    "Governed AI process agents for enterprise operations. Blueprint → Sandbox → Pilot → Production.",
+    "Hire AI Employees that command fleets of specialized agents. Marketing Manager, CFO, Compliance Officer and 17 more — interview free, go live in days.",
+  metadataBase: new URL("https://setuagents.com"),
+  openGraph: {
+    siteName: "Setu AI Employees",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    site: "@setuagents",
+    creator: "@setuagents",
+  },
   robots: {
-    index: false, // app.setuagents.com is not indexed
-    follow: false,
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
   },
 };
 
