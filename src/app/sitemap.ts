@@ -17,6 +17,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/mcp`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/agents`, lastModified: now, changeFrequency: 'daily', priority: 0.75 },
     { url: `${BASE}/flows`, lastModified: now, changeFrequency: 'monthly', priority: 0.65 },
+    { url: `${BASE}/quiz`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${BASE}/agencies`, lastModified: now, changeFrequency: 'monthly', priority: 0.82 },
   ]
 
   const pSeoRoles = [
