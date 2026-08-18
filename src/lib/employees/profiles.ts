@@ -1,5 +1,5 @@
 // @ts-nocheck
-// ── Setu AI Employees — 20 Role Profiles ─────────────────────────────────────
+// ── Setu AI Employees — 100 Role Profiles ────────────────────────────────────
 // Each profile powers: the listing card, the detail page, the interview chat,
 // and the hire confirmation email.
 
@@ -40,7 +40,12 @@ export interface EmployeeProfile {
   systemPrompt: string
 }
 
-export const EMPLOYEES: EmployeeProfile[] = [
+import { EMPLOYEES_PART2 } from './profiles-part2'
+import { EMPLOYEES_PART3 } from './profiles-part3'
+import { EMPLOYEES_PART4 } from './profiles-part4'
+import { EMPLOYEES_PART5 } from './profiles-part5'
+
+const EMPLOYEES_BASE: EmployeeProfile[] = [
   // ── 1. Marcus — Marketing Manager ──────────────────────────────────────────
   {
     slug: 'marketing-manager',
@@ -1028,6 +1033,14 @@ When someone interviews you, respond as a strategic advisor would — calm, prec
   },
 ]
 
+export const EMPLOYEES: EmployeeProfile[] = [
+  ...EMPLOYEES_BASE,
+  ...EMPLOYEES_PART2,
+  ...EMPLOYEES_PART3,
+  ...EMPLOYEES_PART4,
+  ...EMPLOYEES_PART5,
+]
+
 export const EMPLOYEE_BY_SLUG = Object.fromEntries(EMPLOYEES.map(e => [e.slug, e]))
 
 export function getEmployee(slug: string): EmployeeProfile | undefined {
@@ -1035,21 +1048,43 @@ export function getEmployee(slug: string): EmployeeProfile | undefined {
 }
 
 export const DEPT_ORDER = [
+  // C-Suite
   'Executive',
+  // Growth & Revenue
   'Revenue Operations',
   'Sales',
+  'Growth',
   'Marketing',
-  'Finance',
+  // Customer
   'Customer Success',
   'Customer Support',
-  'Operations',
+  // Product & Tech
   'Product',
+  'Engineering',
+  'Technical',
+  // Finance
+  'Finance',
+  // Operations
+  'Operations',
+  'Legal & Operations',
+  // People
+  'HR & People',
+  'People Operations',
+  // Sector
+  'Healthcare',
+  'Education',
+  'Real Estate',
+  'E-commerce',
+  'Creator Economy',
+  'India & Local',
+  // Platform
   'Compliance & Legal',
   'Legal Operations',
-  'People Operations',
   'IT Operations',
   'Analytics',
   'Security',
+  // Communication
+  'WhatsApp & Messaging',
 ]
 
 export function groupByDept(employees: EmployeeProfile[]) {

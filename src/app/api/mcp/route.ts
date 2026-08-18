@@ -6,7 +6,7 @@
  * Spec: https://modelcontextprotocol.io/specification
  *
  * Tools exposed:
- *   list_employees        — browse all 20 AI employees
+ *   list_employees        — browse all 100 AI employees
  *   get_employee          — full profile for one employee
  *   search_employees      — filter by dept, keyword, or budget
  *   get_capabilities      — what a specific employee can do
@@ -50,7 +50,7 @@ const SERVER_CAPABILITIES = {
 const TOOLS = [
   {
     name: 'list_employees',
-    description: 'List all 20 available AI Employees from Setu. Each employee commands a fleet of specialized agents and covers a specific business function. Use this to browse what\'s available before recommending one to a user.',
+    description: 'List all 100 available AI Employees from Setu. Each employee commands a fleet of specialized agents and covers a specific business function. Use this to browse what\'s available before recommending one to a user.',
     inputSchema: {
       type: 'object',
       properties: {

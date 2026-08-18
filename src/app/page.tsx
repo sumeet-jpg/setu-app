@@ -7,17 +7,17 @@ const BASE = 'https://setuagents.com'
 
 export const metadata: Metadata = {
   title: 'Setu — Hire AI Employees for Your Business',
-  description: 'Hire AI Employees that plan, execute, and report like real department heads. 20 roles — Marketing Manager to CFO Intelligence. Interview free. Go live in days.',
+  description: 'Hire AI Employees that plan, execute, and report like real department heads. 100 roles — WhatsApp automation to CMO, CFO, COO. Interview free. Go live in days.',
   openGraph: {
     title: 'Hire AI Employees — Setu',
-    description: 'From Marketing Manager to CFO: 20 AI Employees commanding 2,400+ agents. Interview any of them for free.',
+    description: 'From WhatsApp bot to CMO: 100 AI Employees commanding 10,000+ agents. Interview any of them for free.',
     url: BASE,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Hire AI Employees — Setu',
-    description: 'From Marketing Manager to CFO: 20 AI Employees. Interview free, hire in minutes.',
+    description: '100 AI Employees. WhatsApp automation to C-Suite. Interview free, hire in minutes.',
   },
   alternates: { canonical: BASE },
   keywords: ['AI employees', 'hire AI', 'AI marketing manager', 'AI CFO', 'AI agents', 'business automation', 'Setu', 'AI team', 'agent fleet'],
@@ -41,7 +41,7 @@ const FEATURED_SLUGS = [
 ]
 
 const HOW_STEPS = [
-  { n: '01', title: 'Browse the team', body: 'Explore 20 AI Employees across every business function. Interview any of them for free.' },
+  { n: '01', title: 'Browse the team', body: 'Explore 100 AI Employees across every business function — WhatsApp automation to C-Suite. Interview any of them for free.' },
   { n: '02', title: 'Interview first', body: 'Chat live with the employee. Ask anything. See how they think and work before you hire.' },
   { n: '03', title: 'Hire with one form', body: 'Fill out the hire form. We set up the employee, connect your tools, and get them working.' },
   { n: '04', title: 'Or build your own', body: 'Use our canvas to wire up a custom AI Employee for any workflow unique to your business.' },
@@ -72,7 +72,7 @@ const homeJsonLd = {
     {
       '@type': 'ItemList',
       name: 'AI Employees',
-      description: '20 AI Employees available to hire, each commanding a fleet of specialized agents',
+      description: '100 AI Employees available to hire, each commanding a fleet of specialized agents',
       url: `${BASE}/employees`,
       numberOfItems: EMPLOYEES.length,
       itemListElement: EMPLOYEES.map((e, i) => ({
@@ -153,7 +153,7 @@ export default function HomePage() {
             fontFamily: 'var(--font-space)',
           }}>
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px rgba(34,197,94,0.8)', display: 'inline-block' }} />
-            20 AI Employees · Available to hire today
+            100 AI Employees · Available to hire today
           </div>
 
           <h1 style={{
@@ -175,7 +175,7 @@ export default function HomePage() {
           </h1>
 
           <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.7, maxWidth: 580, margin: '0 auto 40px', letterSpacing: '-0.01em' }}>
-            20 AI Employees that work like real department heads — Marketing Manager, CFO, Compliance Officer, and 17 more. Interview any of them free. Hire when you're ready.
+            100 AI Employees that work like real department heads — from WhatsApp automation to CMO, CFO, and COO. Interview any of them free. Hire when you're ready.
           </p>
 
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -203,8 +203,8 @@ export default function HomePage() {
           {/* Stats row */}
           <div style={{ display: 'flex', gap: 0, justifyContent: 'center', marginTop: 64, flexWrap: 'wrap', borderRadius: 18, border: `1px solid ${BORDER}`, background: 'rgba(30,41,59,0.5)', backdropFilter: 'blur(12px)', maxWidth: 640, marginLeft: 'auto', marginRight: 'auto', overflow: 'hidden' }}>
             {[
-              { value: '20', label: 'AI Employees' },
-              { value: '2,400+', label: 'Agents deployed' },
+              { value: '100', label: 'AI Employees' },
+              { value: '10,000+', label: 'Agents deployed' },
               { value: '$0', label: 'To interview' },
               { value: '1 day', label: 'To go live' },
             ].map((stat, i) => (

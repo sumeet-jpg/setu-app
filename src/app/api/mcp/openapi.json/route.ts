@@ -5,7 +5,7 @@ const spec = {
   openapi: '3.1.0',
   info: {
     title: 'Setu AI Employees',
-    description: 'Browse and hire AI Employees that command fleets of specialized agents. 20 employees across Marketing, Sales, Finance, RevOps, Customer Success, Support, Operations, Legal, HR, IT, Security, and Executive.',
+    description: 'Browse and hire AI Employees that command fleets of specialized agents. 100 employees across WhatsApp, E-commerce, Sales, Marketing, Finance, RevOps, Healthcare, Education, Real Estate, HR, IT, Operations, and C-Suite.',
     version: '1.0.0',
     contact: { name: 'Sumeet', email: 'sumeet@setuagents.com', url: 'https://setuagents.com' },
   },
@@ -15,7 +15,7 @@ const spec = {
       get: {
         operationId: 'listEmployees',
         summary: 'List all AI Employees',
-        description: 'Returns all 20 AI Employees with name, role, department, agent count, and pricing.',
+        description: 'Returns all 100 AI Employees with name, role, department, agent count, and pricing.',
         parameters: [
           { name: 'dept', in: 'query', description: 'Filter by department', schema: { type: 'string' } },
         ],

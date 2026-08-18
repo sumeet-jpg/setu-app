@@ -4,10 +4,10 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'MCP Server — Setu AI Employees',
-  description: 'Connect Claude, GPT-4, and any AI assistant to Setu AI Employees. Browse 20 employees, search by capability, get pricing, and hire — all via MCP.',
+  description: 'Connect Claude, GPT-4, and any AI assistant to Setu AI Employees. Browse 100 employees, search by capability, get pricing, and hire — all via MCP.',
   openGraph: {
     title: 'Setu MCP Server — AI Employees for Any AI Assistant',
-    description: 'Connect your AI assistant to 20 Setu AI Employees. 5 tools: list, search, profile, capabilities, hiring info.',
+    description: 'Connect your AI assistant to 100 Setu AI Employees. 5 tools: list, search, profile, capabilities, hiring info.',
   },
 }
 
@@ -17,7 +17,7 @@ const SURFACE = 'rgba(255,255,255,0.04)'
 const MUTED = '#71717a'
 
 const TOOLS = [
-  { name: 'list_employees', desc: 'Browse all 20 AI Employees with roles, departments, agent counts, and pricing.', params: 'dept? (optional filter)' },
+  { name: 'list_employees', desc: 'Browse all 100 AI Employees with roles, departments, agent counts, and pricing.', params: 'dept? (optional filter)' },
   { name: 'get_employee', desc: 'Full profile: capabilities, tools, how-it-works, pricing, and hire links.', params: 'slug (required)' },
   { name: 'search_employees', desc: 'Natural language search — "who handles email campaigns?" or "CFO-level finance".', params: 'query?, dept?, max_budget_monthly?' },
   { name: 'get_capabilities', desc: 'Detailed capability areas with specific use-case scenarios for any employee.', params: 'slug (required)' },
@@ -57,7 +57,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
   name: 'Setu AI Employees MCP Server',
-  description: 'MCP server exposing 20 AI Employees for Claude, GPT-4, and any MCP-compatible AI assistant',
+  description: 'MCP server exposing 100 AI Employees for Claude, GPT-4, and any MCP-compatible AI assistant',
   url: 'https://setuagents.com/mcp',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Any',
@@ -101,11 +101,11 @@ export default function McpPage() {
             </span>
           </h1>
           <p style={{ fontSize: 16, color: MUTED, maxWidth: 540, margin: '0 auto 32px', lineHeight: 1.7 }}>
-            Connect Claude, GPT-4, or any MCP-compatible assistant to 20 Setu AI Employees. Let your AI recommend the right employee, show capabilities, and guide users through hiring.
+            Connect Claude, GPT-4, or any MCP-compatible assistant to 100 Setu AI Employees. Let your AI recommend the right employee, show capabilities, and guide users through hiring.
           </p>
 
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
-            {['20 AI Employees', '5 tools', 'JSON-RPC 2.0', 'CORS enabled', 'No auth required'].map(badge => (
+            {['100 AI Employees', '5 tools', 'JSON-RPC 2.0', 'CORS enabled', 'No auth required'].map(badge => (
               <span key={badge} style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: SURFACE, border: `1px solid ${BORDER}`, color: '#a1a1aa' }}>
                 {badge}
               </span>
