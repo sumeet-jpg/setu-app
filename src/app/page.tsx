@@ -8,7 +8,7 @@ const BASE = 'https://setuagents.com'
 
 export const metadata: Metadata = {
   title: 'Setu — Hire Your Business Stuntman',
-  description: 'The star gets the credit. Your Stuntman does the work. 100 Stuntmen & Stuntwomen — WhatsApp to CMO, CFO, COO. Interview free. Go live in days.',
+  description: 'The star gets the credit. Your Stuntman does the work. 100 Stuntmen & Stuntwomen — CMO, CFO, COO and 97 more. Interview free. Go live in days.',
   openGraph: {
     title: 'Hire Your Business Stuntman — Setu',
     description: '100 Stuntmen & Stuntwomen commanding 10,000+ agents. Interview any of them for free.',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Hire Your Business Stuntman — Setu',
-    description: '100 Stuntmen & Stuntwomen. WhatsApp to C-Suite. Interview free, hire in minutes.',
+    description: '100 Stuntmen & Stuntwomen. CMO to CFO to COO. Interview free, hire in minutes.',
   },
   alternates: { canonical: BASE },
   keywords: ['AI employees', 'hire AI', 'AI marketing manager', 'AI CFO', 'AI agents', 'business automation', 'Setu', 'AI team', 'agent fleet'],
@@ -40,7 +40,7 @@ const F       = 'var(--font-jakarta)'
 const FEATURED_SLUGS = [
   'marketing-manager',
   'cfo-intelligence',
-  'whatsapp-lead-qualifier',
+  'revenue-ops-lead',
   'cmo-intelligence',
   'hr-ops-manager',
   'coo-intelligence',
@@ -49,7 +49,7 @@ const FEATURED_SLUGS = [
 ]
 
 const HOW_STEPS = [
-  { n: '01', title: 'Browse 100 roles', body: 'From a $199/mo WhatsApp Lead Qualifier to a $2,999/mo AI CMO — browse every function your business needs.' },
+  { n: '01', title: 'Browse 100 roles', body: 'From a RevOps Lead to an AI CMO — browse every function your business needs. Each employee is deeply specialized.' },
   { n: '02', title: 'Interview for free', body: 'Chat live with any employee. Ask real questions. See exactly how they think before you commit a rupee.' },
   { n: '03', title: 'Hire with one form', body: 'Fill out the hire form. We configure the employee, connect your tools, and have them working inside 48 hours.' },
   { n: '04', title: 'Or build your own', body: 'Use the Canvas to wire up a custom AI Employee for any unique workflow — no code, no engineers.' },
@@ -117,7 +117,7 @@ export default function HomePage() {
       <nav style={{ background: WHITE, borderBottom: `1px solid ${GRAY}`, padding: '0 32px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <SetuLogo size={30} color={GREEN} wordColor={INK} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {[['All Employees', '/employees'], ['WhatsApp', '/whatsapp'], ['Enterprise', '/enterprise'], ['Compare', '/compare']].map(([label, href]) => (
+          {[['All Employees', '/employees'], ['Enterprise', '/enterprise'], ['Compare', '/compare'], ['Canvas', '/flows']].map(([label, href]) => (
             <Link key={href} href={href} className="nav-link" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }}>{label}</Link>
           ))}
           <Link href="/quiz" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }} className="nav-link">Which role?</Link>
@@ -182,7 +182,7 @@ export default function HomePage() {
 
       {/* ── MARQUEE ── */}
       <div style={{ borderTop: `1px solid ${GRAY}`, borderBottom: `1px solid ${GRAY}`, padding: '12px 0', overflow: 'hidden', background: WHITE }}>
-        <div style={{ display: 'flex', gap: 8, animation: 'marquee 40s linear infinite', width: 'max-content' }}>
+        <div style={{ display: 'flex', gap: 8, animation: 'marquee 300s linear infinite', width: 'max-content' }}>
           {[...EMPLOYEES, ...EMPLOYEES].map((e, i) => (
             <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12, color: MUTED, padding: '5px 14px', borderRadius: 6, border: `1px solid ${GRAY}`, whiteSpace: 'nowrap', flexShrink: 0, fontWeight: 500 }}>
               <span style={{ fontSize: 13 }}>{e.emoji}</span>
@@ -238,6 +238,49 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── FULL DIRECTORY ── */}
+        <section style={{ marginBottom: 104 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 40 }}>
+            <div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>The full team</span>
+              <h2 style={{ fontSize: 'clamp(26px,3.5vw,40px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '10px 0 0', color: INK, lineHeight: 1.1 }}>
+                All {EMPLOYEES.length} employees
+              </h2>
+            </div>
+            <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>Interview any of them free — no account needed.</p>
+          </div>
+          {(() => {
+            const byDept = EMPLOYEES.reduce((acc, e) => {
+              if (!acc[e.dept]) acc[e.dept] = []
+              acc[e.dept].push(e)
+              return acc
+            }, {} as Record<string, typeof EMPLOYEES>)
+            return Object.entries(byDept).map(([dept, emps]) => (
+              <div key={dept} style={{ marginBottom: 40 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: GREEN, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{dept}</span>
+                  <div style={{ flex: 1, height: 1, background: GRAY }} />
+                  <span style={{ fontSize: 12, color: DIM }}>{emps.length} employee{emps.length > 1 ? 's' : ''}</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 8 }}>
+                  {emps.map(e => (
+                    <Link key={e.slug} href={`/employees/${e.slug}`} className="emp-card" style={{ display: 'flex', alignItems: 'center', gap: 14, background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 14, padding: '14px 18px', textDecoration: 'none', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
+                      <div style={{ width: 42, height: 42, borderRadius: 11, background: `${e.color}12`, border: `1.5px solid ${e.color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                        {e.emoji}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{e.name}</div>
+                        <div style={{ fontSize: 11, color: MUTED, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.title}</div>
+                      </div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: GREEN, flexShrink: 0 }}>{e.pricing.label}</div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))
+          })()}
+        </section>
+
         {/* ── CANVAS CTA ── */}
         <section style={{ marginBottom: 104, background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 24, padding: '52px 48px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 40, alignItems: 'center' }}>
           <div>
@@ -270,7 +313,7 @@ export default function HomePage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
             {[
-              { tier: 'Starter', price: '$199–999/mo', desc: 'WhatsApp bots, Executive Assistant, Support Manager, SDR Manager', accent: GREEN_M },
+              { tier: 'Starter', price: '$199–999/mo', desc: 'Executive Assistant, Support Manager, SDR Manager, Data Analyst', accent: GREEN_M },
               { tier: 'Growth', price: '$999–1,999/mo', desc: 'Marketing Manager, RevOps Lead, Finance Controller, Customer Success', accent: '#1A5C8A' },
               { tier: 'Enterprise', price: '$2,499–2,999/mo', desc: 'CFO Intelligence, AI CMO, AI COO, CTO Intelligence, Chief of Staff', accent: '#8B5A1A' },
               { tier: 'Custom', price: 'Your workflow', desc: 'Build any role on our Canvas — no code, no engineers, any complexity', accent: MUTED },
@@ -324,21 +367,20 @@ export default function HomePage() {
 
             {/* Feature 3 */}
             <div style={{ background: BG, border: `1px solid ${GRAY}`, borderRadius: 20, padding: '32px' }}>
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: MUTED }}>WhatsApp native</span>
-              <div style={{ background: '#075E54', borderRadius: 14, padding: '16px', margin: '24px 0 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {[
-                  { msg: 'Hi, interested in the course 🙏', left: true },
-                  { msg: 'Hi Priya! Which city are you in? And are you looking at the weekend batch or weekday?', left: false },
-                  { msg: 'Mumbai. Weekend works better.', left: true },
-                  { msg: 'Great! I can share the seat availability + a short overview video. Want me to send it now?', left: false },
-                ].map((m, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: m.left ? 'flex-start' : 'flex-end' }}>
-                    <div style={{ background: m.left ? 'rgba(255,255,255,0.1)' : '#25D366', borderRadius: 10, padding: '7px 11px', fontSize: 12, color: WHITE, maxWidth: '78%', lineHeight: 1.45 }}>{m.msg}</div>
-                  </div>
-                ))}
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: MUTED }}>Approval gates</span>
+              <div style={{ background: WHITE, border: `1px solid ${GRAY}`, borderRadius: 14, padding: '18px', margin: '24px 0 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Marcus wants to act</div>
+                <div style={{ background: BG, border: `1px solid ${GRAY}`, borderRadius: 10, padding: '12px 14px' }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: INK, marginBottom: 4 }}>Send campaign to 8,400 contacts</div>
+                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.6 }}>Subject: "Your Q4 pricing window closes Friday"<br />Segment: Enterprise trials · not converted · last active &lt;30d</div>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ flex: 1, background: GREEN, borderRadius: 8, padding: '9px', textAlign: 'center', fontSize: 12, fontWeight: 700, color: WHITE }}>Approve</div>
+                  <div style={{ flex: 1, background: BG, border: `1px solid ${GRAY}`, borderRadius: 8, padding: '9px', textAlign: 'center', fontSize: 12, fontWeight: 600, color: MUTED }}>Reject</div>
+                </div>
               </div>
-              <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.04em', color: INK, margin: '0 0 8px' }}>Sells on WhatsApp while you sleep</h3>
-              <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.65 }}>Replies in under 3 seconds. Qualifies leads, books appointments, and closes on your catalogue. Starts at $199/mo.</p>
+              <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.04em', color: INK, margin: '0 0 8px' }}>Nothing runs without your sign-off</h3>
+              <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.65 }}>Every consequential action pauses for your approval. See the plan, review the details, then approve or redirect.</p>
             </div>
 
             {/* Feature 4 */}
@@ -348,7 +390,7 @@ export default function HomePage() {
                 {[
                   { role: 'Marketing Manager', human: '₹12L/yr', ai: '₹1.99L/mo all-in', savings: '83% less' },
                   { role: 'CFO', human: '₹40L/yr', ai: '₹1.99L/mo all-in', savings: '94% less' },
-                  { role: 'WhatsApp Sales Rep', human: '₹4.8L/yr', ai: '₹16K/mo all-in', savings: '60% less' },
+                  { role: 'SDR Manager', human: '₹8L/yr', ai: '₹33K/mo all-in', savings: '51% less' },
                 ].map(r => (
                   <div key={r.role} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: WHITE, border: `1px solid ${GRAY}`, borderRadius: 10, padding: '10px 14px' }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: INK }}>{r.role}</div>
@@ -393,7 +435,7 @@ export default function HomePage() {
             Which role do I need?
           </Link>
         </div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 24 }}>$199/mo to start · 100 roles available · Cancel anytime</p>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 24 }}>100 roles available · BYOK — use your own API keys · Cancel anytime</p>
       </section>
 
       {/* ── FOOTER ── */}
