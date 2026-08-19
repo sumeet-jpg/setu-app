@@ -502,43 +502,208 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
+  const scrollToInterview = () => {
+    document.getElementById('interview-section')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const BG = '#F6F5F1'
+  const INK = '#0D0C09'
+  const MUTED = '#78746E'
+  const GRAY = '#E3E1DA'
+  const DIM = '#9E9891'
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh',
-      background: '#020817', color: '#E2E8F0', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
 
       {/* ── Nav ── */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px',
-        borderBottom: '1px solid #1E293B', flexShrink: 0 }}>
-        <Link href="/employees" style={{ color: '#64748B', textDecoration: 'none', fontSize: 13 }}>← All Stuntmen</Link>
-        <span style={{ color: '#1E293B' }}>/</span>
-        <span style={{ color: '#E2E8F0', fontSize: 13, fontWeight: 600 }}>{e.name}</span>
-        <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
-          background: '#1E293B', color: '#94A3B8', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 24px',
+        height: 56, borderBottom: `1px solid ${GRAY}`, background: '#fff', position: 'sticky', top: 0, zIndex: 50 }}>
+        <Link href="/employees" style={{ color: MUTED, textDecoration: 'none', fontSize: 13 }}>← All Employees</Link>
+        <span style={{ color: GRAY }}>/</span>
+        <span style={{ color: INK, fontSize: 13, fontWeight: 600 }}>{e.name}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
+          background: e.color + '14', color: e.color, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
           {stuntTitle}
         </span>
-        {streaming && (
-          <span style={{ marginLeft: 'auto', fontSize: 12, color: '#6366F1', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6366F1', display: 'inline-block',
-              animation: 'pulse 1s infinite' }} />
-            Working…
-          </span>
-        )}
-        <Link href={`/employees/${e.slug}/hire`}
-          style={{ marginLeft: streaming ? 0 : 'auto', background: e.color + '18', color: e.color,
-            border: `1px solid ${e.color}40`, borderRadius: 8, padding: '6px 14px',
-            fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
-          Hire {e.name}
-        </Link>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+          <button onClick={scrollToInterview}
+            style={{ background: 'none', border: `1.5px solid ${GRAY}`, borderRadius: 8, padding: '6px 16px',
+              fontWeight: 600, fontSize: 13, cursor: 'pointer', color: INK }}>
+            Interview Free
+          </button>
+          <Link href={`/employees/${e.slug}/hire`}
+            style={{ background: e.color, color: '#fff', border: 'none', borderRadius: 8,
+              padding: '7px 18px', fontWeight: 700, fontSize: 13, textDecoration: 'none', display: 'inline-block' }}>
+            Hire {e.name} →
+          </Link>
+        </div>
       </nav>
 
+      {/* ── PROSPECTUS ── */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '56px 32px 0' }}>
+
+        {/* Hero row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 48, alignItems: 'flex-start', marginBottom: 56 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+              <div style={{ width: 72, height: 72, borderRadius: 20, background: e.color + '14',
+                border: `2px solid ${e.color}25`, display: 'flex', alignItems: 'center',
+                justifyContent: 'center', fontSize: 34, flexShrink: 0 }}>
+                {e.emoji}
+              </div>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: e.color, letterSpacing: '0.08em',
+                  textTransform: 'uppercase', marginBottom: 4 }}>{e.dept}</div>
+                <h1 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.05em', margin: 0,
+                  color: INK, lineHeight: 1.0 }}>{e.name}</h1>
+                <div style={{ fontSize: 16, color: MUTED, marginTop: 4 }}>{e.title} · {stuntTitle}</div>
+              </div>
+            </div>
+
+            <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.75, margin: '0 0 28px', maxWidth: 560 }}>
+              {e.intro}
+            </p>
+
+            <div style={{ display: 'flex', gap: 28, paddingTop: 20, borderTop: `1px solid ${GRAY}` }}>
+              {[
+                { label: 'Experience', value: `${e.years} years` },
+                { label: 'Agents commanded', value: `${e.agentCount}` },
+                { label: 'Department', value: e.dept },
+              ].map(s => (
+                <div key={s.label}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: INK, letterSpacing: '-0.04em' }}>{s.value}</div>
+                  <div style={{ fontSize: 11, color: DIM, marginTop: 3 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pricing card */}
+          <div style={{ background: '#fff', border: `1.5px solid ${GRAY}`, borderRadius: 20,
+            padding: '28px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: e.color }} />
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, letterSpacing: '0.08em',
+              textTransform: 'uppercase', marginBottom: 6 }}>Pricing</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: INK, letterSpacing: '-0.05em', marginBottom: 4 }}>
+              {e.pricing.label}
+            </div>
+            <div style={{ fontSize: 13, color: MUTED, marginBottom: 24, lineHeight: 1.6 }}>
+              BYOK — use your own API keys. Setu charges for orchestration only.
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button onClick={scrollToInterview}
+                style={{ width: '100%', background: INK, color: '#fff', border: 'none',
+                  borderRadius: 10, padding: '13px 0', fontWeight: 700, fontSize: 14,
+                  cursor: 'pointer', letterSpacing: '-0.01em' }}>
+                Interview for Free →
+              </button>
+              <Link href={`/employees/${e.slug}/hire`}
+                style={{ display: 'block', textAlign: 'center', background: e.color + '10',
+                  color: e.color, border: `1.5px solid ${e.color}30`, borderRadius: 10,
+                  padding: '12px 0', fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+                Hire {e.name}
+              </Link>
+            </div>
+            <div style={{ fontSize: 11, color: DIM, marginTop: 14, textAlign: 'center' }}>
+              Interview is free · No account needed · Cancel anytime
+            </div>
+          </div>
+        </div>
+
+        {/* Capabilities */}
+        {e.capabilities.length > 0 && (
+          <div style={{ marginBottom: 48 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
+              textTransform: 'uppercase', marginBottom: 16 }}>What {e.name} Can Do</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+              {e.capabilities.map((cap, i) => (
+                <div key={i} style={{ background: '#fff', border: `1.5px solid ${GRAY}`, borderRadius: 14,
+                  padding: '20px', cursor: 'pointer' }} onClick={scrollToInterview}>
+                  <div style={{ fontSize: 22, marginBottom: 10 }}>{cap.icon}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginBottom: 10,
+                    letterSpacing: '-0.02em' }}>{cap.area}</div>
+                  <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex',
+                    flexDirection: 'column', gap: 4 }}>
+                    {(cap.scenarios ?? []).slice(0, 3).map((s: string, j: number) => (
+                      <li key={j} style={{ fontSize: 12, color: MUTED, lineHeight: 1.5 }}>
+                        · {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tools */}
+        {expectedSlugs.length > 0 && (
+          <div style={{ marginBottom: 48 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
+              textTransform: 'uppercase', marginBottom: 16 }}>Tools {e.name} Uses</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {expectedSlugs.map(slug => {
+                const toolDef = TOOL_REGISTRY.find(t => t.slug === slug)
+                if (!toolDef) return null
+                return (
+                  <div key={slug} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff',
+                    border: `1.5px solid ${GRAY}`, borderRadius: 8, padding: '7px 14px' }}>
+                    <ToolLogo slug={slug} name={toolDef.name} size={18} />
+                    <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>{toolDef.name}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Interview CTA banner */}
+        <div style={{ background: INK, borderRadius: 20, padding: '36px 40px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: 24, marginBottom: 0, flexWrap: 'wrap' }}>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', marginBottom: 6 }}>
+              Interview {e.name} — free, right now
+            </div>
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)' }}>
+              No account needed. Ask anything. See exactly how they think before you hire.
+            </div>
+          </div>
+          <button onClick={scrollToInterview}
+            style={{ background: '#fff', color: INK, border: 'none', borderRadius: 100,
+              padding: '13px 32px', fontWeight: 800, fontSize: 14, cursor: 'pointer',
+              whiteSpace: 'nowrap', flexShrink: 0 }}>
+            Start Interview ↓
+          </button>
+        </div>
+      </div>
+
+      {/* ── INTERVIEW SECTION ── */}
+      <div id="interview-section" style={{ background: '#020817', marginTop: 64 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '20px 0 16px',
+            borderBottom: '1px solid #1E293B' }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E' }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#E2E8F0' }}>
+              {e.name} is live — interview or hire
+            </span>
+            {streaming && (
+              <span style={{ marginLeft: 'auto', fontSize: 12, color: '#6366F1', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6366F1', display: 'inline-block' }} />
+                Working…
+              </span>
+            )}
+          </div>
+        </div>
+
       {/* ── Body: 3 panels ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr 260px', flex: 1, overflow: 'hidden' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr 260px', height: '80vh', maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
 
         {/* ── LEFT: Tool connections ── */}
         <aside style={{ borderRight: '1px solid #1E293B', overflow: 'auto',
           padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 0 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em',
-            textTransform: 'uppercase', marginBottom: 12 }}>Tool Connections</div>
+            textTransform: 'uppercase', marginBottom: 12 }}>Connect Your Tools</div>
 
           {expectedSlugs.length === 0 ? (
             <div style={{ fontSize: 12, color: '#475569' }}>No tools mapped for this employee.</div>
@@ -663,11 +828,11 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
             {msgs.length <= 1 && (
               <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
                 {[
-                  `Plan a campaign for ${new Date().toLocaleString('default', { month: 'long' })}`,
-                  'What tools do you need from me?',
-                  'Show me what you can do with my connected tools',
-                  'Audit my current setup and flag gaps',
-                ].map(chip => (
+                  ...(e.capabilities[0]?.scenarios?.slice(0, 1) ?? []),
+                  ...(e.capabilities[1]?.scenarios?.slice(0, 1) ?? []),
+                  'What tools do you need to get started?',
+                  'Walk me through how you work',
+                ].slice(0, 4).map(chip => (
                   <button key={chip} onClick={() => { setInput(chip) }}
                     style={{ background: '#0F172A', border: '1px solid #1E293B', color: '#94A3B8',
                       borderRadius: 20, padding: '6px 14px', fontSize: 12, cursor: 'pointer' }}>
@@ -747,6 +912,7 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
           ))}
         </aside>
       </div>
+      </div>{/* /interview-section */}
 
       {/* Connect modal */}
       {connectingSlug && (
