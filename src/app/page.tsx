@@ -44,6 +44,8 @@ const FEATURED_SLUGS = [
   'cmo-intelligence',
   'hr-ops-manager',
   'coo-intelligence',
+  'sdr-manager',
+  'customer-success-manager',
 ]
 
 const HOW_STEPS = [
@@ -229,7 +231,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
             {featured.map(e => (
               <EmployeeCard key={e.slug} employee={e} />
             ))}
