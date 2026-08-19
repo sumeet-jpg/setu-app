@@ -1,796 +1,778 @@
-// @ts-nocheck
 'use client'
+// @ts-nocheck
+
 import { useState, useRef, useEffect, useCallback } from 'react'
-import Link from 'next/link'
-import { SetuLogo } from '@/components/SetuLogo'
 import { getStuntTitle } from '@/lib/employees/profiles'
+import { TOOL_REGISTRY, toolLogoUrl } from '@/lib/tools/registry'
+import Link from 'next/link'
 
-/* ─── Types ──────────────────────────────────────────────────── */
-interface PlanStep {
-  id: number
-  label: string
-  tool: string | null
-  detail: string
-  status: 'pending' | 'running' | 'done' | 'error'
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface Employee {
+  slug: string; name: string; title: string; dept: string; emoji: string
+  color: string; years: number; tagline: string; intro: string
+  agentCount: number; pricing: { monthly: number | 'custom'; label: string }
+  knows: string[]; capabilities: any[]; tools: any[]; howItWorks: any[]
 }
 
-interface Plan {
-  summary: string
-  steps: PlanStep[]
+interface ConnectedTool {
+  slug: string; name: string; category: string; logo: string; domain: string
+  connected_at: string; last_used_at?: string
 }
 
-interface Message {
-  role: 'user' | 'assistant'
+interface ApprovalGate {
+  tool_use_id: string; action: string; details: string
+  affected: string; reversible: boolean
+}
+
+interface ChatMsg {
+  role: 'user' | 'assistant' | 'system'
   content: string
-  plan?: Plan
-  planState?: 'awaiting_approval' | 'running' | 'done' | 'cancelled'
+  toolEvents?: ToolEvent[]
+  approvalGate?: ApprovalGate
+  taskId?: string
 }
 
-interface ToolEntry {
-  name: string
-  icon: string
-  category: string
-  apiKeyLabel?: string
-  oauthLabel?: string
-  placeholder?: string
+interface ToolEvent {
+  type: 'executing' | 'result' | 'complete'
+  tool?: string; method?: string; path?: string; label?: string; ok?: boolean; status?: number
 }
 
-/* ─── Extract tool list from employee tools config ───────────── */
-function extractTools(toolGroups: any[]): ToolEntry[] {
-  const icons: Record<string, string> = {
-    HubSpot: '🟠', Salesforce: '🔵', Pipedrive: '🟢', 'Close.io': '⚫', Copper: '🟤',
-    Mailchimp: '🐒', Klaviyo: '📧', SendGrid: '📨', 'ActiveCampaign': '⚡', Brevo: '📬',
-    Stripe: '💳', PayPal: '🅿️', Razorpay: '🔴', Chargebee: '💰', Recurly: '🔄',
-    Slack: '💬', Gmail: '📮', Outlook: '📧', Notion: '📓', Airtable: '🗂️',
-    'Google Analytics': '📊', 'Mixpanel': '📉', Amplitude: '📈', PostHog: '🦔',
-    Jira: '🐞', Linear: '〰️', Asana: '🎯', Trello: '📋', Monday: '📆',
-    GitHub: '🐙', GitLab: '🦊', Vercel: '▲', AWS: '☁️', GCP: '🌐',
-    Ahrefs: '🔍', SEMrush: '🔎', 'Google Search Console': '🔬', Moz: '🌎',
-    'Google Ads': '🔷', 'Meta Ads': '🔵', 'LinkedIn Ads': '🔗', 'Twitter Ads': '🐦',
-    Shopify: '🛒', WooCommerce: '🛍️', Amazon: '📦', Flipkart: '📱',
-    QuickBooks: '📒', Xero: '📗', Zoho: '🔵', Freshbooks: '📘',
-    Workday: '🏢', Darwinbox: '🦕', BambooHR: '🎋', Rippling: '🌊',
-    Twilio: '📞', WhatsApp: '💚', Intercom: '💙', Zendesk: '🎫', Freshdesk: '🌿',
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function getUserId(): string {
+  if (typeof window === 'undefined') return ''
+  let id = localStorage.getItem('setu_user_id')
+  if (!id) { id = crypto.randomUUID(); localStorage.setItem('setu_user_id', id) }
+  return id
+}
+
+function employeeToolSlugs(toolGroups: any[]): string[] {
+  const nameMap: Record<string, string> = {
+    'HubSpot': 'hubspot', 'Salesforce': 'salesforce', 'Marketo': 'marketo',
+    'ActiveCampaign': 'activecampaign', 'Mailchimp': 'mailchimp', 'Klaviyo': 'klaviyo',
+    'Customer.io': 'customer-io', 'SendGrid': 'sendgrid', 'Google Ads': 'google-ads',
+    'Meta Ads': 'meta-ads', 'LinkedIn Ads': 'linkedin-ads', 'TikTok Ads': 'tiktok-ads',
+    'Semrush': 'semrush', 'SEMrush': 'semrush', 'Ahrefs': 'ahrefs',
+    'Search Console': 'search-console', 'GA4': 'ga4', 'Mixpanel': 'mixpanel',
+    'Amplitude': 'amplitude', 'Looker': 'looker', 'WhatsApp Business API': 'whatsapp-api',
+    'Twilio': 'twilio', 'Shopify': 'shopify', 'WooCommerce': 'woocommerce',
+    'Razorpay': 'razorpay', 'PayU': 'payu', 'CleverTap': 'clevertap',
+    'MoEngage': 'moengage', 'Slack': 'slack', 'Intercom': 'intercom',
+    'Zendesk': 'zendesk', 'Freshdesk': 'freshdesk', 'Jira': 'jira',
+    'GitHub': 'github', 'Sentry': 'sentry', 'DataDog': 'datadog', 'Datadog': 'datadog',
+    'Linear': 'linear', 'Notion': 'notion', 'Asana': 'asana', 'Figma': 'figma',
+    'BambooHR': 'bamboohr', 'Rippling': 'rippling', 'Darwinbox': 'darwinbox',
+    'Stripe': 'stripe', 'QuickBooks': 'quickbooks', 'Xero': 'xero',
+    'Chargebee': 'chargebee', 'Outreach': 'outreach', 'Salesloft': 'salesloft',
+    'Apollo': 'apollo', 'Pipedrive': 'pipedrive', 'Canva': 'canva',
+    'Buffer': 'buffer', 'Hootsuite': 'hootsuite', 'Monday.com': 'monday',
+    'Monday': 'monday', 'ClickUp': 'clickup', 'Airtable': 'airtable',
+    'Google Workspace': 'google-workspace', 'PostHog': 'posthog', 'Hotjar': 'hotjar',
+    'Tableau': 'tableau', 'Zoho CRM': 'zoho-crm',
   }
-  const out: ToolEntry[] = []
-  for (const group of (toolGroups ?? [])) {
-    for (const tool of (group.tools ?? [])) {
-      if (!out.find(t => t.name === tool)) {
-        out.push({
-          name: tool,
-          icon: icons[tool] ?? '🔧',
-          category: group.category,
-          apiKeyLabel: `${tool} API Key`,
-          placeholder: `Enter your ${tool} API key...`,
-        })
-      }
+  const slugs = new Set<string>()
+  for (const group of toolGroups) {
+    for (const t of group.tools ?? []) {
+      const s = nameMap[t]
+      if (s) slugs.add(s)
     }
   }
-  return out
+  return [...slugs]
 }
 
-/* ─── Parse plan from streamed content ───────────────────────── */
-function parsePlan(content: string): { text: string; plan: Plan | null } {
-  const planMatch = content.match(/<plan>([\s\S]*?)<\/plan>/)
-  if (!planMatch) return { text: content, plan: null }
-  try {
-    const plan: Plan = JSON.parse(planMatch[1].trim())
-    plan.steps = plan.steps.map(s => ({ ...s, status: 'pending' }))
-    const text = content.replace(/<plan>[\s\S]*?<\/plan>/, '').trim()
-    return { text, plan }
-  } catch {
-    return { text: content, plan: null }
+// ── Logo component ────────────────────────────────────────────────────────────
+
+function ToolLogo({ slug, name, size = 20 }: { slug: string; name: string; size?: number }) {
+  const [err, setErr] = useState(false)
+  const url = toolLogoUrl(slug)
+  if (err || !url) {
+    return (
+      <div style={{ width: size, height: size, borderRadius: 4, background: '#334155',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: size * 0.45, color: '#94A3B8', fontWeight: 700, flexShrink: 0 }}>
+        {name[0]}
+      </div>
+    )
   }
+  return (
+    <img src={url} alt={name} width={size} height={size}
+      style={{ borderRadius: 4, objectFit: 'contain', flexShrink: 0, background: '#fff' }}
+      onError={() => setErr(true)} />
+  )
 }
 
-/* ─── Token colors ───────────────────────────────────────────── */
-const BG       = '#0C0F1A'
-const SURFACE  = '#151824'
-const BORDER   = 'rgba(148,163,184,0.10)'
-const BORDER2  = 'rgba(148,163,184,0.16)'
-const MUTED    = '#64748B'
-const TEXT     = '#F1F5F9'
-const DIM      = '#475569'
-const F        = 'var(--font-jakarta, system-ui)'
+// ── Connect modal ─────────────────────────────────────────────────────────────
 
-/* ─── Main Workspace ─────────────────────────────────────────── */
-export default function EmployeeWorkspace({ employee }: { employee: any }) {
-  const e = employee
+function ConnectModal({ toolSlug, onClose, onConnected }: {
+  toolSlug: string; onClose: () => void; onConnected: (slug: string) => void
+}) {
+  const toolDef = TOOL_REGISTRY.find(t => t.slug === toolSlug)
+  const [key, setKey] = useState('')
+  const [config, setConfig] = useState<Record<string, string>>({})
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  /* state */
-  const [msgs, setMsgs] = useState<Message[]>([])
+  if (!toolDef) return null
+
+  // Extra config fields some tools need
+  const extraFields: Record<string, { label: string; placeholder: string; key: string }[]> = {
+    'mailchimp': [{ label: 'Datacenter (from end of API key, e.g. us21)', placeholder: 'us21', key: 'dc' }],
+    'activecampaign': [{ label: 'Account URL (e.g. mycompany)', placeholder: 'mycompany', key: 'account' }],
+    'shopify': [{ label: 'Store name (e.g. mystore)', placeholder: 'mystore', key: 'store' }],
+    'chargebee': [{ label: 'Site name (e.g. mycompany-test)', placeholder: 'mycompany-test', key: 'site' }],
+    'bamboohr': [{ label: 'Company subdomain', placeholder: 'mycompany', key: 'company' }],
+    'zendesk': [{ label: 'Subdomain (e.g. mycompany)', placeholder: 'mycompany', key: 'subdomain' }],
+    'freshdesk': [{ label: 'Domain (e.g. mycompany)', placeholder: 'mycompany', key: 'domain' }],
+    'jira': [{ label: 'Domain (e.g. mycompany)', placeholder: 'mycompany', key: 'domain' }],
+  }
+  const extras = extraFields[toolSlug] ?? []
+
+  const handleConnect = async () => {
+    if (!key.trim()) { setError('API key is required'); return }
+    setLoading(true); setError('')
+    try {
+      const res = await fetch('/api/tools/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: getUserId(), tool_slug: toolSlug, api_key: key.trim(), config }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error ?? 'Failed to connect'); setLoading(false); return }
+      onConnected(toolSlug)
+      onClose()
+    } catch (e: any) {
+      setError(e.message)
+    } finally { setLoading(false) }
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ background: '#0F172A', border: '1px solid #1E293B', borderRadius: 16,
+        padding: 28, maxWidth: 480, width: '100%', color: '#E2E8F0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <ToolLogo slug={toolSlug} name={toolDef.name} size={32} />
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 16 }}>Connect {toolDef.name}</div>
+            <div style={{ fontSize: 12, color: '#64748B' }}>{toolDef.category}</div>
+          </div>
+          <button onClick={onClose} style={{ marginLeft: 'auto', background: 'none', border: 'none',
+            color: '#64748B', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>×</button>
+        </div>
+
+        <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 16,
+          background: '#1E293B', borderRadius: 8, padding: '10px 14px' }}>
+          <strong style={{ color: '#E2E8F0' }}>How to get your key:</strong><br/>
+          {toolDef.authHint}
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ fontSize: 12, color: '#94A3B8', display: 'block', marginBottom: 6 }}>
+            {toolDef.authLabel}
+          </label>
+          <input
+            value={key} onChange={e => setKey(e.target.value)}
+            placeholder={toolDef.authPlaceholder} type="password"
+            style={{ width: '100%', background: '#1E293B', border: '1px solid #334155',
+              borderRadius: 8, padding: '10px 12px', color: '#E2E8F0', fontSize: 13,
+              outline: 'none', boxSizing: 'border-box' }}
+          />
+        </div>
+
+        {extras.map(f => (
+          <div key={f.key} style={{ marginBottom: 14 }}>
+            <label style={{ fontSize: 12, color: '#94A3B8', display: 'block', marginBottom: 6 }}>{f.label}</label>
+            <input value={config[f.key] ?? ''} onChange={e => setConfig(c => ({ ...c, [f.key]: e.target.value }))}
+              placeholder={f.placeholder}
+              style={{ width: '100%', background: '#1E293B', border: '1px solid #334155',
+                borderRadius: 8, padding: '10px 12px', color: '#E2E8F0', fontSize: 13,
+                outline: 'none', boxSizing: 'border-box' }} />
+          </div>
+        ))}
+
+        {error && <div style={{ color: '#F87171', fontSize: 12, marginBottom: 12 }}>{error}</div>}
+
+        <div style={{ fontSize: 11, color: '#475569', marginBottom: 16 }}>
+          🔒 Your key is AES-256-GCM encrypted at rest. It is never logged or sent to third parties.
+        </div>
+
+        <button onClick={handleConnect} disabled={loading}
+          style={{ width: '100%', background: '#6366F1', color: '#fff', border: 'none',
+            borderRadius: 8, padding: '11px 0', fontWeight: 700, fontSize: 14,
+            cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
+          {loading ? 'Connecting…' : `Connect ${toolDef.name}`}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ── Approval card ─────────────────────────────────────────────────────────────
+
+function ApprovalCard({ gate, taskId, onDecision }: {
+  gate: ApprovalGate; taskId: string; onDecision: (decision: 'approved' | 'rejected') => void
+}) {
+  const [loading, setLoading] = useState<'approved' | 'rejected' | null>(null)
+
+  const decide = async (decision: 'approved' | 'rejected') => {
+    setLoading(decision)
+    try {
+      await fetch(`/api/tools/tasks/${taskId}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: getUserId(), decision, tool_use_id: gate.tool_use_id }),
+      })
+      onDecision(decision)
+    } finally { setLoading(null) }
+  }
+
+  return (
+    <div style={{ background: '#1E293B', border: '1px solid #F59E0B40', borderRadius: 12,
+      padding: 16, marginTop: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+        <span style={{ fontSize: 16 }}>⚠️</span>
+        <span style={{ fontWeight: 700, color: '#F59E0B', fontSize: 14 }}>Approval Required</span>
+        {!gate.reversible && (
+          <span style={{ fontSize: 11, background: '#7F1D1D', color: '#FCA5A5',
+            borderRadius: 4, padding: '2px 6px', marginLeft: 'auto' }}>Irreversible</span>
+        )}
+      </div>
+      <div style={{ fontWeight: 600, fontSize: 14, color: '#E2E8F0', marginBottom: 8 }}>{gate.action}</div>
+      <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 6, lineHeight: 1.6 }}>{gate.details}</div>
+      <div style={{ fontSize: 12, color: '#64748B', marginBottom: 14 }}>
+        <strong style={{ color: '#94A3B8' }}>Affects:</strong> {gate.affected}
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={() => decide('approved')} disabled={!!loading}
+          style={{ flex: 1, background: '#16A34A', color: '#fff', border: 'none', borderRadius: 8,
+            padding: '9px 0', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+            opacity: loading ? 0.6 : 1 }}>
+          {loading === 'approved' ? 'Approving…' : '✓ Approve'}
+        </button>
+        <button onClick={() => decide('rejected')} disabled={!!loading}
+          style={{ flex: 1, background: '#1E293B', color: '#94A3B8', border: '1px solid #334155',
+            borderRadius: 8, padding: '9px 0', fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            opacity: loading ? 0.6 : 1 }}>
+          {loading === 'rejected' ? 'Rejecting…' : '✕ Reject'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ── Tool event pill ───────────────────────────────────────────────────────────
+
+function ToolEventPill({ event }: { event: ToolEvent }) {
+  const color = event.type === 'complete' ? '#16A34A'
+    : event.ok === false ? '#EF4444' : '#6366F1'
+  const icon = event.type === 'complete' ? '✓'
+    : event.ok === false ? '✗' : '⟳'
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11,
+      background: color + '18', color, borderRadius: 20, padding: '3px 10px',
+      border: `1px solid ${color}30`, marginBottom: 4 }}>
+      <span style={{ fontWeight: 700 }}>{icon}</span>
+      <span>{event.label ?? `${event.method ?? ''} ${event.tool ?? ''}`}</span>
+      {event.status ? <span style={{ opacity: 0.7 }}>{event.status}</span> : null}
+    </div>
+  )
+}
+
+// ── Main workspace ────────────────────────────────────────────────────────────
+
+export default function EmployeeWorkspace({ employee: e }: { employee: Employee }) {
+  const stuntTitle = getStuntTitle(e.name)
+  const userId = typeof window !== 'undefined' ? getUserId() : ''
+
+  // Tool state
+  const [connected, setConnected] = useState<ConnectedTool[]>([])
+  const [loadingTools, setLoadingTools] = useState(true)
+  const [connectingSlug, setConnectingSlug] = useState<string | null>(null)
+
+  // Chat state
+  const [msgs, setMsgs] = useState<ChatMsg[]>([
+    {
+      role: 'assistant',
+      content: `Hi! I'm **${e.name}**, your ${e.title} ${stuntTitle}.\n\n${e.tagline}\n\nConnect your tools in the panel on the left, then tell me what you need — I'll plan it, get your approval on anything important, and execute it using your actual accounts.`,
+    }
+  ])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
-  const [connectedTools, setConnectedTools] = useState<Record<string, string>>({})
-  const [connectModal, setConnectModal] = useState<ToolEntry | null>(null)
-  const [apiKeyDraft, setApiKeyDraft] = useState('')
-  const [listening, setListening] = useState(false)
-  const [runningPlanIdx, setRunningPlanIdx] = useState<number | null>(null)
+  const [currentTaskId, setCurrentTaskId] = useState<string | null>(null)
+  const [pendingApproval, setPendingApproval] = useState<{ gate: ApprovalGate; taskId: string } | null>(null)
+
   const bottomRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
-  const recognitionRef = useRef<any>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
-  const toolList = extractTools(e.tools)
-  const stuntTitle = getStuntTitle(e.name)
+  // Employee's expected tools
+  const expectedSlugs = employeeToolSlugs(e.tools)
 
-  /* load connections from localStorage */
+  // Load connected tools on mount
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(`setu_tools_${e.slug}`)
-      if (saved) setConnectedTools(JSON.parse(saved))
-    } catch {}
-  }, [e.slug])
+    if (!userId) return
+    fetch(`/api/tools/connections?user_id=${userId}`)
+      .then(r => r.json())
+      .then(d => { setConnected(d.connections ?? []); setLoadingTools(false) })
+      .catch(() => setLoadingTools(false))
+  }, [userId])
 
-  /* scroll to bottom */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [msgs])
 
-  /* initial greeting */
-  useEffect(() => {
-    setMsgs([{
-      role: 'assistant',
-      content: `Hi! I'm ${e.name}, your ${e.title} ${stuntTitle}. ${e.tagline}\n\nTell me what you need done — I'll create a plan and start executing immediately.`,
-    }])
-  }, [e.slug])
+  // ── Execute task ────────────────────────────────────────────────────────────
 
-  /* ── send message ── */
-  const send = useCallback(async (text?: string) => {
-    const txt = (text ?? input).trim()
-    if (!txt || streaming) return
-    setInput('')
+  const executeTask = useCallback(async (taskText: string, resumeTaskId?: string) => {
+    if (!taskText.trim() || streaming) return
     setStreaming(true)
+    setPendingApproval(null)
 
-    const userMsg: Message = { role: 'user', content: txt }
-    const history = [...msgs, userMsg]
-    setMsgs(history)
+    if (!resumeTaskId) {
+      setMsgs(m => [...m, { role: 'user', content: taskText }])
+    }
 
-    const connected = Object.entries(connectedTools)
-      .filter(([, v]) => v)
-      .map(([k]) => k)
+    let assistantContent = ''
+    const toolEvents: ToolEvent[] = []
+    let currentApproval: ApprovalGate | null = null
+    let resolvedTaskId = resumeTaskId ?? null
+
+    setMsgs(m => [...m, { role: 'assistant', content: '', toolEvents: [] }])
+
+    abortRef.current = new AbortController()
 
     try {
-      const res = await fetch('/api/employees/workspace', {
+      const body: any = { task: taskText, user_id: userId }
+      if (resumeTaskId) body.task_id = resumeTaskId
+      if (pendingApproval) {
+        body.approval_result = { approved: true, tool_use_id: pendingApproval.gate.tool_use_id }
+      }
+
+      const res = await fetch(`/api/employees/${e.slug}/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          slug: e.slug,
-          messages: history.map(m => ({ role: m.role, content: m.content })),
-          connectedTools: connected,
-        }),
+        body: JSON.stringify(body),
+        signal: abortRef.current.signal,
       })
 
-      if (!res.body) throw new Error('No response body')
-      const reader = res.body.getReader()
-      const dec = new TextDecoder()
-      let partial = ''
-      let accumulated = ''
-
-      setMsgs(prev => [...prev, { role: 'assistant', content: '' }])
+      const reader = res.body!.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-        partial += dec.decode(value, { stream: true })
-        const lines = partial.split('\n')
-        partial = lines.pop() ?? ''
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() ?? ''
+
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue
-          const d = line.slice(6)
-          if (d === '[DONE]') continue
+          const raw = line.slice(6).trim()
+          if (raw === '[DONE]') break
+
           try {
-            const j = JSON.parse(d)
-            const delta = j.choices?.[0]?.delta?.content ?? ''
-            if (!delta) continue
-            accumulated += delta
-            const { text: displayText, plan } = parsePlan(accumulated)
-            setMsgs(prev => {
-              const updated = [...prev]
-              updated[updated.length - 1] = {
-                role: 'assistant',
-                content: displayText,
-                ...(plan ? { plan, planState: 'awaiting_approval' } : {}),
+            const event = JSON.parse(raw)
+
+            if (event.type === 'task_created') {
+              resolvedTaskId = event.task_id
+              setCurrentTaskId(event.task_id)
+            }
+
+            if (event.type === 'text') {
+              assistantContent += event.content
+              setMsgs(m => {
+                const copy = [...m]
+                const last = copy[copy.length - 1]
+                if (last?.role === 'assistant') last.content = assistantContent
+                return copy
+              })
+            }
+
+            if (event.type === 'executing') {
+              const ev: ToolEvent = { type: 'executing', ...event }
+              toolEvents.push(ev)
+              setMsgs(m => {
+                const copy = [...m]
+                const last = copy[copy.length - 1]
+                if (last?.role === 'assistant') last.toolEvents = [...toolEvents]
+                return copy
+              })
+            }
+
+            if (event.type === 'tool_result') {
+              const last = toolEvents[toolEvents.length - 1]
+              if (last) { last.ok = event.ok; last.status = event.status }
+              setMsgs(m => {
+                const copy = [...m]
+                const lastMsg = copy[copy.length - 1]
+                if (lastMsg?.role === 'assistant') lastMsg.toolEvents = [...toolEvents]
+                return copy
+              })
+            }
+
+            if (event.type === 'approval_required') {
+              currentApproval = {
+                tool_use_id: event.tool_use_id,
+                action: event.action,
+                details: event.details,
+                affected: event.affected,
+                reversible: event.reversible,
               }
-              return updated
-            })
+              if (resolvedTaskId) {
+                setPendingApproval({ gate: currentApproval, taskId: resolvedTaskId })
+                setMsgs(m => {
+                  const copy = [...m]
+                  const lastMsg = copy[copy.length - 1]
+                  if (lastMsg?.role === 'assistant') {
+                    lastMsg.approvalGate = currentApproval!
+                    lastMsg.taskId = resolvedTaskId!
+                  }
+                  return copy
+                })
+              }
+            }
+
+            if (event.type === 'complete') {
+              setMsgs(m => {
+                const copy = [...m]
+                const lastMsg = copy[copy.length - 1]
+                if (lastMsg?.role === 'assistant') {
+                  lastMsg.toolEvents = [...toolEvents, { type: 'complete', label: 'Task complete' }]
+                }
+                return copy
+              })
+              setCurrentTaskId(null)
+              setPendingApproval(null)
+            }
           } catch {}
         }
       }
-    } catch (err) {
-      setMsgs(prev => [...prev, { role: 'assistant', content: 'Sorry, I ran into an issue. Please try again.' }])
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        setMsgs(m => {
+          const copy = [...m]
+          const last = copy[copy.length - 1]
+          if (last?.role === 'assistant' && !last.content) {
+            last.content = 'Something went wrong. Please try again.'
+          }
+          return copy
+        })
+      }
     } finally {
       setStreaming(false)
     }
-  }, [input, msgs, streaming, connectedTools, e.slug])
+  }, [streaming, userId, e.slug, pendingApproval])
 
-  /* ── keyboard handler ── */
-  function onKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      send()
+  const handleSend = () => {
+    const text = input.trim()
+    setInput('')
+    if (text) executeTask(text)
+  }
+
+  const handleApprovalDecision = (decision: 'approved' | 'rejected') => {
+    if (!pendingApproval) return
+    if (decision === 'approved') {
+      // Resume execution with a continuation message
+      executeTask(`[APPROVAL_GRANTED] Continue executing. The user approved: ${pendingApproval.gate.action}`, pendingApproval.taskId)
+    } else {
+      setMsgs(m => [...m, { role: 'system', content: '✕ Action rejected. What would you like to do instead?' }])
+      setPendingApproval(null)
     }
   }
 
-  /* ── voice input ── */
-  function toggleVoice() {
-    if (listening) {
-      recognitionRef.current?.stop()
-      setListening(false)
-      return
-    }
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SR) return
-    const rec = new SR()
-    rec.lang = 'en-US'
-    rec.continuous = false
-    rec.interimResults = true
-    rec.onresult = (ev: any) => {
-      const transcript = Array.from(ev.results).map((r: any) => r[0].transcript).join('')
-      setInput(transcript)
-    }
-    rec.onend = () => {
-      setListening(false)
-    }
-    rec.start()
-    recognitionRef.current = rec
-    setListening(true)
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
-  /* ── connect a tool ── */
-  function saveConnection() {
-    if (!connectModal) return
-    const updated = { ...connectedTools, [connectModal.name]: apiKeyDraft }
-    setConnectedTools(updated)
-    localStorage.setItem(`setu_tools_${e.slug}`, JSON.stringify(updated))
-    setConnectModal(null)
-    setApiKeyDraft('')
-  }
+  // ── Disconnect tool ──────────────────────────────────────────────────────────
 
-  function disconnectTool(name: string) {
-    const updated = { ...connectedTools }
-    delete updated[name]
-    setConnectedTools(updated)
-    localStorage.setItem(`setu_tools_${e.slug}`, JSON.stringify(updated))
-  }
-
-  /* ── execute a plan ── */
-  async function approvePlan(msgIdx: number) {
-    const msg = msgs[msgIdx]
-    if (!msg.plan) return
-
-    setRunningPlanIdx(msgIdx)
-    const steps = msg.plan.steps.map(s => ({ ...s, status: 'pending' as const }))
-
-    setMsgs(prev => {
-      const updated = [...prev]
-      updated[msgIdx] = { ...updated[msgIdx], planState: 'running', plan: { ...updated[msgIdx].plan!, steps } }
-      return updated
+  const disconnectTool = async (slug: string) => {
+    await fetch('/api/tools/connect', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, tool_slug: slug }),
     })
-
-    for (let i = 0; i < steps.length; i++) {
-      /* mark step running */
-      setMsgs(prev => {
-        const updated = [...prev]
-        const p = { ...updated[msgIdx].plan! }
-        p.steps = p.steps.map((s, si) => si === i ? { ...s, status: 'running' } : s)
-        updated[msgIdx] = { ...updated[msgIdx], plan: p }
-        return updated
-      })
-
-      /* simulate execution (1.2–2s per step) */
-      await delay(1200 + Math.random() * 800)
-
-      /* mark step done */
-      setMsgs(prev => {
-        const updated = [...prev]
-        const p = { ...updated[msgIdx].plan! }
-        p.steps = p.steps.map((s, si) => si === i ? { ...s, status: 'done' } : s)
-        updated[msgIdx] = { ...updated[msgIdx], plan: p }
-        return updated
-      })
-    }
-
-    /* plan complete — add summary message */
-    setMsgs(prev => {
-      const updated = [...prev]
-      updated[msgIdx] = { ...updated[msgIdx], planState: 'done' }
-      return [
-        ...updated,
-        {
-          role: 'assistant',
-          content: `All done! ✅ ${msg.plan!.summary} — everything is set up and running. Check your connected tools for results. Need anything else?`,
-        },
-      ]
-    })
-    setRunningPlanIdx(null)
+    setConnected(c => c.filter(t => t.slug !== slug))
   }
 
-  function cancelPlan(msgIdx: number) {
-    setMsgs(prev => {
-      const updated = [...prev]
-      updated[msgIdx] = { ...updated[msgIdx], planState: 'cancelled' }
-      return updated
-    })
-  }
+  const connectedSlugs = new Set(connected.map(t => t.slug))
 
-  const connectedCount = Object.values(connectedTools).filter(Boolean).length
+  // ── Render ───────────────────────────────────────────────────────────────────
 
-  /* ─── Render ─── */
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: BG, color: TEXT, fontFamily: F, overflow: 'hidden' }}>
-      {/* ── NAV ── */}
-      <nav style={{ height: 52, borderBottom: `1px solid ${BORDER}`, display: 'flex', alignItems: 'center', padding: '0 20px', gap: 12, background: SURFACE, flexShrink: 0, zIndex: 20 }}>
-        <SetuLogo size={26} color="#22c55e" wordColor={TEXT} />
-        <div style={{ width: 1, height: 22, background: BORDER2, margin: '0 4px' }} />
-        <Link href="/employees" style={{ fontSize: 12, color: MUTED, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-          ← Employees
-        </Link>
-        <span style={{ fontSize: 12, color: MUTED }}>/</span>
-        <span style={{ fontSize: 12, color: DIM }}>{e.emoji} {e.name}</span>
-        <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, background: 'rgba(255,255,255,0.06)', color: MUTED, fontWeight: 600 }}>{stuntTitle}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh',
+      background: '#020817', color: '#E2E8F0', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
 
-        <div style={{ flex: 1 }} />
-
-        <Link href={`/employees/${e.slug}/interview`} style={{ padding: '6px 14px', borderRadius: 8, background: 'transparent', border: `1px solid ${BORDER2}`, color: MUTED, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
-          Interview free
-        </Link>
-        <Link href={`/employees/${e.slug}/hire`} style={{ padding: '6px 16px', borderRadius: 8, background: e.color, color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
-          Hire {e.name} →
+      {/* ── Nav ── */}
+      <nav style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px',
+        borderBottom: '1px solid #1E293B', flexShrink: 0 }}>
+        <Link href="/employees" style={{ color: '#64748B', textDecoration: 'none', fontSize: 13 }}>← All Stuntmen</Link>
+        <span style={{ color: '#1E293B' }}>/</span>
+        <span style={{ color: '#E2E8F0', fontSize: 13, fontWeight: 600 }}>{e.name}</span>
+        <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
+          background: '#1E293B', color: '#94A3B8', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+          {stuntTitle}
+        </span>
+        {streaming && (
+          <span style={{ marginLeft: 'auto', fontSize: 12, color: '#6366F1', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6366F1', display: 'inline-block',
+              animation: 'pulse 1s infinite' }} />
+            Working…
+          </span>
+        )}
+        <Link href={`/employees/${e.slug}/hire`}
+          style={{ marginLeft: streaming ? 0 : 'auto', background: e.color + '18', color: e.color,
+            border: `1px solid ${e.color}40`, borderRadius: 8, padding: '6px 14px',
+            fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
+          Hire {e.name}
         </Link>
       </nav>
 
-      {/* ── THREE-PANEL BODY ── */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '240px 1fr 260px', overflow: 'hidden' }}>
+      {/* ── Body: 3 panels ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr 260px', flex: 1, overflow: 'hidden' }}>
 
-        {/* ── LEFT: Tools + Employee ── */}
-        <div style={{ background: SURFACE, borderRight: `1px solid ${BORDER}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          {/* Employee header */}
-          <div style={{ padding: '20px 18px 16px', borderBottom: `1px solid ${BORDER}` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 42, height: 42, borderRadius: 12, background: e.color + '18', border: `1.5px solid ${e.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
+        {/* ── LEFT: Tool connections ── */}
+        <aside style={{ borderRight: '1px solid #1E293B', overflow: 'auto',
+          padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em',
+            textTransform: 'uppercase', marginBottom: 12 }}>Tool Connections</div>
+
+          {expectedSlugs.length === 0 ? (
+            <div style={{ fontSize: 12, color: '#475569' }}>No tools mapped for this employee.</div>
+          ) : expectedSlugs.map(slug => {
+            const toolDef = TOOL_REGISTRY.find(t => t.slug === slug)
+            if (!toolDef) return null
+            const isConnected = connectedSlugs.has(slug)
+            return (
+              <div key={slug} style={{ display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 10px', borderRadius: 8, marginBottom: 4,
+                background: isConnected ? '#0F2419' : '#0F172A',
+                border: `1px solid ${isConnected ? '#16A34A30' : '#1E293B'}` }}>
+                <ToolLogo slug={slug} name={toolDef.name} size={22} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#E2E8F0',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {toolDef.name}
+                  </div>
+                  <div style={{ fontSize: 10, color: '#64748B' }}>{toolDef.category}</div>
+                </div>
+                {isConnected ? (
+                  <button onClick={() => disconnectTool(slug)}
+                    title="Disconnect" style={{ background: 'none', border: 'none',
+                      color: '#16A34A', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 0 }}>✓</button>
+                ) : (
+                  <button onClick={() => setConnectingSlug(slug)}
+                    style={{ background: '#1E293B', border: '1px solid #334155',
+                      color: '#94A3B8', borderRadius: 6, padding: '3px 8px', fontSize: 11,
+                      cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    + Add
+                  </button>
+                )}
+              </div>
+            )
+          })}
+
+          {/* Separator */}
+          {connected.some(c => !expectedSlugs.includes(c.slug)) && (
+            <>
+              <div style={{ fontSize: 10, color: '#334155', margin: '10px 0 8px',
+                textTransform: 'uppercase', letterSpacing: '0.06em' }}>Other connected</div>
+              {connected.filter(c => !expectedSlugs.includes(c.slug)).map(c => (
+                <div key={c.slug} style={{ display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '8px 10px', borderRadius: 8, marginBottom: 4,
+                  background: '#0F2419', border: '1px solid #16A34A30' }}>
+                  <ToolLogo slug={c.slug} name={c.name} size={22} />
+                  <div style={{ flex: 1, fontSize: 12, color: '#94A3B8' }}>{c.name}</div>
+                  <button onClick={() => disconnectTool(c.slug)}
+                    title="Disconnect" style={{ background: 'none', border: 'none',
+                      color: '#16A34A', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>✓</button>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Employee info */}
+          <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid #1E293B' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: e.color + '20',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
                 {e.emoji}
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: TEXT, letterSpacing: '-0.02em' }}>{e.name}</div>
-                <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>{e.title} {stuntTitle}</div>
+                <div style={{ fontWeight: 700, fontSize: 13, color: '#E2E8F0' }}>{e.name}</div>
+                <div style={{ fontSize: 11, color: '#64748B' }}>{e.title} · {stuntTitle}</div>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {[
-                { v: e.agentCount, l: 'agents' },
-                { v: e.years + 'yr', l: 'exp' },
-              ].map(s => (
-                <div key={s.l} style={{ flex: 1, background: BG, borderRadius: 8, padding: '6px 8px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: e.color, letterSpacing: '-0.04em' }}>{s.v}</div>
-                  <div style={{ fontSize: 9, color: MUTED, marginTop: 1 }}>{s.l}</div>
-                </div>
-              ))}
+            <div style={{ fontSize: 11, color: '#64748B' }}>
+              {e.agentCount} agents · {e.years} yrs exp
             </div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: e.color, marginTop: 6 }}>{e.pricing.label}</div>
           </div>
-
-          {/* Tools panel */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '14px 14px 0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: DIM, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Integrations</div>
-              <div style={{ fontSize: 10, padding: '2px 7px', borderRadius: 20, background: connectedCount > 0 ? '#22c55e18' : BG, color: connectedCount > 0 ? '#22c55e' : MUTED, fontWeight: 600 }}>
-                {connectedCount}/{toolList.length} connected
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {toolList.map(tool => {
-                const isConnected = !!connectedTools[tool.name]
-                return (
-                  <div
-                    key={tool.name}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px',
-                      borderRadius: 8, background: BG, border: `1px solid ${isConnected ? e.color + '30' : BORDER}`,
-                      cursor: 'pointer', transition: 'border-color 0.15s',
-                    }}
-                    onClick={() => {
-                      if (isConnected) {
-                        if (confirm(`Disconnect ${tool.name}?`)) disconnectTool(tool.name)
-                      } else {
-                        setConnectModal(tool)
-                        setApiKeyDraft('')
-                      }
-                    }}
-                  >
-                    <span style={{ fontSize: 15 }}>{tool.icon}</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: TEXT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tool.name}</div>
-                      <div style={{ fontSize: 9, color: MUTED }}>{tool.category}</div>
-                    </div>
-                    {isConnected ? (
-                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', flexShrink: 0, boxShadow: '0 0 6px #22c55e80' }} />
-                    ) : (
-                      <span style={{ fontSize: 10, color: e.color, fontWeight: 600, flexShrink: 0 }}>+ API</span>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-
-            <div style={{ padding: '12px 0', color: MUTED, fontSize: 10, lineHeight: 1.6 }}>
-              Connect your tools above. {e.name} will use them to execute tasks — no extra setup needed.
-            </div>
-          </div>
-
-          {/* Pricing */}
-          <div style={{ padding: '12px 14px', borderTop: `1px solid ${BORDER}`, background: BG }}>
-            <div style={{ fontSize: 10, color: MUTED, marginBottom: 2 }}>Starting at</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: TEXT, letterSpacing: '-0.04em' }}>{e.pricing.label}/mo</div>
-          </div>
-        </div>
+        </aside>
 
         {/* ── CENTER: Chat ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', background: BG }}>
+        <main style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {/* Messages */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {msgs.map((msg, idx) => (
-              <div key={idx} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', ...(msg.role === 'user' ? { flexDirection: 'row-reverse' } : {}) }}>
-                {/* Avatar */}
-                {msg.role === 'assistant' && (
-                  <div style={{ width: 32, height: 32, borderRadius: 10, background: e.color + '18', border: `1.5px solid ${e.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0, marginTop: 2 }}>
-                    {e.emoji}
+          <div style={{ flex: 1, overflow: 'auto', padding: '20px 24px', display: 'flex',
+            flexDirection: 'column', gap: 16 }}>
+            {msgs.map((msg, i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column',
+                alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '100%' }}>
+                {msg.role === 'system' ? (
+                  <div style={{ fontSize: 12, color: '#64748B', fontStyle: 'italic', textAlign: 'center',
+                    width: '100%', padding: '4px 0' }}>{msg.content}</div>
+                ) : (
+                  <div style={{ maxWidth: '80%' }}>
+                    <div style={{
+                      background: msg.role === 'user' ? e.color + '18' : '#0F172A',
+                      border: `1px solid ${msg.role === 'user' ? e.color + '30' : '#1E293B'}`,
+                      borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                      padding: '12px 16px', fontSize: 14, lineHeight: 1.7, color: '#E2E8F0',
+                      whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                    }}>
+                      {msg.content || (streaming && i === msgs.length - 1 ? (
+                        <span style={{ color: '#64748B', fontStyle: 'italic' }}>Thinking…</span>
+                      ) : null)}
+                    </div>
+
+                    {/* Tool events */}
+                    {msg.toolEvents && msg.toolEvents.length > 0 && (
+                      <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                        {msg.toolEvents.map((ev, j) => <ToolEventPill key={j} event={ev} />)}
+                      </div>
+                    )}
+
+                    {/* Approval gate */}
+                    {msg.approvalGate && msg.taskId && (
+                      <ApprovalCard gate={msg.approvalGate} taskId={msg.taskId}
+                        onDecision={handleApprovalDecision} />
+                    )}
                   </div>
                 )}
-
-                <div style={{ maxWidth: '75%', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {/* Message bubble */}
-                  {msg.content && (
-                    <div style={{
-                      padding: '12px 16px', borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '4px 16px 16px 16px',
-                      background: msg.role === 'user' ? e.color : SURFACE,
-                      color: msg.role === 'user' ? '#fff' : TEXT,
-                      fontSize: 14, lineHeight: 1.72,
-                      border: msg.role === 'assistant' ? `1px solid ${BORDER}` : 'none',
-                      whiteSpace: 'pre-wrap',
-                    }}>
-                      {msg.content}
-                      {streaming && idx === msgs.length - 1 && msg.role === 'assistant' && !msg.plan && (
-                        <span style={{ display: 'inline-block', width: 8, height: 14, background: e.color, borderRadius: 2, marginLeft: 4, animation: 'blink 0.8s step-end infinite', verticalAlign: 'middle' }} />
-                      )}
-                    </div>
-                  )}
-
-                  {/* Plan card */}
-                  {msg.plan && msg.planState !== 'cancelled' && (
-                    <PlanCard
-                      plan={msg.plan}
-                      planState={msg.planState ?? 'awaiting_approval'}
-                      accent={e.color}
-                      onApprove={() => approvePlan(idx)}
-                      onCancel={() => cancelPlan(idx)}
-                    />
-                  )}
-                  {msg.plan && msg.planState === 'cancelled' && (
-                    <div style={{ fontSize: 12, color: MUTED, fontStyle: 'italic' }}>Plan cancelled.</div>
-                  )}
-                </div>
               </div>
             ))}
-
-            {/* Typing indicator */}
-            {streaming && msgs[msgs.length - 1]?.role !== 'assistant' && (
-              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                <div style={{ width: 32, height: 32, borderRadius: 10, background: e.color + '18', border: `1.5px solid ${e.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
-                  {e.emoji}
-                </div>
-                <div style={{ padding: '12px 16px', borderRadius: '4px 16px 16px 16px', background: SURFACE, border: `1px solid ${BORDER}`, display: 'flex', gap: 5, alignItems: 'center' }}>
-                  {[0, 1, 2].map(i => (
-                    <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: MUTED, animation: `bounce 1.2s ${i * 0.2}s ease-in-out infinite` }} />
-                  ))}
-                </div>
-              </div>
-            )}
             <div ref={bottomRef} />
           </div>
 
-          {/* ── Input area ── */}
-          <div style={{ borderTop: `1px solid ${BORDER}`, padding: '16px 20px', background: SURFACE }}>
-            {/* Quick prompts (only show if no messages yet beyond greeting) */}
+          {/* Input */}
+          <div style={{ padding: '16px 24px', borderTop: '1px solid #1E293B', flexShrink: 0 }}>
+            {/* Quick chips */}
             {msgs.length <= 1 && (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
-                {getQuickPrompts(e).map(p => (
-                  <button
-                    key={p}
-                    onClick={() => send(p)}
-                    style={{ fontSize: 11, padding: '5px 11px', borderRadius: 20, background: BG, border: `1px solid ${BORDER2}`, color: MUTED, cursor: 'pointer', fontFamily: F, transition: 'border-color 0.15s' }}
-                  >
-                    {p}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+                {[
+                  `Plan a campaign for ${new Date().toLocaleString('default', { month: 'long' })}`,
+                  'What tools do you need from me?',
+                  'Show me what you can do with my connected tools',
+                  'Audit my current setup and flag gaps',
+                ].map(chip => (
+                  <button key={chip} onClick={() => { setInput(chip) }}
+                    style={{ background: '#0F172A', border: '1px solid #1E293B', color: '#94A3B8',
+                      borderRadius: 20, padding: '6px 14px', fontSize: 12, cursor: 'pointer' }}>
+                    {chip}
                   </button>
                 ))}
               </div>
             )}
 
             <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
-              <div style={{ flex: 1, position: 'relative' }}>
-                <textarea
-                  ref={inputRef}
-                  value={input}
-                  onChange={ev => setInput(ev.target.value)}
-                  onKeyDown={onKey}
-                  placeholder={`Ask ${e.name} anything, or describe a task to execute...`}
-                  disabled={streaming}
-                  rows={1}
-                  style={{
-                    width: '100%', padding: '11px 44px 11px 16px',
-                    background: BG, border: `1px solid ${BORDER2}`,
-                    borderRadius: 12, color: TEXT, fontSize: 14, outline: 'none',
-                    fontFamily: F, resize: 'none', lineHeight: 1.5, boxSizing: 'border-box',
-                    maxHeight: 120, overflowY: 'auto',
-                    transition: 'border-color 0.2s',
-                  }}
-                />
-                {/* Voice button inside input */}
-                <button
-                  onClick={toggleVoice}
-                  style={{
-                    position: 'absolute', right: 10, bottom: 9,
-                    width: 28, height: 28, borderRadius: 8,
-                    background: listening ? e.color : 'transparent',
-                    border: `1px solid ${listening ? e.color : BORDER2}`,
-                    color: listening ? '#fff' : MUTED,
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 14, transition: 'all 0.2s',
-                  }}
-                  title="Voice input"
-                >
-                  🎙️
-                </button>
-              </div>
-              <button
-                onClick={() => send()}
-                disabled={!input.trim() || streaming}
-                style={{
-                  width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-                  background: input.trim() && !streaming ? e.color : SURFACE,
-                  border: `1px solid ${input.trim() && !streaming ? e.color : BORDER2}`,
-                  color: input.trim() && !streaming ? '#fff' : MUTED,
-                  cursor: input.trim() && !streaming ? 'pointer' : 'not-allowed',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 18, transition: 'all 0.2s',
-                }}
-              >
-                ↑
+              <textarea
+                ref={textareaRef}
+                value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKey}
+                placeholder={`Tell ${e.name} what to work on…`} rows={2}
+                style={{ flex: 1, background: '#0F172A', border: '1px solid #334155', borderRadius: 12,
+                  padding: '12px 14px', color: '#E2E8F0', fontSize: 14, resize: 'none',
+                  outline: 'none', lineHeight: 1.5, fontFamily: 'inherit' }}
+              />
+              <button onClick={handleSend} disabled={streaming || !input.trim()}
+                style={{ background: streaming || !input.trim() ? '#1E293B' : e.color,
+                  color: streaming || !input.trim() ? '#475569' : '#fff',
+                  border: 'none', borderRadius: 10, width: 44, height: 44,
+                  fontSize: 18, cursor: streaming || !input.trim() ? 'not-allowed' : 'pointer',
+                  flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.15s' }}>
+                {streaming ? '⏸' : '↑'}
               </button>
             </div>
-            <div style={{ marginTop: 8, fontSize: 11, color: DIM, textAlign: 'center' }}>
-              Powered by Claude Sonnet · Enter to send · Shift+Enter for new line
+            <div style={{ fontSize: 11, color: '#334155', marginTop: 8, textAlign: 'center' }}>
+              Real API calls · Approval required before any action · Keys encrypted
             </div>
           </div>
-        </div>
+        </main>
 
-        {/* ── RIGHT: Capabilities + CTA ── */}
-        <div style={{ background: SURFACE, borderLeft: `1px solid ${BORDER}`, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '20px 16px' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: DIM, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>What {e.name} does</div>
+        {/* ── RIGHT: Capabilities ── */}
+        <aside style={{ borderLeft: '1px solid #1E293B', overflow: 'auto',
+          padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em',
+            textTransform: 'uppercase', marginBottom: 4 }}>What I Can Do</div>
 
-            {e.capabilities.map((cap: any) => (
-              <CapabilityBlock key={cap.area} cap={cap} accent={e.color} />
-            ))}
-          </div>
+          {e.capabilities.map((cap, i) => (
+            <details key={i} style={{ borderRadius: 8, background: '#0F172A',
+              border: '1px solid #1E293B', padding: '10px 12px' }}>
+              <summary style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+                fontSize: 12, fontWeight: 600, color: '#E2E8F0', listStyle: 'none' }}>
+                <span>{cap.icon}</span>
+                <span>{cap.area}</span>
+              </summary>
+              <ul style={{ margin: '10px 0 0', padding: '0 0 0 8px', listStyle: 'none',
+                display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {(cap.scenarios ?? []).map((s: string, j: number) => (
+                  <li key={j} style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.5,
+                    cursor: 'pointer', padding: '2px 0' }}
+                    onClick={() => { setInput(s); textareaRef.current?.focus() }}>
+                    › {s}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ))}
 
-          {/* Sticky CTA */}
-          <div style={{ marginTop: 'auto', padding: '16px', borderTop: `1px solid ${BORDER}`, background: BG }}>
-            <div style={{ fontSize: 12, color: MUTED, marginBottom: 10, lineHeight: 1.6 }}>
-              This is a free demo. Hire your {e.title} {stuntTitle} to run your workflows automatically, 24/7.
+          {/* How it works */}
+          <div style={{ marginTop: 4, fontSize: 11, fontWeight: 700, color: '#64748B',
+            letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>How I Work</div>
+          {e.howItWorks.map((step, i) => (
+            <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <div style={{ width: 20, height: 20, borderRadius: '50%', background: e.color + '20',
+                color: e.color, fontSize: 11, fontWeight: 700, display: 'flex',
+                alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                {i + 1}
+              </div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#E2E8F0' }}>{step.step}</div>
+                <div style={{ fontSize: 11, color: '#64748B', marginTop: 2, lineHeight: 1.5 }}>{step.detail}</div>
+              </div>
             </div>
-            <Link href={`/employees/${e.slug}/hire`} style={{ display: 'block', padding: '11px', borderRadius: 10, background: e.color, color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none', textAlign: 'center', marginBottom: 6 }}>
-              Hire {e.name} — {e.pricing.label}/mo →
-            </Link>
-            <div style={{ fontSize: 10, color: DIM, textAlign: 'center' }}>
-              {e.agentCount} agents · Cancel anytime
-            </div>
-          </div>
-        </div>
+          ))}
+        </aside>
       </div>
 
-      {/* ── Connect modal ── */}
-      {connectModal && (
-        <div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}
-          onClick={ev => { if (ev.target === ev.currentTarget) setConnectModal(null) }}
-        >
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER2}`, borderRadius: 20, padding: 28, width: 420, maxWidth: '90vw' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-              <span style={{ fontSize: 24 }}>{connectModal.icon}</span>
-              <div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: TEXT }}>Connect {connectModal.name}</div>
-                <div style={{ fontSize: 12, color: MUTED }}>{connectModal.category}</div>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: MUTED, marginBottom: 8 }}>
-                {connectModal.apiKeyLabel ?? `${connectModal.name} API Key`}
-              </label>
-              <input
-                type="password"
-                value={apiKeyDraft}
-                onChange={ev => setApiKeyDraft(ev.target.value)}
-                onKeyDown={ev => ev.key === 'Enter' && saveConnection()}
-                placeholder={connectModal.placeholder ?? 'Enter your API key...'}
-                autoFocus
-                style={{ width: '100%', padding: '11px 14px', background: BG, border: `1px solid ${BORDER2}`, borderRadius: 10, color: TEXT, fontSize: 14, outline: 'none', fontFamily: F, boxSizing: 'border-box' }}
-              />
-            </div>
-
-            <div style={{ fontSize: 12, color: DIM, marginBottom: 20, lineHeight: 1.7 }}>
-              Your API key is stored only in your browser (localStorage). It is never sent to our servers — {e.name} uses it to call {connectModal.name}'s API directly.
-            </div>
-
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                onClick={() => setConnectModal(null)}
-                style={{ flex: 1, padding: '10px', borderRadius: 10, background: 'transparent', border: `1px solid ${BORDER2}`, color: MUTED, cursor: 'pointer', fontFamily: F, fontSize: 13, fontWeight: 600 }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveConnection}
-                disabled={!apiKeyDraft.trim()}
-                style={{ flex: 2, padding: '10px', borderRadius: 10, background: apiKeyDraft.trim() ? e.color : SURFACE, border: 'none', color: '#fff', cursor: apiKeyDraft.trim() ? 'pointer' : 'not-allowed', fontFamily: F, fontSize: 13, fontWeight: 700 }}
-              >
-                Connect {connectModal.name}
-              </button>
-            </div>
-
-            <div style={{ marginTop: 14, textAlign: 'center', fontSize: 11, color: DIM }}>
-              Don't have an API key?{' '}
-              <a
-                href={`https://www.google.com/search?q=${encodeURIComponent(connectModal.name + ' API key')}`}
-                target="_blank" rel="noopener"
-                style={{ color: e.color, textDecoration: 'none', fontWeight: 600 }}
-              >
-                Get one here →
-              </a>
-            </div>
-          </div>
-        </div>
+      {/* Connect modal */}
+      {connectingSlug && (
+        <ConnectModal
+          toolSlug={connectingSlug}
+          onClose={() => setConnectingSlug(null)}
+          onConnected={slug => {
+            const toolDef = TOOL_REGISTRY.find(t => t.slug === slug)
+            if (toolDef) {
+              setConnected(c => [...c.filter(x => x.slug !== slug), {
+                slug, name: toolDef.name, category: toolDef.category,
+                logo: toolLogoUrl(slug), domain: toolDef.domain,
+                connected_at: new Date().toISOString(),
+              }])
+            }
+          }}
+        />
       )}
 
       <style>{`
-        @keyframes blink { 0%,100% { opacity: 1 } 50% { opacity: 0 } }
-        @keyframes bounce { 0%,80%,100% { transform: translateY(0) } 40% { transform: translateY(-6px) } }
-        @keyframes spin { to { transform: rotate(360deg) } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: none } }
-        @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.5 } }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        textarea::placeholder { color: #475569; }
+        details summary::-webkit-details-marker { display: none; }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 2px; }
       `}</style>
     </div>
   )
-}
-
-/* ─── Plan card component ─────────────────────────────────────── */
-function PlanCard({ plan, planState, accent, onApprove, onCancel }: {
-  plan: Plan
-  planState: string
-  accent: string
-  onApprove: () => void
-  onCancel: () => void
-}) {
-  return (
-    <div style={{ background: '#0A0F1E', border: `1.5px solid ${accent}30`, borderRadius: 14, overflow: 'hidden', animation: 'fadeIn 0.25s ease-out' }}>
-      {/* Plan header */}
-      <div style={{ padding: '12px 16px', borderBottom: `1px solid rgba(255,255,255,0.06)`, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ width: 6, height: 6, borderRadius: '50%', background: planState === 'done' ? '#22c55e' : planState === 'running' ? accent : '#F59E0B', animation: planState === 'running' ? 'pulse 1s ease-in-out infinite' : 'none' }} />
-        <span style={{ fontSize: 12, fontWeight: 700, color: TEXT }}>
-          {planState === 'done' ? '✅ Completed' : planState === 'running' ? '⚡ Running' : planState === 'awaiting_approval' ? '📋 Action Plan' : 'Plan'}
-        </span>
-        <span style={{ fontSize: 11, color: MUTED, marginLeft: 4 }}>{plan.summary}</span>
-      </div>
-
-      {/* Steps */}
-      <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {plan.steps.map((step, i) => (
-          <div key={step.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-            {/* Step status icon */}
-            <div style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, marginTop: 1,
-              background: step.status === 'done' ? '#22c55e18' : step.status === 'running' ? accent + '20' : 'rgba(255,255,255,0.04)',
-              border: `1.5px solid ${step.status === 'done' ? '#22c55e' : step.status === 'running' ? accent : 'rgba(255,255,255,0.12)'}`,
-              color: step.status === 'done' ? '#22c55e' : step.status === 'running' ? accent : MUTED,
-            }}>
-              {step.status === 'done' ? '✓' : step.status === 'running' ? (
-                <div style={{ width: 10, height: 10, borderRadius: '50%', border: `2px solid ${accent}`, borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
-              ) : i + 1}
-            </div>
-
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: step.status === 'done' ? MUTED : TEXT }}>{step.label}</div>
-              {step.tool && (
-                <div style={{ fontSize: 11, color: MUTED, marginTop: 2 }}>via {step.tool}</div>
-              )}
-              {step.detail && step.status === 'running' && (
-                <div style={{ fontSize: 11, color: accent, marginTop: 2 }}>{step.detail}</div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Approval buttons */}
-      {planState === 'awaiting_approval' && (
-        <div style={{ padding: '12px 16px', borderTop: `1px solid rgba(255,255,255,0.06)`, display: 'flex', gap: 8 }}>
-          <button
-            onClick={onApprove}
-            style={{ flex: 2, padding: '9px 16px', borderRadius: 8, background: accent, border: 'none', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: F }}
-          >
-            ▶ Approve & Run
-          </button>
-          <button
-            onClick={onCancel}
-            style={{ flex: 1, padding: '9px 14px', borderRadius: 8, background: 'transparent', border: `1px solid rgba(255,255,255,0.12)`, color: MUTED, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: F }}
-          >
-            Cancel
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-/* ─── Capability block ───────────────────────────────────────── */
-function CapabilityBlock({ cap, accent }: { cap: any; accent: string }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div style={{ marginBottom: 6 }}>
-      <button
-        onClick={() => setOpen(o => !o)}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '9px 10px', borderRadius: 8, background: open ? accent + '12' : 'transparent', border: `1px solid ${open ? accent + '30' : BORDER}`, cursor: 'pointer', fontFamily: F, textAlign: 'left', transition: 'all 0.15s' }}
-      >
-        <span style={{ fontSize: 16 }}>{cap.icon}</span>
-        <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: TEXT }}>{cap.area}</span>
-        <span style={{ fontSize: 10, color: MUTED }}>{open ? '▲' : '▼'}</span>
-      </button>
-      {open && (
-        <div style={{ padding: '8px 10px 4px', animation: 'fadeIn 0.15s ease-out' }}>
-          <div style={{ fontSize: 12, color: MUTED, marginBottom: 6, lineHeight: 1.5 }}>{cap.blurb}</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {cap.scenarios.slice(0, 4).map((s: string) => (
-              <div key={s} style={{ fontSize: 11, color: DIM, display: 'flex', gap: 5 }}>
-                <span style={{ color: accent }}>›</span> {s}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-/* ─── Quick prompts by dept ──────────────────────────────────── */
-function getQuickPrompts(e: any): string[] {
-  const d = e.dept
-  if (d === 'Marketing' || e.title.includes('CMO') || e.title.includes('Brand')) {
-    return ['Write a weekly email campaign', 'Analyze my top campaigns', 'Create a content calendar']
-  }
-  if (d === 'Finance' || e.title.includes('CFO')) {
-    return ['Generate a P&L summary', 'Forecast next quarter cash flow', 'Prepare board financials']
-  }
-  if (d === 'Sales') {
-    return ['Review my pipeline', 'Write 5 outreach emails', 'Analyze this quarter\'s deals']
-  }
-  if (d === 'Messaging & Commerce' || e.title.includes('WhatsApp')) {
-    return ['Set up a lead qualification flow', 'Write a broadcast campaign', 'Analyze response rates']
-  }
-  if (d === 'HR & People' || d === 'People Operations') {
-    return ['Post a job description', 'Screen 10 applicants', 'Create onboarding plan']
-  }
-  if (d === 'Analytics') {
-    return ['Run a cohort analysis', 'Build a retention report', 'Find conversion drop-offs']
-  }
-  if (d === 'Customer Success' || d === 'Customer Support') {
-    return ['Show me NPS trends', 'Summarize open tickets', 'Generate health scores']
-  }
-  if (d === 'Engineering' || d === 'IT Operations') {
-    return ['Review open PRs', 'Create a sprint plan', 'Analyze system performance']
-  }
-  return ['What can you do?', 'Show me a weekly report', 'Give me a task plan']
-}
-
-/* ─── Util ───────────────────────────────────────────────────── */
-function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
 }
