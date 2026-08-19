@@ -7,18 +7,18 @@ import { SetuLogo } from '@/components/SetuLogo'
 const BASE = 'https://setuagents.com'
 
 export const metadata: Metadata = {
-  title: 'Setu — Hire AI Employees for Your Business',
-  description: 'Hire AI Employees that plan, execute, and report like real department heads. 100 roles — WhatsApp automation to CMO, CFO, COO. Interview free. Go live in days.',
+  title: 'Setu — Hire Your Business Stuntman',
+  description: 'The star gets the credit. Your Stuntman does the work. 100 Stuntmen & Stuntwomen — WhatsApp to CMO, CFO, COO. Interview free. Go live in days.',
   openGraph: {
-    title: 'Hire AI Employees — Setu',
-    description: 'From WhatsApp bot to CMO: 100 AI Employees commanding 10,000+ agents. Interview any of them for free.',
+    title: 'Hire Your Business Stuntman — Setu',
+    description: '100 Stuntmen & Stuntwomen commanding 10,000+ agents. Interview any of them for free.',
     url: BASE,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Hire AI Employees — Setu',
-    description: '100 AI Employees. WhatsApp automation to C-Suite. Interview free, hire in minutes.',
+    title: 'Hire Your Business Stuntman — Setu',
+    description: '100 Stuntmen & Stuntwomen. WhatsApp to C-Suite. Interview free, hire in minutes.',
   },
   alternates: { canonical: BASE },
   keywords: ['AI employees', 'hire AI', 'AI marketing manager', 'AI CFO', 'AI agents', 'business automation', 'Setu', 'AI team', 'agent fleet'],
@@ -130,15 +130,15 @@ export default function HomePage() {
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.09em', textTransform: 'uppercase', padding: '5px 14px', borderRadius: 6, background: GREEN_L, marginBottom: 28 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: GREEN_M, display: 'inline-block' }} />
-            100 AI Employees · Hiring now
+            100 Stuntmen &amp; Stuntwomen · Hiring now
           </div>
 
           <h1 style={{ fontSize: 'clamp(44px,5vw,72px)', fontWeight: 800, letterSpacing: '-0.055em', margin: '0 0 24px', color: INK, lineHeight: 1.0, fontFamily: F }}>
-            Your business,<br />run by AI<br /><span style={{ color: GREEN }}>Employees.</span>
+            The star gets<br />the credit. Your<br /><span style={{ color: GREEN }}>Stuntman works.</span>
           </h1>
 
           <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.72, maxWidth: 460, margin: '0 0 40px', fontWeight: 400 }}>
-            100 AI Employees that work like real department heads — WhatsApp automation to CMO, CFO, and COO. Interview any of them free. Hire when you are ready.
+            100 Stuntmen &amp; Stuntwomen — CMO, CFO, COO and 97 more. They do the heavy work. You stay in control. Interview any of them free.
           </p>
 
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -153,7 +153,7 @@ export default function HomePage() {
           {/* Stats */}
           <div style={{ display: 'flex', gap: 36, marginTop: 52, paddingTop: 36, borderTop: `1px solid ${GRAY}` }}>
             {[
-              { value: '100', label: 'AI Employees' },
+              { value: '100', label: 'Stuntmen & Stuntwomen' },
               { value: '10,000+', label: 'Agents deployed' },
               { value: '$0', label: 'To interview' },
               { value: '48h', label: 'To go live' },

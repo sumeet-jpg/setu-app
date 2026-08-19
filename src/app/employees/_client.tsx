@@ -2,7 +2,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { EMPLOYEES, DEPT_ORDER } from '@/lib/employees/profiles'
+import { EMPLOYEES, DEPT_ORDER, getStuntTitle } from '@/lib/employees/profiles'
 import { SetuLogo } from '@/components/SetuLogo'
 
 /* ─── Design tokens ─── */
@@ -68,14 +68,14 @@ export default function EmployeesClient() {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '56px 32px 40px', position: 'relative' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 700, color: '#a5b4fc', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 16, padding: '5px 14px', borderRadius: 24, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', fontFamily: 'var(--font-space)' }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px rgba(34,197,94,0.8)', display: 'inline-block' }} />
-            AI Employees
+            Stuntmen &amp; Stuntwomen
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
             <div>
               <h1 style={{ fontSize: 'clamp(32px,4.5vw,54px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '0 0 12px', color: '#fff', fontFamily: 'var(--font-space)', lineHeight: 1.04 }}>
-                100 AI Employees,<br />ready to hire
+                100 Stuntmen &amp; Stuntwomen,<br />ready to hire
               </h1>
-              <p style={{ fontSize: 15, color: MUTED, margin: 0, lineHeight: 1.65 }}>Interview any employee free. Hire when you're ready. Or build your own with the canvas.</p>
+              <p style={{ fontSize: 15, color: MUTED, margin: 0, lineHeight: 1.65 }}>The star gets the credit. Your Stuntman does the work. Interview free, hire when ready.</p>
             </div>
             <Link href="/flows" style={{
               flexShrink: 0,
@@ -139,7 +139,7 @@ export default function EmployeesClient() {
 
         {/* Results count */}
         <div style={{ marginBottom: 20, fontSize: 12, color: DIM, fontFamily: 'var(--font-space)', letterSpacing: '0.02em' }}>
-          {filtered.length} employee{filtered.length !== 1 ? 's' : ''} {dept !== 'All' ? `in ${dept}` : 'across all departments'}
+          {filtered.length} stunt{filtered.length !== 1 ? 'men & stuntwomen' : 'man/stuntwoman'} {dept !== 'All' ? `in ${dept}` : 'across all departments'}
         </div>
 
         {/* Grid */}
@@ -225,7 +225,10 @@ function EmployeeCard({ e }: { e: any }) {
           {e.emoji}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: e.color, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4, fontFamily: 'var(--font-space)' }}>{e.dept}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: e.color, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-space)' }}>{e.dept}</div>
+            <div style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: 'rgba(255,255,255,0.06)', color: '#94A3B8', letterSpacing: '0.04em', textTransform: 'uppercase' }}>{getStuntTitle(e.name)}</div>
+          </div>
           <div style={{ fontSize: 17, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', fontFamily: 'var(--font-space)' }}>{e.name}</div>
           <div style={{ fontSize: 12.5, color: MUTED, marginTop: 2 }}>{e.title} · {e.years} yrs</div>
         </div>

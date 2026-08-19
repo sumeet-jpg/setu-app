@@ -44,6 +44,7 @@ import { EMPLOYEES_PART2 } from './profiles-part2'
 import { EMPLOYEES_PART3 } from './profiles-part3'
 import { EMPLOYEES_PART4 } from './profiles-part4'
 import { EMPLOYEES_PART5 } from './profiles-part5'
+import { EMPLOYEES_PART6 } from './profiles-part6'
 
 const EMPLOYEES_BASE: EmployeeProfile[] = [
   // ── 1. Marcus — Marketing Manager ──────────────────────────────────────────
@@ -1039,12 +1040,37 @@ export const EMPLOYEES: EmployeeProfile[] = [
   ...EMPLOYEES_PART3,
   ...EMPLOYEES_PART4,
   ...EMPLOYEES_PART5,
+  ...EMPLOYEES_PART6,
 ]
 
 export const EMPLOYEE_BY_SLUG = Object.fromEntries(EMPLOYEES.map(e => [e.slug, e]))
 
 export function getEmployee(slug: string): EmployeeProfile | undefined {
   return EMPLOYEE_BY_SLUG[slug]
+}
+
+/* ── Stuntman / Stuntwoman by name ──────────────────────────── */
+const FEMALE_NAMES = new Set([
+  // Part 1
+  'Aria','Diana','Nora','Clara','Maya','Zara','Iris','Vera','Sage','Luna',
+  // Part 2
+  'Nisha','Tara','Meera','Priya','Ananya','Siya','Shreya','Ayesha','Neha',
+  // Part 3
+  'Lavanya','Tanvi','Kavya','Jyoti','Pooja','Divya','Ritu','Anjali','Sonal',
+  // Part 4
+  'Sunita','Roshni','Nandini','Ankita','Pallavi','Reena','Shweta','Priti',
+  // Part 5
+  'Rashmi','Smita','Usha','Sneha','Bhavna','Padma','Priyanka','Kavita','Meghna',
+  // Part 6
+  'Chloe','Dara','Camille',
+])
+
+export function getStuntTitle(name: string): 'Stuntman' | 'Stuntwoman' {
+  return FEMALE_NAMES.has(name) ? 'Stuntwoman' : 'Stuntman'
+}
+
+export function getStuntLabel(name: string, title: string): string {
+  return `${title} ${getStuntTitle(name)}`
 }
 
 export const DEPT_ORDER = [
