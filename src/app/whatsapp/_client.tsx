@@ -2,6 +2,7 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import { SetuLogo } from '@/components/SetuLogo'
 
 const WA_EMPLOYEES = [
   {
@@ -91,10 +92,7 @@ export default function WhatsAppClient() {
 
       {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(6,10,24,0.92)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${C.borderMid}`, padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: C.text }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#6366f1,#7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, color: '#fff' }}>S</div>
-          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.04em' }}>Setu</span>
-        </Link>
+        <SetuLogo size={28} color={C.green} wordColor={C.text} />
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <Link href="/employees" style={{ fontSize: 13, color: C.muted, textDecoration: 'none', padding: '6px 12px' }}>All employees</Link>
           <Link href="/employees/whatsapp-lead-qualifier/interview" style={{ fontSize: 13, fontWeight: 700, color: C.green, padding: '7px 16px', borderRadius: 20, background: C.greenDim, border: `1px solid ${C.greenBorder}`, textDecoration: 'none' }}>

@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { SetuLogo } from '@/components/SetuLogo'
 
 const BG = '#07091C'
 const SURFACE = '#0D1428'
@@ -130,10 +131,7 @@ export default function QuizClient() {
     <div style={{ minHeight: '100vh', background: BG, color: '#F1F5F9', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', lineHeight: 1.6 }}>
       {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(7,9,28,0.94)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${BORDER}`, padding: '0 24px', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: '#F1F5F9' }}>
-          <div style={{ width: 26, height: 26, borderRadius: 7, background: 'linear-gradient(135deg,#6366f1,#7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900, color: '#fff' }}>S</div>
-          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.04em' }}>Setu</span>
-        </Link>
+        <SetuLogo size={28} color="#22c55e" wordColor="#F1F5F9" />
         <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none' }}>Browse all 100 employees →</Link>
       </nav>
 

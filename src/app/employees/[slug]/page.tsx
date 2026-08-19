@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getEmployee, EMPLOYEES } from '@/lib/employees/profiles'
+import { SetuLogo } from '@/components/SetuLogo'
 
 export async function generateStaticParams() {
   return EMPLOYEES.map(e => ({ slug: e.slug }))
@@ -111,12 +112,7 @@ export default async function EmployeeProfilePage({ params }: { params: Promise<
         position: 'sticky', top: 0, zIndex: 50,
         background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
       }}>
-        <Link href="/employees" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(99,102,241,0.4)' }}>
-            <span style={{ fontSize: 14, fontWeight: 900, color: '#fff', fontFamily: 'var(--font-space)' }}>S</span>
-          </div>
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#F1F5F9', letterSpacing: '-0.03em', fontFamily: 'var(--font-space)' }}>Setu</span>
-        </Link>
+        <SetuLogo href="/" size={30} color="#22c55e" wordColor="#F1F5F9" />
         <div style={{ display: 'flex', gap: 8 }}>
           <Link href={`/employees/${e.slug}/interview`} style={{ padding: '8px 18px', borderRadius: 10, background: 'transparent', border: `1px solid ${e.color}45`, color: e.color, fontSize: 13, fontWeight: 600, textDecoration: 'none', fontFamily: 'var(--font-space)', letterSpacing: '-0.01em' }}>
             Interview {e.name}

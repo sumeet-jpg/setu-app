@@ -1,6 +1,7 @@
 // @ts-nocheck
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { SetuLogo } from '@/components/SetuLogo'
 
 export const metadata: Metadata = {
   title: 'MCP Server — Setu AI Employees',
@@ -72,12 +73,7 @@ export default function McpPage() {
 
       {/* Nav */}
       <nav style={{ borderBottom: `1px solid ${BORDER}`, padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50, background: 'rgba(9,9,11,0.9)', backdropFilter: 'blur(16px)' }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: 13, fontWeight: 900, color: '#fff' }}>S</span>
-          </div>
-          <span style={{ fontSize: 15, fontWeight: 700, color: '#fafafa', letterSpacing: '-0.02em' }}>Setu</span>
-        </Link>
+        <SetuLogo size={28} color="#22c55e" wordColor="#fafafa" />
         <div style={{ display: 'flex', gap: 10 }}>
           <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '6px 12px' }}>AI Employees</Link>
           <a href="https://setuagents.com/api/mcp" target="_blank" rel="noopener" style={{ padding: '7px 16px', borderRadius: 8, background: '#6366f1', color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>

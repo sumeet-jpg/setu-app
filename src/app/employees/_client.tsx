@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { EMPLOYEES, DEPT_ORDER } from '@/lib/employees/profiles'
+import { SetuLogo } from '@/components/SetuLogo'
 
 /* ─── Design tokens ─── */
 const BG      = '#0F172A'
@@ -52,17 +53,7 @@ export default function EmployeesClient() {
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
       }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 10,
-            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 4px 16px rgba(99,102,241,0.4)',
-          }}>
-            <span style={{ fontSize: 14, fontWeight: 900, color: '#fff', fontFamily: 'var(--font-space)' }}>S</span>
-          </div>
-          <span style={{ fontSize: 16, fontWeight: 700, color: TEXT, letterSpacing: '-0.03em', fontFamily: 'var(--font-space)' }}>Setu</span>
-        </Link>
+        <SetuLogo size={30} color="#22c55e" wordColor={TEXT} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Link href="/whatsapp" style={{ fontSize: 13, color: '#4ade80', textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>WhatsApp</Link>
           <Link href="/pricing" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Pricing</Link>

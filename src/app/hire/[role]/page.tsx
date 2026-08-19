@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { EMPLOYEE_BY_SLUG } from '@/lib/employees/profiles'
+import { SetuLogo } from '@/components/SetuLogo'
 
 // Maps pSEO role slugs → employee profile slugs + copy overrides
 const ROLE_MAP: Record<string, {
@@ -123,10 +124,7 @@ export default async function HireRolePage({ params }: { params: Promise<{ role:
 
       {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(10,15,30,0.92)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${BORDER}`, padding: '0 24px', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: '#F1F5F9' }}>
-          <div style={{ width: 26, height: 26, borderRadius: 7, background: 'linear-gradient(135deg,#6366f1,#7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900, color: '#fff' }}>S</div>
-          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.04em' }}>Setu</span>
-        </Link>
+        <SetuLogo size={28} color="#22c55e" wordColor="#F1F5F9" />
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '6px 12px' }}>All 100 employees</Link>
           {employee && (

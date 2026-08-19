@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { EMPLOYEES } from '@/lib/employees/profiles'
+import { SetuLogo } from '@/components/SetuLogo'
 
 const BASE = 'https://setuagents.com'
 
@@ -112,12 +113,7 @@ export default function HomePage() {
 
       {/* ── NAV ── */}
       <nav style={{ background: WHITE, borderBottom: `1px solid ${GRAY}`, padding: '0 32px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: GREEN, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: '#fff', fontFamily: F }}>S</span>
-          </div>
-          <span style={{ fontSize: 16, fontWeight: 800, color: INK, letterSpacing: '-0.04em', fontFamily: F }}>Setu</span>
-        </Link>
+        <SetuLogo size={30} color={GREEN} wordColor={INK} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           {[['All Employees', '/employees'], ['WhatsApp', '/whatsapp'], ['Enterprise', '/enterprise'], ['Compare', '/compare']].map(([label, href]) => (
             <Link key={href} href={href} className="nav-link" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }}>{label}</Link>

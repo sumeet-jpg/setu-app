@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { EMPLOYEE_BY_SLUG } from '@/lib/employees/profiles'
+import { SetuLogo } from '@/components/SetuLogo'
 
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
@@ -107,12 +108,7 @@ export default function HireClient({ slug }: { slug: string }) {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
       }}>
-        <Link href={`/employees/${e.slug}`} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: '#F1F5F9' }}>
-          <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(99,102,241,0.4)' }}>
-            <span style={{ fontSize: 14, fontWeight: 900, color: '#fff', fontFamily: 'var(--font-space)' }}>S</span>
-          </div>
-          <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.03em', fontFamily: 'var(--font-space)' }}>Setu</span>
-        </Link>
+        <SetuLogo href="/" size={30} color="#22c55e" wordColor="#F1F5F9" />
         <Link href={`/employees/${e.slug}/interview`} style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '7px 14px', borderRadius: 8, border: `1px solid ${BORDER}`, fontFamily: 'var(--font-space)' }}>
           Interview {e.name} first (free)
         </Link>

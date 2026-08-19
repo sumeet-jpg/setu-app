@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { SetuLogo } from '@/components/SetuLogo'
 
 export const metadata: Metadata = {
   title: 'AI Employees vs Human Hires — Real Cost Comparison',
@@ -70,10 +71,7 @@ export default function ComparePage() {
 
       {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(8,12,28,0.92)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${BORDER}`, padding: '0 24px', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: '#F1F5F9' }}>
-          <div style={{ width: 26, height: 26, borderRadius: 7, background: 'linear-gradient(135deg,#6366f1,#7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900, color: '#fff' }}>S</div>
-          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.04em' }}>Setu</span>
-        </Link>
+        <SetuLogo size={28} color="#22c55e" wordColor="#F1F5F9" />
         <div style={{ display: 'flex', gap: 8 }}>
           <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '6px 12px' }}>All employees</Link>
           <Link href="/pricing" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '6px 12px' }}>Pricing</Link>
