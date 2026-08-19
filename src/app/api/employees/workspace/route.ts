@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { getEmployee } from '@/lib/employees/profiles'
 
 export const runtime = 'nodejs'
-export const maxDuration = 120
+export const maxDuration = 60
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
