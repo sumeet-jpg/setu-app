@@ -1,9 +1,11 @@
 // @ts-nocheck
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { EMPLOYEES, EMPLOYEE_COUNT } from '@/lib/employees/profiles'
+import { EMPLOYEES, EMPLOYEE_COUNT, DEPT_ORDER } from '@/lib/employees/profiles'
 import { SetuLogo } from '@/components/SetuLogo'
 import EmployeeMatchBox from '@/components/EmployeeMatchBox'
+import VideoHero from '@/components/VideoHero'
+import DeptPicker from '@/components/DeptPicker'
 
 const BASE = 'https://setuagents.com'
 
@@ -37,17 +39,6 @@ const GRAY    = '#E3E1DA'
 const MUTED   = '#78746E'
 const DIM     = '#9E9891'
 const F       = 'var(--font-jakarta)'
-
-const FEATURED_SLUGS = [
-  'marketing-manager',
-  'cfo-intelligence',
-  'revenue-ops-lead',
-  'cmo-intelligence',
-  'hr-ops-manager',
-  'coo-intelligence',
-  'sdr-manager',
-  'customer-success-manager',
-]
 
 const HOW_STEPS = [
   { n: '01', title: 'Browse 100 roles', body: 'From a RevOps Lead to an AI CMO — browse every function your business needs. Each employee is deeply specialized.' },
@@ -94,7 +85,14 @@ const homeJsonLd = {
 }
 
 export default function HomePage() {
-  const featured = FEATURED_SLUGS.map(s => EMPLOYEES.find(e => e.slug === s)).filter(Boolean)
+  const departments = DEPT_ORDER
+    .filter(d => EMPLOYEES.some(e => e.dept === d))
+    .map(d => ({
+      name: d,
+      employees: EMPLOYEES
+        .filter(e => e.dept === d)
+        .map(e => ({ slug: e.slug, name: e.name, title: e.title, emoji: e.emoji, color: e.color, dept: e.dept, pricing: e.pricing })),
+    }))
 
   return (
     <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: F }}>
@@ -169,14 +167,12 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Hero right: 2 employee cards */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {featured.slice(0, 2).map(e => (
-            <HeroEmployeeCard key={e.slug} employee={e} />
-          ))}
-          <div style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 16, padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 13, color: MUTED, fontWeight: 500 }}>+98 more employees across every function</span>
-            <Link href="/employees" style={{ fontSize: 12, fontWeight: 700, color: GREEN, textDecoration: 'none' }}>View all →</Link>
+        {/* Hero right: video */}
+        <div>
+          <VideoHero />
+          <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 12, color: MUTED }}>30-second overview · Arthur voices it</span>
+            <Link href="/employees" style={{ fontSize: 12, fontWeight: 700, color: GREEN, textDecoration: 'none', marginLeft: 'auto' }}>Browse the team →</Link>
           </div>
         </div>
       </section>
@@ -230,47 +226,18 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── FULL DIRECTORY ── */}
+        {/* ── DEPT PICKER ── */}
         <section style={{ marginBottom: 104 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 40 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 32 }}>
             <div>
-              <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Browse AI Employees</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Browse by Department</span>
               <h2 style={{ fontSize: 'clamp(26px,3.5vw,40px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '10px 0 0', color: INK, lineHeight: 1.1 }}>
-                All {EMPLOYEES.length} AI Employees
+                Pick a department, meet the team
               </h2>
             </div>
             <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>Interview any of them free — no account needed.</p>
           </div>
-          {(() => {
-            const byDept = EMPLOYEES.reduce((acc, e) => {
-              if (!acc[e.dept]) acc[e.dept] = []
-              acc[e.dept].push(e)
-              return acc
-            }, {} as Record<string, typeof EMPLOYEES>)
-            return Object.entries(byDept).map(([dept, emps]) => (
-              <div key={dept} style={{ marginBottom: 40 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: GREEN, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{dept}</span>
-                  <div style={{ flex: 1, height: 1, background: GRAY }} />
-                  <span style={{ fontSize: 12, color: DIM }}>{emps.length} employee{emps.length > 1 ? 's' : ''}</span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 8 }}>
-                  {emps.map(e => (
-                    <Link key={e.slug} href={`/employees/${e.slug}`} className="emp-card" style={{ display: 'flex', alignItems: 'center', gap: 14, background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 14, padding: '14px 18px', textDecoration: 'none', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
-                      <div style={{ width: 42, height: 42, borderRadius: 11, background: `${e.color}12`, border: `1.5px solid ${e.color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
-                        {e.emoji}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{e.name}</div>
-                        <div style={{ fontSize: 11, color: MUTED, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.title}</div>
-                      </div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: GREEN, flexShrink: 0 }}>{e.pricing.label}</div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))
-          })()}
+          <DeptPicker departments={departments} />
         </section>
 
         {/* ── CANVAS CTA ── */}
@@ -449,21 +416,4 @@ export default function HomePage() {
   )
 }
 
-function HeroEmployeeCard({ employee: e }: { employee: any }) {
-  return (
-    <Link href={`/employees/${e.slug}`} className="emp-card" style={{ display: 'flex', alignItems: 'center', gap: 16, background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 16, padding: '20px 22px', textDecoration: 'none', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-      <div style={{ width: 52, height: 52, borderRadius: 14, background: `${e.color}14`, border: `1.5px solid ${e.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, flexShrink: 0 }}>
-        {e.emoji}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: INK, letterSpacing: '-0.03em' }}>{e.name}</div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: GREEN, flexShrink: 0 }}>{e.pricing.label}</div>
-        </div>
-        <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{e.title}</div>
-        <div style={{ fontSize: 11, color: DIM, marginTop: 5 }}>{e.agentCount} agents · {e.dept}</div>
-      </div>
-    </Link>
-  )
-}
 
