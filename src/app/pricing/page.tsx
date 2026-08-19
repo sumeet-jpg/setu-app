@@ -35,7 +35,7 @@ const TIERS: Array<{
     label: 'Starter',
     emoji: '💬',
     tagline: 'WhatsApp automation & simple bots',
-    range: '$199 – $399 /mo',
+    range: '$29 – $89 /mo',
     color: '#25D366',
     features: [
       'WhatsApp customer support bot',
@@ -55,7 +55,7 @@ const TIERS: Array<{
     label: 'Business',
     emoji: '🚀',
     tagline: 'Core business functions covered',
-    range: '$499 – $999 /mo',
+    range: '$79 – $149 /mo',
     color: '#1A5C8A',
     highlight: true,
     features: [
@@ -76,7 +76,7 @@ const TIERS: Array<{
     label: 'Growth',
     emoji: '📈',
     tagline: 'Specialist & technical functions',
-    range: '$1,099 – $1,999 /mo',
+    range: '$159 – $249 /mo',
     color: '#EC4899',
     features: [
       'Technical employees (DevOps, QA, Cloud)',
@@ -96,7 +96,7 @@ const TIERS: Array<{
     label: 'C-Suite',
     emoji: '👔',
     tagline: 'Executive AI employees for scale',
-    range: '$2,499 – $2,999 /mo',
+    range: '$299 – $349 /mo',
     color: '#F59E0B',
     features: [
       'Chief of Staff (241 agents)',

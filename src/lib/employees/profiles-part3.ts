@@ -1,4 +1,4 @@
-// @ts-nocheck
+﻿// @ts-nocheck
 import type { EmployeeProfile } from './profiles'
 
 export const EMPLOYEES_PART3: EmployeeProfile[] = [
@@ -14,7 +14,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Launches, produces, and grows podcasts that build authority and generate business leads.',
     intro: "Rohan handles every part of your podcast — strategy, episode planning, guest booking, show notes, SEO, and distribution. He turns each episode into a multi-channel content asset and tracks which episodes drive the most business outcomes.",
     agentCount: 41,
-    pricing: { monthly: 599, label: '$599/mo' },
+    pricing: { monthly: 79, label: '$79/mo' },
     knows: ['Podcast strategy and format design', 'Guest booking and coordination', 'Episode planning and research', 'Show notes and SEO', 'Audio editing coordination', 'Podcast SEO on Spotify/Apple', 'Distribution across 15+ platforms', 'Episode repurposing for social', 'Sponsorship outreach', 'Listener growth tactics'],
     capabilities: [
       { area: 'Production & Planning', icon: '🎙️', blurb: 'Consistent, high-quality episodes every time.', scenarios: ['Plan quarterly episode calendar by theme', 'Research and book relevant guests', 'Write episode briefs and interview questions', 'Coordinate post-production and publish schedule'] },
@@ -44,7 +44,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Writes scripts that hook, hold, and convert — for ads, explainers, short-form, and long-form video.',
     intro: "Lavanya writes scripts that work. Whether it's a 30-second ad, a 10-minute explainer, or a full-length documentary, she understands structure, pacing, and the moment a viewer decides to stay or scroll. Every word earns its place.",
     agentCount: 37,
-    pricing: { monthly: 549, label: '$549/mo' },
+    pricing: { monthly: 79, label: '$79/mo' },
     knows: ['Ad scriptwriting (15s/30s/60s)', 'Explainer and product demo scripts', 'Short-form scripts (Reels/Shorts/TikTok)', 'Long-form YouTube scripts', 'Hook writing and opening frameworks', 'Storyboarding and shot direction', 'Brand voice adaptation', 'A/B script testing', 'UGC and testimonial scripts'],
     capabilities: [
       { area: 'Ad Scripts', icon: '📺', blurb: 'Scripts that stop the scroll and drive action.', scenarios: ['Write 15s, 30s, and 60s ad scripts with strong hooks', 'Develop multiple creative angles for A/B testing', 'Write UGC-style scripts for creator briefs', 'Script problem-agitate-solution ad formats'] },
@@ -74,7 +74,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Grows Instagram accounts that convert followers into customers, not just fans.',
     intro: "Tanvi manages Instagram accounts with a revenue lens. She plans the content calendar, writes captions, manages hashtags, responds to comments, coordinates Reels production, and tracks which posts actually drive sales. Followers are a vanity metric — buyers are the goal.",
     agentCount: 64,
-    pricing: { monthly: 649, label: '$649/mo' },
+    pricing: { monthly: 89, label: '$89/mo' },
     knows: ['Instagram algorithm and Reels strategy', 'Content calendar planning', 'Caption writing and hook strategy', 'Hashtag strategy by niche', 'Reels scripting and direction', 'Stories and link strategy', 'Collab posts and IG Live', 'Instagram Shopping', 'Community management', 'Insights analysis and reporting'],
     capabilities: [
       { area: 'Content Strategy & Production', icon: '📸', blurb: 'Content that earns reach and drives action.', scenarios: ['Build monthly content calendar by theme and format', 'Write scroll-stopping captions with clear CTAs', 'Script Reels with hook and retention structure', 'Manage content approval and scheduling workflow'] },
@@ -106,7 +106,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Keeps your GST, TDS, and income tax filings accurate, on time, and audit-proof.',
     intro: "Suresh handles India's complex tax compliance stack so you don't have to. Monthly GST returns, quarterly TDS filings, annual tax computation, and audit readiness — all done on time, every time, with zero penalties.",
     agentCount: 93,
-    pricing: { monthly: 799, label: '$799/mo' },
+    pricing: { monthly: 119, label: '$119/mo' },
     knows: ['GST returns (GSTR-1, GSTR-3B, GSTR-9)', 'TDS calculation and filing (Form 24Q/26Q)', 'Input tax credit reconciliation', 'E-invoicing and e-way bills', 'Income tax computation and ITR filing', 'Tax audit preparation', 'Transfer pricing documentation', 'GST notices and assessments', 'Customs duty and import GST', 'ROC annual compliances'],
     capabilities: [
       { area: 'GST Management', icon: '📋', blurb: 'GST filings done before the due date, every month.', scenarios: ['File GSTR-1 and GSTR-3B monthly', 'Reconcile ITC with GSTR-2B monthly', 'Prepare and file GSTR-9 annual return', 'Handle GST notices and department queries'] },
@@ -136,7 +136,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Runs payroll for Indian companies — PF, ESI, PT, TDS, and pay slips done right every month.',
     intro: "Kavya manages India payroll from end to end. Monthly payroll processing, PF and ESI contributions, professional tax, Form 16 generation, and statutory compliance — for companies from 5 to 500 employees.",
     agentCount: 67,
-    pricing: { monthly: 699, label: '$699/mo' },
+    pricing: { monthly: 99, label: '$99/mo' },
     knows: ['Indian payroll processing', 'PF (Provident Fund) compliance', 'ESI (Employee State Insurance)', 'Professional tax by state', 'TDS on salary (Form 24Q)', 'Gratuity and leave encashment', 'Pay slip generation', 'Full and final settlement', 'ESOP taxation', 'Payroll software management'],
     capabilities: [
       { area: 'Monthly Payroll', icon: '💰', blurb: 'Salaries paid on time, correctly, every month.', scenarios: ['Process monthly payroll for all employees', 'Calculate CTC breakup, deductions, and net pay', 'Generate payslips and distribute to employees', 'Handle salary revisions, new joiners, and exits'] },
@@ -166,7 +166,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Manages your international trade — IEC, customs, DGFT, RBI compliance, and trade finance.',
     intro: "Arun handles everything from your first export shipment to your 500th. IEC registration, DGFT benefits, customs documentation, Letter of Credit handling, RBI reporting, and export incentives like RoDTEP and duty drawback.",
     agentCount: 101,
-    pricing: { monthly: 999, label: '$999/mo' },
+    pricing: { monthly: 149, label: '$149/mo' },
     knows: ['IEC registration and renewal', 'Export documentation (Invoice, BL, COO)', 'DGFT schemes (MEIS, RoDTEP, EPCG)', 'Customs classification (HS Code)', 'Duty drawback claims', 'Letter of Credit management', 'RBI FEMA compliance and BRC', 'Import clearance and duty calculation', 'ECGC credit insurance', 'Trade finance instruments'],
     capabilities: [
       { area: 'Export Compliance & Benefits', icon: '📦', blurb: 'Capture every export incentive you\'re entitled to.', scenarios: ['Register and maintain IEC with DGFT', 'Claim RoDTEP and duty drawback on exports', 'Apply for EPCG licence for capital goods', 'Handle customs examination and clearance'] },
@@ -196,7 +196,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Runs procurement, negotiates vendor contracts, and cuts costs without cutting corners.',
     intro: "Madhav manages your vendor relationships and procurement operations. He sources new suppliers, negotiates contracts, manages performance, and identifies where you're overpaying — saving typically 15-25% on procurement costs in the first 90 days.",
     agentCount: 121,
-    pricing: { monthly: 899, label: '$899/mo' },
+    pricing: { monthly: 129, label: '$129/mo' },
     knows: ['Vendor sourcing and shortlisting', 'RFQ and tender management', 'Contract negotiation', 'Vendor performance management', 'Cost benchmarking', 'Payment terms optimisation', 'Vendor risk assessment', 'Category management', 'Supplier development', 'GeM portal management'],
     capabilities: [
       { area: 'Sourcing & Negotiation', icon: '🤝', blurb: 'Better vendors, better prices, better terms.', scenarios: ['Source qualified vendors for any category', 'Run RFQ/RFP process and evaluate responses', 'Negotiate pricing, payment terms, and SLAs', 'Benchmark costs against market rates'] },
@@ -226,7 +226,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Unlocks every government scheme, subsidy, and credit facility your MSME is eligible for.',
     intro: "Jyoti specialises in helping Indian MSMEs navigate and benefit from government schemes, credit facilities, and subsidies. She handles Udyam registration, CGTMSE guarantees, MUDRA loans, state industrial subsidies, and cluster development programmes.",
     agentCount: 128,
-    pricing: { monthly: 599, label: '$599/mo' },
+    pricing: { monthly: 79, label: '$79/mo' },
     knows: ['Udyam registration and renewal', 'MSME credit guarantee (CGTMSE)', 'MUDRA loan schemes', 'State industrial subsidies', 'TReDS invoice discounting', 'NSIC schemes', 'GeM seller registration', 'Startup India and DPIIT recognition', 'PLI scheme application', 'SIDBI credit programmes'],
     capabilities: [
       { area: 'Government Registrations & Certifications', icon: '📋', blurb: 'Every registration that unlocks a benefit.', scenarios: ['Register for Udyam MSME certification', 'Get DPIIT Startup India recognition', 'Register on GeM for government sales', 'Apply for NSIC single point registration'] },
@@ -256,7 +256,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Handles all your startup\'s legal and compliance requirements so you can focus on building.',
     intro: "Rahul manages the complete legal compliance stack for Indian startups — company incorporation, DPIIT recognition, annual ROC filings, FEMA compliance for foreign investment, ESOP documentation, and shareholder agreements.",
     agentCount: 136,
-    pricing: { monthly: 1099, label: '$1,099/mo' },
+    pricing: { monthly: 159, label: '$159/mo' },
     knows: ['Company incorporation (Private Ltd/LLP)', 'DPIIT Startup India recognition', 'ROC annual filings (AOC-4, MGT-7)', 'FEMA compliance for FDI', 'ESOP scheme documentation', 'Shareholder and founder agreements', 'Trademark registration', 'IP protection strategy', 'Vendor and customer contracts', 'Employment agreements'],
     capabilities: [
       { area: 'Company Compliances', icon: '📋', blurb: 'All ROC and statutory compliances, on time.', scenarios: ['File annual returns (AOC-4 and MGT-7)', 'Handle board meeting and AGM secretarial work', 'Maintain statutory registers', 'File DIR-3 KYC and DIN updates for directors'] },
@@ -288,7 +288,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Builds CI/CD pipelines, manages cloud infrastructure, and keeps your systems up 99.9% of the time.',
     intro: "Nikhil owns your DevOps stack — from Dockerfile to production. He sets up CI/CD, manages cloud infrastructure, configures monitoring, and responds to incidents before your users even notice. Zero-downtime deployments are the standard, not the goal.",
     agentCount: 167,
-    pricing: { monthly: 1499, label: '$1,499/mo' },
+    pricing: { monthly: 199, label: '$199/mo' },
     knows: ['CI/CD pipeline design (GitHub Actions, GitLab CI, Jenkins)', 'Container orchestration (Docker, Kubernetes)', 'Cloud infrastructure (AWS, GCP, Azure)', 'Infrastructure as Code (Terraform, Pulumi)', 'Monitoring and alerting (Datadog, PagerDuty)', 'Database operations and backups', 'Security hardening and access management', 'Cost optimisation on cloud', 'Service mesh and networking', 'Incident response'],
     capabilities: [
       { area: 'CI/CD & Deployment', icon: '🚀', blurb: 'Code ships fast and safely, every time.', scenarios: ['Design and implement CI/CD pipelines for any stack', 'Set up blue-green and canary deployment strategies', 'Automate testing gates before production deploy', 'Build rollback procedures for failed deployments'] },
@@ -318,7 +318,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Builds test coverage that catches bugs before your users do — and keeps it fast.',
     intro: "Pooja builds and maintains quality assurance systems that actually work. She designs test strategies, writes automation scripts, manages test environments, and gives you confidence that every release is safe to ship.",
     agentCount: 113,
-    pricing: { monthly: 1099, label: '$1,099/mo' },
+    pricing: { monthly: 159, label: '$159/mo' },
     knows: ['Test strategy and planning', 'Manual and automated testing', 'Selenium, Playwright, Cypress', 'API testing (Postman, REST Assured)', 'Performance testing (k6, JMeter)', 'Mobile testing (Appium)', 'Test management (TestRail, Jira)', 'BDD with Cucumber', 'Visual regression testing', 'CI/CD test integration'],
     capabilities: [
       { area: 'Test Automation', icon: '🤖', blurb: 'Tests that run on every commit, not just before release.', scenarios: ['Build E2E test suite with Playwright or Cypress', 'Write API test suites with Postman collections', 'Set up visual regression testing for UI changes', 'Integrate tests into CI/CD pipeline'] },
@@ -348,7 +348,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Cuts your cloud bill by 30-50% without touching performance or reliability.',
     intro: "Karan audits your AWS, GCP, or Azure spend and eliminates waste with surgical precision. Reserved instances, rightsizing, spot instances, idle resource cleanup — he finds the money you're leaving on the table and gets it back.",
     agentCount: 91,
-    pricing: { monthly: 799, label: '$799/mo' },
+    pricing: { monthly: 119, label: '$119/mo' },
     knows: ['AWS cost optimisation', 'GCP billing management', 'Azure cost management', 'Reserved instances and savings plans', 'Spot and preemptible instances', 'Rightsizing workloads', 'Idle resource cleanup', 'Storage tiering and lifecycle policies', 'FinOps framework', 'Cost allocation and tagging'],
     capabilities: [
       { area: 'Cost Audit & Reduction', icon: '💰', blurb: 'Find and eliminate cloud waste fast.', scenarios: ['Full cloud spend audit by service and team', 'Identify idle and underutilised resources', 'Rightsize over-provisioned instances', 'Clean up orphaned storage, IPs, and snapshots'] },
@@ -378,7 +378,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Connects your tools, automates your workflows, and eliminates manual data entry across your stack.',
     intro: "Siddharth connects things that don't talk to each other. CRM to email platform to helpdesk to billing — he maps the data flows, builds the integrations, and makes sure the right information is in the right place at the right time.",
     agentCount: 144,
-    pricing: { monthly: 1199, label: '$1,199/mo' },
+    pricing: { monthly: 179, label: '$179/mo' },
     knows: ['REST and GraphQL API integration', 'Webhook design and management', 'Zapier and Make.com automation', 'iPaaS platforms (Workato, Boomi)', 'Custom API development', 'OAuth and API authentication', 'Error handling and retry logic', 'Data transformation and mapping', 'ETL pipeline design', 'API documentation'],
     capabilities: [
       { area: 'Integration Design & Build', icon: '🔌', blurb: 'Systems that talk to each other without you in the middle.', scenarios: ['Map data flows between your tools', 'Build bi-directional CRM to helpdesk integration', 'Connect payment gateway to accounting system', 'Integrate e-commerce platform with ERP and 3PL'] },
@@ -408,7 +408,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Writes developer docs, API references, and internal wikis that engineers actually use.',
     intro: "Divya owns your technical documentation. She interviews engineers, reads code, and produces docs that are accurate, clear, and maintained. Developer experience starts with documentation, and good docs reduce support tickets by 40%.",
     agentCount: 52,
-    pricing: { monthly: 699, label: '$699/mo' },
+    pricing: { monthly: 99, label: '$99/mo' },
     knows: ['API reference documentation', 'Developer guides and quickstarts', 'SDK documentation', 'Internal engineering wikis', 'Process and runbook documentation', 'Docs-as-code (Markdown, MDX, RST)', 'Docs site management (GitBook, Mintlify, Docusaurus)', 'Technical writing style guides', 'Video tutorial scripting', 'Changelog writing'],
     capabilities: [
       { area: 'Developer Documentation', icon: '📚', blurb: 'Docs that make developers love your product.', scenarios: ['Write and structure API reference documentation', 'Create quickstart guides for new integrations', 'Build SDK documentation from code and specs', 'Write authentication and error code references'] },
@@ -440,7 +440,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Fills your broker or developer pipeline with qualified buyers and investors — without cold calling.',
     intro: "Ritu runs digital lead generation for real estate developers, brokers, and property platforms. She manages Meta and Google campaigns, builds WhatsApp qualification flows, and delivers leads with verified intent and budget — not just form submissions.",
     agentCount: 109,
-    pricing: { monthly: 999, label: '$999/mo' },
+    pricing: { monthly: 149, label: '$149/mo' },
     knows: ['Real estate digital marketing', 'Meta Ads for real estate', 'Google Ads for property', '99acres/Magicbricks/Housing.com listings', 'WhatsApp lead qualification for real estate', 'NRI investor outreach', 'Site visit booking automation', 'Real estate CRM management', 'Video walkthrough promotion', 'Lead scoring for property buyers'],
     capabilities: [
       { area: 'Lead Generation Campaigns', icon: '🎯', blurb: 'Campaigns that reach serious buyers, not browsers.', scenarios: ['Run Meta lead form ads targeting property buyers', 'Set up Google Search ads for high-intent keywords', 'Manage listing performance on 99acres and MagicBricks', 'Build WhatsApp qualification flow for every inbound lead'] },
@@ -470,7 +470,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Manages your rental portfolio — tenant sourcing, rent collection, maintenance, and compliance.',
     intro: "Varun manages rental properties like a professional property management company. He handles tenant communications, rent reminders, maintenance coordination, rental agreements, and regulatory compliance — so you collect rent without the headaches.",
     agentCount: 76,
-    pricing: { monthly: 799, label: '$799/mo' },
+    pricing: { monthly: 119, label: '$119/mo' },
     knows: ['Tenant sourcing and screening', 'Rental agreement drafting', 'Rent collection and reminders', 'Maintenance request management', 'Property inspection coordination', 'Security deposit management', 'NOC and rental compliance', 'Utility billing and reconciliation', 'Tenant exit and handover', 'Rental market analysis'],
     capabilities: [
       { area: 'Tenant Management', icon: '🤝', blurb: 'Good tenants, on-time rent, zero drama.', scenarios: ['Source and screen tenants for vacant properties', 'Draft and execute rental agreements', 'Automate rent reminders and collection tracking', 'Handle tenant maintenance requests end to end'] },
@@ -500,7 +500,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Delivers investment-grade real estate market research, valuations, and deal analysis.',
     intro: "Anjali produces the research that serious real estate decisions are built on. Market demand reports, comparable sales analysis, yield calculations, investment return modelling, and micro-market trend analysis — all delivered in clear, actionable reports.",
     agentCount: 87,
-    pricing: { monthly: 1099, label: '$1,099/mo' },
+    pricing: { monthly: 159, label: '$159/mo' },
     knows: ['Residential and commercial market analysis', 'Comparable sales and rental analysis', 'Yield and cap rate calculation', 'Discounted cash flow modelling', 'Micro-market demand research', 'RERA data analysis', 'Macro economic impact on real estate', 'Land parcel research', 'Investment ROI modelling', 'Market entry and exit timing analysis'],
     capabilities: [
       { area: 'Market Research', icon: '🔍', blurb: 'Research that tells you where to buy, sell, or hold.', scenarios: ['Micro-market demand and supply analysis', 'Comparative market analysis for pricing', 'Rental yield analysis by locality and asset class', 'Macro trend impact on local real estate market'] },
@@ -530,7 +530,7 @@ export const EMPLOYEES_PART3: EmployeeProfile[] = [
     tagline: 'Creates property content that generates enquiries — virtual tours, Instagram Reels, and listing copy.',
     intro: "Sonal manages content for real estate developers and brokers — listing copy, virtual tour scripts, Instagram Reels, YouTube property walkthroughs, and WhatsApp broadcast campaigns. She makes properties look irresistible.",
     agentCount: 58,
-    pricing: { monthly: 649, label: '$649/mo' },
+    pricing: { monthly: 89, label: '$89/mo' },
     knows: ['Real estate listing copywriting', 'Virtual tour and walkthrough scripts', 'Instagram and YouTube property content', 'Real estate video production coordination', 'Property brochure writing', 'WhatsApp broadcast campaigns for launches', 'Real estate blog and SEO content', 'Project launch campaign management', 'Property photography briefs', 'NRI-targeted content strategy'],
     capabilities: [
       { area: 'Listing & Launch Content', icon: '✍️', blurb: 'Copy and content that makes buyers enquire.', scenarios: ['Write property listings for all portals', 'Create project brochure content and highlights', 'Script virtual tour walkthroughs', 'Write WhatsApp broadcast for project launch'] },

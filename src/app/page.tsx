@@ -272,9 +272,9 @@ export default function HomePage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
             {[
-              { tier: 'Starter', price: '$199–999/mo', desc: 'Executive Assistant, Support Manager, SDR Manager, Data Analyst', accent: GREEN_M },
-              { tier: 'Growth', price: '$999–1,999/mo', desc: 'Marketing Manager, RevOps Lead, Finance Controller, Customer Success', accent: '#1A5C8A' },
-              { tier: 'Enterprise', price: '$2,499–2,999/mo', desc: 'CFO Intelligence, AI CMO, AI COO, CTO Intelligence, Chief of Staff', accent: '#8B5A1A' },
+              { tier: 'Starter', price: '$29–99/mo', desc: 'Executive Assistant, Support Manager, SDR Manager, Data Analyst', accent: GREEN_M },
+              { tier: 'Growth', price: '$99–249/mo', desc: 'Marketing Manager, RevOps Lead, Finance Controller, Customer Success', accent: '#1A5C8A' },
+              { tier: 'Enterprise', price: '$299–349/mo', desc: 'CFO Intelligence, AI CMO, AI COO, CTO Intelligence, Chief of Staff', accent: '#8B5A1A' },
               { tier: 'Custom', price: 'Your workflow', desc: 'Build any role on our Canvas — no code, no engineers, any complexity', accent: MUTED },
             ].map(t => (
               <div key={t.tier} style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 16, padding: '26px 22px', position: 'relative', overflow: 'hidden' }}>
@@ -347,9 +347,9 @@ export default function HomePage() {
               <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: MUTED }}>Cost comparison</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '24px 0 20px' }}>
                 {[
-                  { role: 'Marketing Manager', human: '₹12L/yr', ai: '₹1.99L/mo all-in', savings: '83% less' },
-                  { role: 'CFO', human: '₹40L/yr', ai: '₹1.99L/mo all-in', savings: '94% less' },
-                  { role: 'SDR Manager', human: '₹8L/yr', ai: '₹33K/mo all-in', savings: '51% less' },
+                  { role: 'Marketing Manager', human: '₹15L/yr', ai: '₹20.7K/mo', savings: '83% less' },
+                  { role: 'CFO', human: '₹40L/yr', ai: '₹29K/mo', savings: '91% less' },
+                  { role: 'SDR Manager', human: '₹10L/yr', ai: '₹16.5K/mo', savings: '80% less' },
                 ].map(r => (
                   <div key={r.role} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: WHITE, border: `1px solid ${GRAY}`, borderRadius: 10, padding: '10px 14px' }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: INK }}>{r.role}</div>

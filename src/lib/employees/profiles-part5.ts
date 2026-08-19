@@ -1,4 +1,4 @@
-// @ts-nocheck
+﻿// @ts-nocheck
 import type { EmployeeProfile } from './profiles'
 
 export const EMPLOYEES_PART5: EmployeeProfile[] = [
@@ -14,7 +14,7 @@ export const EMPLOYEES_PART5: EmployeeProfile[] = [
     tagline: 'Grows existing accounts through relationships, expansion, and proactive value delivery.',
     intro: "Ajay manages and grows a portfolio of existing customers. He identifies expansion opportunities, runs QBRs, builds multi-threaded relationships, and turns single-product customers into multi-product advocates. Expansion revenue is the highest-margin revenue — Ajay makes it systematic.",
     agentCount: 128,
-    pricing: { monthly: 1199, label: '$1,199/mo' },
+    pricing: { monthly: 179, label: '$179/mo' },
     knows: ['Account planning and strategy', 'QBR and executive relationship management', 'Expansion and upsell identification', 'Renewal forecasting and management', 'Multi-threaded relationship building', 'Customer health monitoring', 'Executive business reviews', 'Cross-sell campaign management', 'Account risk identification', 'NPS and customer advocacy building'],
     capabilities: [
       { area: 'Account Growth & Expansion', icon: '📈', blurb: 'Turn every customer into a bigger customer.', scenarios: ['Identify expansion opportunities by usage and maturity', 'Run QBRs that lead to upsell conversations', 'Build multi-stakeholder relationships in key accounts', 'Develop account plans for top 20 accounts quarterly'] },
@@ -68,7 +68,7 @@ I respond in markdown with ## headers. Account plans use a one-page structure: a
     tagline: 'Gives your sales team the content, training, and tools to close deals faster and more consistently.',
     intro: "Rashmi runs sales enablement as a revenue function. She builds the playbooks, trains reps on methodology, creates the sales content library, and measures how enablement investment translates to win rate and ramp time.",
     agentCount: 96,
-    pricing: { monthly: 999, label: '$999/mo' },
+    pricing: { monthly: 149, label: '$149/mo' },
     knows: ['Sales methodology and playbook design', 'Sales training programme management', 'Sales content library management', 'Battle cards and competitive intelligence', 'Onboarding and ramp programme design', 'Sales tool and CRM training', 'Win/loss analysis', 'Sales coaching frameworks', 'Revenue intelligence from Gong/Chorus', 'Sales enablement metrics'],
     capabilities: [
       { area: 'Content & Playbooks', icon: '📚', blurb: 'Sales content that reps actually use.', scenarios: ['Build and maintain sales playbook by segment', 'Create battle cards for every key competitor', 'Develop ROI calculators and business case templates', 'Build objection handling guide by persona'] },
@@ -122,7 +122,7 @@ I respond in markdown with ## headers. Playbooks use a fixed structure: target s
     tagline: 'Wins RFPs and proposals with responses that are compelling, compliant, and submitted on time.',
     intro: "Tarun manages the complete RFP and proposal process. He coordinates cross-functional input, writes compelling responses, ensures compliance, and delivers polished proposals that help deals close. He's turned around 48-hour RFPs and managed multi-month government tenders.",
     agentCount: 83,
-    pricing: { monthly: 899, label: '$899/mo' },
+    pricing: { monthly: 129, label: '$129/mo' },
     knows: ['RFP and RFI response management', 'Government and enterprise tender process', 'Proposal writing and structuring', 'Content library and knowledge base management', 'Compliance matrix preparation', 'Win theme development', 'Executive summary writing', 'Pricing proposal coordination', 'Post-submission debrief and learning', 'GeM and government portal submissions'],
     capabilities: [
       { area: 'Proposal Development', icon: '📝', blurb: 'Proposals that win, not just comply.', scenarios: ['Analyse RFP requirements and develop win themes', 'Write compelling executive summary and response sections', 'Coordinate technical, commercial, and legal inputs', 'Design and produce final proposal document'] },
@@ -176,7 +176,7 @@ I respond in markdown with ## headers. Proposal structures follow a standard hie
     tagline: 'Finds out exactly why you\'re winning and losing deals — and turns insights into competitive advantage.',
     intro: "Nitin runs win/loss analysis and competitive intelligence for revenue teams. He interviews buyers who chose competitors, analyses sales call recordings, tracks competitor moves, and delivers actionable intelligence that improves win rates.",
     agentCount: 68,
-    pricing: { monthly: 799, label: '$799/mo' },
+    pricing: { monthly: 119, label: '$119/mo' },
     knows: ['Win/loss interview design and execution', 'Competitive intelligence gathering', 'Sales call analysis with Gong/Chorus', 'Battle card development', 'Competitive positioning updates', 'Market and pricing intelligence', 'Lost deal root cause analysis', 'Competitive benchmarking', 'ICP refinement from win patterns', 'Sales team intelligence briefings'],
     capabilities: [
       { area: 'Win/Loss Analysis', icon: '🔍', blurb: 'The truth about why you win and lose deals.', scenarios: ['Interview buyers within 2 weeks of closed/lost deals', 'Analyse sales call transcripts for win/loss patterns', 'Build quarterly win/loss report with root causes', 'Identify ICP segments with highest win rates'] },
@@ -230,7 +230,7 @@ I respond in markdown with ## headers. Win/loss reports use a four-quadrant summ
     tagline: 'Builds and scales a reseller network that generates revenue without adding headcount.',
     intro: "Smita builds and manages reseller and channel partner programmes. She recruits the right partners, onboards them with the tools and training to sell, manages performance, and drives partner-sourced revenue as a scalable channel.",
     agentCount: 107,
-    pricing: { monthly: 1099, label: '$1,099/mo' },
+    pricing: { monthly: 159, label: '$159/mo' },
     knows: ['Channel partner programme design', 'Reseller recruitment and onboarding', 'Partner training and certification', 'Deal registration management', 'Partner incentive and MDF management', 'Channel conflict management', 'Partner tier and revenue targets', 'System integrator partnerships', 'VAR programme management', 'Partner portal management'],
     capabilities: [
       { area: 'Partner Recruitment & Enablement', icon: '🤝', blurb: 'Partners who sell, not just sign up.', scenarios: ['Define ideal partner profile and recruit accordingly', 'Design partner onboarding and certification programme', 'Build partner portal with all sales tools', 'Run quarterly partner QBRs and business reviews'] },
@@ -286,7 +286,7 @@ I respond in markdown with ## headers. Partner programme design documents includ
     tagline: 'Delivers projects on time, on budget, and on scope — without you chasing status updates.',
     intro: "Prateek manages projects so they actually get delivered. He runs kickoffs, maintains project plans, tracks risks, facilitates cross-functional alignment, and sends status reports that stakeholders actually read. No surprises, no missed deadlines.",
     agentCount: 177,
-    pricing: { monthly: 1099, label: '$1,099/mo' },
+    pricing: { monthly: 159, label: '$159/mo' },
     knows: ['Project planning and scheduling', 'Risk management and mitigation', 'Stakeholder communication', 'Agile and waterfall methodologies', 'RACI and responsibility assignment', 'Status reporting and escalation', 'Budget tracking and forecasting', 'Resource allocation', 'Dependency mapping', 'Post-project retrospective'],
     capabilities: [
       { area: 'Project Planning & Execution', icon: '📊', blurb: 'Detailed plans that actually get followed.', scenarios: ['Build project plan with milestones, dependencies, and owners', 'Run kickoff and alignment sessions', 'Track tasks and flag at-risk items weekly', 'Manage scope change requests formally'] },
@@ -340,7 +340,7 @@ I respond in markdown with ## headers. Status reports use a RAG summary table at
     tagline: 'Manages the day-to-day operational overhead of running a company so you don\'t have to.',
     intro: "Usha handles all the operational administration that keeps a company running — vendor management, facility coordination, office supplies, meeting scheduling, travel booking, and the thousand small things that eat founder time every week.",
     agentCount: 59,
-    pricing: { monthly: 499, label: '$499/mo' },
+    pricing: { monthly: 69, label: '$69/mo' },
     knows: ['Office and facility management', 'Vendor coordination and management', 'Executive calendar and meeting management', 'Travel booking and coordination', 'Expense management and approval', 'Event planning and coordination', 'Onboarding logistics for new joiners', 'Maintenance and repair management', 'Insurance and license renewals', 'General administration'],
     capabilities: [
       { area: 'Administrative Operations', icon: '🏢', blurb: 'The back-office runs smoothly, always.', scenarios: ['Manage vendor relationships and renewals', 'Coordinate office supplies and facility requests', 'Handle employee onboarding logistics', 'Manage insurance and statutory licence renewals'] },
@@ -394,7 +394,7 @@ I respond in markdown with ## headers. Monthly operational reports use a table: 
     tagline: 'Manages all corporate travel and expense operations — policy, booking, reporting, and compliance.',
     intro: "Manish owns the corporate travel and expense function. He sets policy, manages the booking platform, reviews expenses for compliance, identifies savings opportunities, and produces the spend analytics that finance needs for budgeting.",
     agentCount: 71,
-    pricing: { monthly: 649, label: '$649/mo' },
+    pricing: { monthly: 89, label: '$89/mo' },
     knows: ['Corporate travel policy design', 'Travel management platform administration', 'Expense policy and compliance', 'Preferred vendor negotiation (hotels, airlines)', 'International travel compliance', 'GST input tax credit on travel', 'Expense analytics and reporting', 'Per diem and allowance management', 'Visa and document coordination', 'Duty of care and travel risk'],
     capabilities: [
       { area: 'Travel Management', icon: '✈️', blurb: 'Travel booked right, within policy, every time.', scenarios: ['Manage corporate travel booking platform', 'Negotiate preferred hotel and airline rates', 'Handle visa applications and travel documentation', 'Monitor travel bookings for policy compliance'] },
@@ -448,7 +448,7 @@ I respond in markdown with ## headers. Monthly T&E reports use a table: departme
     tagline: 'Plans and executes corporate events that people actually remember — from team offsites to customer summits.',
     intro: "Sneha manages corporate events from concept to execution. Sales kickoffs, customer summits, product launches, team offsites, and virtual events — she handles logistics, vendor management, content coordination, and the day-of execution that makes everything look effortless.",
     agentCount: 112,
-    pricing: { monthly: 899, label: '$899/mo' },
+    pricing: { monthly: 129, label: '$129/mo' },
     knows: ['Corporate event planning and management', 'Venue sourcing and negotiation', 'Event logistics and operations', 'Virtual and hybrid event platforms', 'Speaker management and agenda design', 'Event marketing and promotion', 'Budget management for events', 'Attendee registration and management', 'Post-event surveys and measurement', 'Event production and AV coordination'],
     capabilities: [
       { area: 'Event Planning & Logistics', icon: '🎪', blurb: 'Every event delivered without a single crisis.', scenarios: ['Source and negotiate venue for any event type', 'Manage full event logistics from hotel blocks to AV', 'Coordinate speakers, agenda, and run-of-show', 'Handle attendee registration, badges, and communications'] },
@@ -502,7 +502,7 @@ I respond in markdown with ## headers. Event briefs use a one-page structure: ob
     tagline: 'Manages every contract from drafting to renewal — no missed deadlines, no hidden risks.',
     intro: "Rakesh owns the contract management function. He drafts standard agreements, manages the review and sign process, tracks obligations and renewal dates, and ensures you never get caught by an auto-renewal you didn't mean to trigger.",
     agentCount: 84,
-    pricing: { monthly: 799, label: '$799/mo' },
+    pricing: { monthly: 119, label: '$119/mo' },
     knows: ['Contract drafting and review', 'NDA, MSA, SOW, and vendor agreements', 'Contract lifecycle management (CLM)', 'Obligation tracking and management', 'Renewal and expiry management', 'Redline and negotiation support', 'Contract risk identification', 'Legal approval workflow management', 'Electronic signature management', 'Contract repository management'],
     capabilities: [
       { area: 'Contract Drafting & Review', icon: '📜', blurb: 'Contracts drafted correctly, reviewed efficiently.', scenarios: ['Draft standard NDA, MSA, SOW, and vendor agreements', 'Review incoming contracts for standard deviations', 'Manage redline process between parties', 'Build contract playbook for standard positions'] },
@@ -558,7 +558,7 @@ I respond in markdown with ## headers. Redline review outputs use a table: claus
     tagline: 'Manages vendor payments, invoice processing, and payables — accurately, on time, every month.',
     intro: "Bhavna runs accounts payable and finance operations with zero late payment penalties and zero duplicate payments. She manages the full P2P cycle from invoice receipt to payment approval, keeps the books clean, and provides the payment analytics finance needs for cash flow planning.",
     agentCount: 119,
-    pricing: { monthly: 799, label: '$799/mo' },
+    pricing: { monthly: 119, label: '$119/mo' },
     knows: ['Accounts payable management', '3-way invoice matching', 'Vendor payment processing', 'Payment terms optimisation', 'Duplicate invoice detection', 'TDS on vendor payments', 'GST reconciliation on purchases', 'Vendor statement reconciliation', 'AP automation and workflow', 'Month-end AP closing'],
     capabilities: [
       { area: 'Invoice Processing', icon: '🧾', blurb: 'Every invoice processed correctly the first time.', scenarios: ['Receive, code, and match invoices to POs', 'Route for approval within SLA', 'Flag duplicate and fraudulent invoices', 'Process payment batches on schedule'] },
@@ -612,7 +612,7 @@ I respond in markdown with ## headers. AP aging reports use a table: vendor name
     tagline: 'Builds the financial models, forecasts, and dashboards that make your business decisions obvious.',
     intro: "Sameer owns the FP&A function. He builds the annual budget, produces the monthly management accounts, forecasts cash flow, and delivers the financial story that the board, investors, and leadership team need to make smart decisions.",
     agentCount: 153,
-    pricing: { monthly: 1499, label: '$1,499/mo' },
+    pricing: { monthly: 199, label: '$199/mo' },
     knows: ['Financial modelling and forecasting', 'Annual budget and planning', 'Monthly management accounts', 'Cash flow forecasting', 'Board and investor financial reporting', 'Revenue and cost bridge analysis', 'Scenario and sensitivity analysis', 'Unit economics modelling', 'SaaS financial metrics (ARR, MRR, NRR)', 'Financial dashboard development'],
     capabilities: [
       { area: 'Financial Modelling & Forecasting', icon: '📊', blurb: 'Models that make the business future visible.', scenarios: ['Build annual budget from first principles', 'Produce monthly rolling 12-month cash flow forecast', 'Run 3-scenario analysis for key business decisions', 'Build unit economics model and LTV/CAC analysis'] },
@@ -666,7 +666,7 @@ I respond in markdown with ## headers. Financial models have three tabs: Assumpt
     tagline: 'Prepares founders for fundraises with the deck, data room, and investor targeting that gets meetings.',
     intro: "Padma works with founders preparing to raise. She researches investors by thesis and portfolio fit, helps prepare the pitch deck and financial model, organises the data room, and manages investor communication through the process.",
     agentCount: 186,
-    pricing: { monthly: 1999, label: '$1,999/mo' },
+    pricing: { monthly: 249, label: '$249/mo' },
     knows: ['Investor research and targeting', 'Pitch deck structure and narrative', 'Financial model for fundraising', 'Data room organisation', 'Investor outreach and sequencing', 'Due diligence preparation', 'Term sheet interpretation', 'Valuation benchmarking', 'Investor update communication', 'Cap table management'],
     capabilities: [
       { area: 'Fundraise Preparation', icon: '💼', blurb: 'Everything you need before the first investor meeting.', scenarios: ['Research investors by stage, thesis, and portfolio fit', 'Prepare pitch deck with narrative and financial slides', 'Build 5-year financial model for investor review', 'Organise data room with all due diligence documents'] },
@@ -720,7 +720,7 @@ I respond in markdown with ## headers. Investor target lists use a table: invest
     tagline: 'Gets your outstanding invoices paid faster — without damaging customer relationships.',
     intro: "Yash manages the complete collections and accounts receivable function. He sends invoices, follows up on overdue payments, handles disputes, and tracks DSO — ensuring your cash actually arrives when it's supposed to.",
     agentCount: 93,
-    pricing: { monthly: 699, label: '$699/mo' },
+    pricing: { monthly: 99, label: '$99/mo' },
     knows: ['Invoice management and delivery', 'Collections follow-up strategy', 'Payment reconciliation', 'Dispute resolution and management', 'DSO calculation and reduction', 'Credit terms management', 'Debtors aging analysis', 'NACH and direct debit setup', 'GST on invoices', 'Bad debt provisioning and write-off'],
     capabilities: [
       { area: 'Invoice & Collections', icon: '📥', blurb: 'Invoices sent on time, payments collected fast.', scenarios: ['Generate and deliver invoices on due dates', 'Run automated follow-up sequence by invoice age', 'Escalate to account manager for relationship-sensitive overdue', 'Handle payment disputes with supporting documentation'] },
@@ -776,7 +776,7 @@ I respond in markdown with ## headers. AR aging reports use a table: customer na
     tagline: 'Fills roles with the right people faster — with sourcing, screening, and a candidate experience that makes you look great.',
     intro: "Priyanka manages the full recruiting lifecycle — from job brief to offer accepted. She sources on LinkedIn and Naukri, screens candidates, coordinates interviews, manages the offer process, and tracks the metrics that reveal whether your hiring is efficient or broken.",
     agentCount: 164,
-    pricing: { monthly: 1299, label: '$1,299/mo' },
+    pricing: { monthly: 189, label: '$189/mo' },
     knows: ['Full-cycle recruiting', 'Boolean and LinkedIn sourcing', 'Naukri and Indeed management', 'Job description writing', 'Screening and shortlisting', 'Interview process design', 'Offer negotiation and management', 'Employer brand positioning', 'Diversity hiring strategy', 'ATS management and hygiene'],
     capabilities: [
       { area: 'Sourcing & Screening', icon: '🔍', blurb: 'The right candidates, not just the most candidates.', scenarios: ['Write compelling job descriptions for any role', 'Source qualified candidates via LinkedIn, Naukri, and boolean', 'Screen resumes and conduct initial qualification calls', 'Build talent pools for recurring hire types'] },
@@ -830,7 +830,7 @@ I respond in markdown with ## headers. Role briefs use a structured template: ro
     tagline: 'Builds an employee experience that makes people want to stay, grow, and bring their best to work.',
     intro: "Kavita manages everything that shapes how employees feel about working at your company — onboarding, culture programmes, engagement surveys, recognition, and the informal rituals that make a team feel like a team.",
     agentCount: 82,
-    pricing: { monthly: 799, label: '$799/mo' },
+    pricing: { monthly: 119, label: '$119/mo' },
     knows: ['Onboarding programme design', 'Employee engagement surveys', 'Culture programme management', 'Recognition and rewards systems', 'Pulse surveys and eNPS', 'Manager effectiveness programmes', 'DEI initiatives', 'Employee communication management', 'Offboarding experience design', 'Employer brand building'],
     capabilities: [
       { area: 'Onboarding & Retention', icon: '💛', blurb: 'Employees who feel set up for success from day one.', scenarios: ['Design structured onboarding programme by role', 'Build 30-60-90 day success framework for new hires', 'Run 60-day check-in programme for all new joiners', 'Track new joiner engagement and early attrition risk'] },
@@ -884,7 +884,7 @@ I respond in markdown with ## headers. Engagement reports lead with the eNPS sco
     tagline: 'Builds L&D programmes that grow capabilities, retain talent, and reduce skill gaps.',
     intro: "Girish runs learning and development as a strategic capability-building function. He assesses skill gaps, designs training programmes, manages the LMS, and measures whether training is actually improving performance.",
     agentCount: 101,
-    pricing: { monthly: 899, label: '$899/mo' },
+    pricing: { monthly: 129, label: '$129/mo' },
     knows: ['Training needs analysis', 'L&D programme design', 'LMS management and content curation', 'Leadership development programmes', 'Technical skills training', 'Onboarding training', 'E-learning content development', 'Training ROI measurement', 'External training vendor management', 'Internal trainer development'],
     capabilities: [
       { area: 'Programme Design & Delivery', icon: '📖', blurb: 'Learning programmes that change behaviour, not just knowledge.', scenarios: ['Run training needs analysis by role and level', 'Design and deliver leadership development programme', 'Build technical onboarding curriculum for new engineers', 'Source and manage external training vendors'] },
@@ -938,7 +938,7 @@ I respond in markdown with ## headers. L&D programme proposals use a structured 
     tagline: 'Partners with business leaders to build high-performing teams and navigate people challenges.',
     intro: "Meghna works as an embedded HR Business Partner to your leadership team. She advises on org design, performance management, difficult conversations, compensation equity, and the people strategy that supports your business goals.",
     agentCount: 137,
-    pricing: { monthly: 1299, label: '$1,299/mo' },
+    pricing: { monthly: 189, label: '$189/mo' },
     knows: ['HR business partnership', 'Organisational design', 'Performance management', 'Compensation benchmarking and equity', 'Employee relations and conflict resolution', 'Succession planning', 'Change management', 'Workforce planning', 'HR policy design', 'Leadership coaching support'],
     capabilities: [
       { area: 'People Strategy', icon: '🌱', blurb: 'A people strategy that matches your business strategy.', scenarios: ['Design org structure for current and next growth stage', 'Build succession plan for key roles', 'Run workforce planning for the year ahead', 'Advise on compensation equity and benchmarking'] },
