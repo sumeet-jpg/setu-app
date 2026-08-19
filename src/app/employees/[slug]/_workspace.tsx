@@ -88,9 +88,9 @@ function ToolLogo({ slug, name, size = 20 }: { slug: string; name: string; size?
   const url = toolLogoUrl(slug)
   if (err || !url) {
     return (
-      <div style={{ width: size, height: size, borderRadius: 4, background: '#334155',
+      <div style={{ width: size, height: size, borderRadius: 4, background: '#E3E1DA',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: size * 0.45, color: '#94A3B8', fontWeight: 700, flexShrink: 0 }}>
+        fontSize: size * 0.45, color: '#78746E', fontWeight: 700, flexShrink: 0 }}>
         {name[0]}
       </div>
     )
@@ -147,58 +147,59 @@ function ConnectModal({ toolSlug, onClose, onConnected }: {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000,
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(13,12,9,0.55)', zIndex: 1000,
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ background: '#0F172A', border: '1px solid #1E293B', borderRadius: 16,
-        padding: 28, maxWidth: 480, width: '100%', color: '#E2E8F0' }}>
+      <div style={{ background: '#FFFFFF', border: '1.5px solid #E3E1DA', borderRadius: 16,
+        padding: 28, maxWidth: 480, width: '100%', color: '#0D0C09',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.12)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <ToolLogo slug={toolSlug} name={toolDef.name} size={32} />
           <div>
             <div style={{ fontWeight: 700, fontSize: 16 }}>Connect {toolDef.name}</div>
-            <div style={{ fontSize: 12, color: '#64748B' }}>{toolDef.category}</div>
+            <div style={{ fontSize: 12, color: '#78746E' }}>{toolDef.category}</div>
           </div>
           <button onClick={onClose} style={{ marginLeft: 'auto', background: 'none', border: 'none',
-            color: '#64748B', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>×</button>
+            color: '#78746E', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>×</button>
         </div>
 
-        <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 16,
-          background: '#1E293B', borderRadius: 8, padding: '10px 14px' }}>
-          <strong style={{ color: '#E2E8F0' }}>How to get your key:</strong><br/>
+        <div style={{ fontSize: 13, color: '#78746E', marginBottom: 16,
+          background: '#F6F5F1', borderRadius: 8, padding: '10px 14px', border: '1px solid #E3E1DA' }}>
+          <strong style={{ color: '#0D0C09' }}>How to get your key:</strong><br/>
           {toolDef.authHint}
         </div>
 
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 12, color: '#94A3B8', display: 'block', marginBottom: 6 }}>
+          <label style={{ fontSize: 12, color: '#78746E', display: 'block', marginBottom: 6 }}>
             {toolDef.authLabel}
           </label>
           <input
             value={key} onChange={e => setKey(e.target.value)}
             placeholder={toolDef.authPlaceholder} type="password"
-            style={{ width: '100%', background: '#1E293B', border: '1px solid #334155',
-              borderRadius: 8, padding: '10px 12px', color: '#E2E8F0', fontSize: 13,
+            style={{ width: '100%', background: '#F6F5F1', border: '1.5px solid #E3E1DA',
+              borderRadius: 8, padding: '10px 12px', color: '#0D0C09', fontSize: 13,
               outline: 'none', boxSizing: 'border-box' }}
           />
         </div>
 
         {extras.map(f => (
           <div key={f.key} style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: '#94A3B8', display: 'block', marginBottom: 6 }}>{f.label}</label>
+            <label style={{ fontSize: 12, color: '#78746E', display: 'block', marginBottom: 6 }}>{f.label}</label>
             <input value={config[f.key] ?? ''} onChange={e => setConfig(c => ({ ...c, [f.key]: e.target.value }))}
               placeholder={f.placeholder}
-              style={{ width: '100%', background: '#1E293B', border: '1px solid #334155',
-                borderRadius: 8, padding: '10px 12px', color: '#E2E8F0', fontSize: 13,
+              style={{ width: '100%', background: '#F6F5F1', border: '1.5px solid #E3E1DA',
+                borderRadius: 8, padding: '10px 12px', color: '#0D0C09', fontSize: 13,
                 outline: 'none', boxSizing: 'border-box' }} />
           </div>
         ))}
 
-        {error && <div style={{ color: '#F87171', fontSize: 12, marginBottom: 12 }}>{error}</div>}
+        {error && <div style={{ color: '#DC2626', fontSize: 12, marginBottom: 12 }}>{error}</div>}
 
-        <div style={{ fontSize: 11, color: '#475569', marginBottom: 16 }}>
+        <div style={{ fontSize: 11, color: '#9E9891', marginBottom: 16 }}>
           🔒 Your key is AES-256-GCM encrypted at rest. It is never logged or sent to third parties.
         </div>
 
         <button onClick={handleConnect} disabled={loading}
-          style={{ width: '100%', background: '#6366F1', color: '#fff', border: 'none',
+          style={{ width: '100%', background: '#0E5C34', color: '#fff', border: 'none',
             borderRadius: 8, padding: '11px 0', fontWeight: 700, fontSize: 14,
             cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
           {loading ? 'Connecting…' : `Connect ${toolDef.name}`}
@@ -228,20 +229,20 @@ function ApprovalCard({ gate, taskId, onDecision }: {
   }
 
   return (
-    <div style={{ background: '#1E293B', border: '1px solid #F59E0B40', borderRadius: 12,
+    <div style={{ background: '#FFFBEB', border: '1.5px solid #F59E0B40', borderRadius: 12,
       padding: 16, marginTop: 8 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <span style={{ fontSize: 16 }}>⚠️</span>
-        <span style={{ fontWeight: 700, color: '#F59E0B', fontSize: 14 }}>Approval Required</span>
+        <span style={{ fontWeight: 700, color: '#B45309', fontSize: 14 }}>Approval Required</span>
         {!gate.reversible && (
-          <span style={{ fontSize: 11, background: '#7F1D1D', color: '#FCA5A5',
+          <span style={{ fontSize: 11, background: '#FEE2E2', color: '#B91C1C',
             borderRadius: 4, padding: '2px 6px', marginLeft: 'auto' }}>Irreversible</span>
         )}
       </div>
-      <div style={{ fontWeight: 600, fontSize: 14, color: '#E2E8F0', marginBottom: 8 }}>{gate.action}</div>
-      <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 6, lineHeight: 1.6 }}>{gate.details}</div>
-      <div style={{ fontSize: 12, color: '#64748B', marginBottom: 14 }}>
-        <strong style={{ color: '#94A3B8' }}>Affects:</strong> {gate.affected}
+      <div style={{ fontWeight: 600, fontSize: 14, color: '#0D0C09', marginBottom: 8 }}>{gate.action}</div>
+      <div style={{ fontSize: 13, color: '#78746E', marginBottom: 6, lineHeight: 1.6 }}>{gate.details}</div>
+      <div style={{ fontSize: 12, color: '#9E9891', marginBottom: 14 }}>
+        <strong style={{ color: '#78746E' }}>Affects:</strong> {gate.affected}
       </div>
       <div style={{ display: 'flex', gap: 8 }}>
         <button onClick={() => decide('approved')} disabled={!!loading}
@@ -251,7 +252,7 @@ function ApprovalCard({ gate, taskId, onDecision }: {
           {loading === 'approved' ? 'Approving…' : '✓ Approve'}
         </button>
         <button onClick={() => decide('rejected')} disabled={!!loading}
-          style={{ flex: 1, background: '#1E293B', color: '#94A3B8', border: '1px solid #334155',
+          style={{ flex: 1, background: '#F6F5F1', color: '#78746E', border: '1.5px solid #E3E1DA',
             borderRadius: 8, padding: '9px 0', fontWeight: 600, fontSize: 13, cursor: 'pointer',
             opacity: loading ? 0.6 : 1 }}>
           {loading === 'rejected' ? 'Rejecting…' : '✕ Reject'}
@@ -265,7 +266,7 @@ function ApprovalCard({ gate, taskId, onDecision }: {
 
 function ToolEventPill({ event }: { event: ToolEvent }) {
   const color = event.type === 'complete' ? '#16A34A'
-    : event.ok === false ? '#EF4444' : '#6366F1'
+    : event.ok === false ? '#EF4444' : '#0E5C34'
   const icon = event.type === 'complete' ? '✓'
     : event.ok === false ? '✗' : '⟳'
   return (
@@ -679,17 +680,17 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
       </div>
 
       {/* ── INTERVIEW SECTION ── */}
-      <div id="interview-section" style={{ background: '#020817', marginTop: 64 }}>
+      <div id="interview-section" style={{ background: '#F6F5F1', marginTop: 64, borderTop: '1.5px solid #E3E1DA' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '20px 0 16px',
-            borderBottom: '1px solid #1E293B' }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E' }} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#E2E8F0' }}>
+            borderBottom: '1.5px solid #E3E1DA' }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#16A34A' }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#0D0C09' }}>
               {e.name} is live — interview or hire
             </span>
             {streaming && (
-              <span style={{ marginLeft: 'auto', fontSize: 12, color: '#6366F1', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6366F1', display: 'inline-block' }} />
+              <span style={{ marginLeft: 'auto', fontSize: 12, color: '#0E5C34', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#0E5C34', display: 'inline-block' }} />
                 Working…
               </span>
             )}
@@ -700,13 +701,14 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
       <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr 260px', height: '80vh', maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
 
         {/* ── LEFT: Tool connections ── */}
-        <aside style={{ borderRight: '1px solid #1E293B', overflow: 'auto',
-          padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 0 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em',
+        <aside style={{ borderRight: '1.5px solid #E3E1DA', overflow: 'auto',
+          padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 0,
+          background: '#FFFFFF' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#78746E', letterSpacing: '0.08em',
             textTransform: 'uppercase', marginBottom: 12 }}>Connect Your Tools</div>
 
           {expectedSlugs.length === 0 ? (
-            <div style={{ fontSize: 12, color: '#475569' }}>No tools mapped for this employee.</div>
+            <div style={{ fontSize: 12, color: '#9E9891' }}>No tools mapped for this employee.</div>
           ) : expectedSlugs.map(slug => {
             const toolDef = TOOL_REGISTRY.find(t => t.slug === slug)
             if (!toolDef) return null
@@ -714,15 +716,15 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
             return (
               <div key={slug} style={{ display: 'flex', alignItems: 'center', gap: 10,
                 padding: '8px 10px', borderRadius: 8, marginBottom: 4,
-                background: isConnected ? '#0F2419' : '#0F172A',
-                border: `1px solid ${isConnected ? '#16A34A30' : '#1E293B'}` }}>
+                background: isConnected ? '#EAF5EE' : '#F6F5F1',
+                border: `1.5px solid ${isConnected ? '#16A34A30' : '#E3E1DA'}` }}>
                 <ToolLogo slug={slug} name={toolDef.name} size={22} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#E2E8F0',
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#0D0C09',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {toolDef.name}
                   </div>
-                  <div style={{ fontSize: 10, color: '#64748B' }}>{toolDef.category}</div>
+                  <div style={{ fontSize: 10, color: '#78746E' }}>{toolDef.category}</div>
                 </div>
                 {isConnected ? (
                   <button onClick={() => disconnectTool(slug)}
@@ -730,8 +732,8 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
                       color: '#16A34A', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 0 }}>✓</button>
                 ) : (
                   <button onClick={() => setConnectingSlug(slug)}
-                    style={{ background: '#1E293B', border: '1px solid #334155',
-                      color: '#94A3B8', borderRadius: 6, padding: '3px 8px', fontSize: 11,
+                    style={{ background: '#FFFFFF', border: '1.5px solid #E3E1DA',
+                      color: '#78746E', borderRadius: 6, padding: '3px 8px', fontSize: 11,
                       cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>
                     + Add
                   </button>
@@ -743,14 +745,14 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
           {/* Separator */}
           {connected.some(c => !expectedSlugs.includes(c.slug)) && (
             <>
-              <div style={{ fontSize: 10, color: '#334155', margin: '10px 0 8px',
+              <div style={{ fontSize: 10, color: '#9E9891', margin: '10px 0 8px',
                 textTransform: 'uppercase', letterSpacing: '0.06em' }}>Other connected</div>
               {connected.filter(c => !expectedSlugs.includes(c.slug)).map(c => (
                 <div key={c.slug} style={{ display: 'flex', alignItems: 'center', gap: 10,
                   padding: '8px 10px', borderRadius: 8, marginBottom: 4,
-                  background: '#0F2419', border: '1px solid #16A34A30' }}>
+                  background: '#EAF5EE', border: '1.5px solid #16A34A30' }}>
                   <ToolLogo slug={c.slug} name={c.name} size={22} />
-                  <div style={{ flex: 1, fontSize: 12, color: '#94A3B8' }}>{c.name}</div>
+                  <div style={{ flex: 1, fontSize: 12, color: '#0D0C09' }}>{c.name}</div>
                   <button onClick={() => disconnectTool(c.slug)}
                     title="Disconnect" style={{ background: 'none', border: 'none',
                       color: '#16A34A', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>✓</button>
@@ -760,18 +762,19 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
           )}
 
           {/* Employee info */}
-          <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid #1E293B' }}>
+          <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1.5px solid #E3E1DA' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: e.color + '20',
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: e.color + '14',
+                border: `1.5px solid ${e.color}25`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
                 {e.emoji}
               </div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: 13, color: '#E2E8F0' }}>{e.name}</div>
-                <div style={{ fontSize: 11, color: '#64748B' }}>{e.title} · {stuntTitle}</div>
+                <div style={{ fontWeight: 700, fontSize: 13, color: '#0D0C09' }}>{e.name}</div>
+                <div style={{ fontSize: 11, color: '#78746E' }}>{e.title} · {stuntTitle}</div>
               </div>
             </div>
-            <div style={{ fontSize: 11, color: '#64748B' }}>
+            <div style={{ fontSize: 11, color: '#78746E' }}>
               {e.agentCount} agents · {e.years} yrs exp
             </div>
             <div style={{ fontSize: 13, fontWeight: 700, color: e.color, marginTop: 6 }}>{e.pricing.label}</div>
@@ -779,7 +782,7 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
         </aside>
 
         {/* ── CENTER: Chat ── */}
-        <main style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <main style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F6F5F1' }}>
           {/* Messages */}
           <div style={{ flex: 1, overflow: 'auto', padding: '20px 24px', display: 'flex',
             flexDirection: 'column', gap: 16 }}>
@@ -787,19 +790,20 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
               <div key={i} style={{ display: 'flex', flexDirection: 'column',
                 alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '100%' }}>
                 {msg.role === 'system' ? (
-                  <div style={{ fontSize: 12, color: '#64748B', fontStyle: 'italic', textAlign: 'center',
+                  <div style={{ fontSize: 12, color: '#9E9891', fontStyle: 'italic', textAlign: 'center',
                     width: '100%', padding: '4px 0' }}>{msg.content}</div>
                 ) : (
                   <div style={{ maxWidth: '80%' }}>
                     <div style={{
-                      background: msg.role === 'user' ? e.color + '18' : '#0F172A',
-                      border: `1px solid ${msg.role === 'user' ? e.color + '30' : '#1E293B'}`,
+                      background: msg.role === 'user' ? e.color + '12' : '#FFFFFF',
+                      border: `1.5px solid ${msg.role === 'user' ? e.color + '30' : '#E3E1DA'}`,
                       borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                      padding: '12px 16px', fontSize: 14, lineHeight: 1.7, color: '#E2E8F0',
+                      padding: '12px 16px', fontSize: 14, lineHeight: 1.7, color: '#0D0C09',
                       whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                     }}>
                       {msg.content || (streaming && i === msgs.length - 1 ? (
-                        <span style={{ color: '#64748B', fontStyle: 'italic' }}>Thinking…</span>
+                        <span style={{ color: '#9E9891', fontStyle: 'italic' }}>Thinking…</span>
                       ) : null)}
                     </div>
 
@@ -823,7 +827,7 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
           </div>
 
           {/* Input */}
-          <div style={{ padding: '16px 24px', borderTop: '1px solid #1E293B', flexShrink: 0 }}>
+          <div style={{ padding: '16px 24px', borderTop: '1.5px solid #E3E1DA', flexShrink: 0, background: '#FFFFFF' }}>
             {/* Quick chips */}
             {msgs.length <= 1 && (
               <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
@@ -834,7 +838,7 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
                   'Walk me through how you work',
                 ].slice(0, 4).map(chip => (
                   <button key={chip} onClick={() => { setInput(chip) }}
-                    style={{ background: '#0F172A', border: '1px solid #1E293B', color: '#94A3B8',
+                    style={{ background: '#F6F5F1', border: '1.5px solid #E3E1DA', color: '#78746E',
                       borderRadius: 20, padding: '6px 14px', fontSize: 12, cursor: 'pointer' }}>
                     {chip}
                   </button>
@@ -847,13 +851,13 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
                 ref={textareaRef}
                 value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKey}
                 placeholder={`Tell ${e.name} what to work on…`} rows={2}
-                style={{ flex: 1, background: '#0F172A', border: '1px solid #334155', borderRadius: 12,
-                  padding: '12px 14px', color: '#E2E8F0', fontSize: 14, resize: 'none',
+                style={{ flex: 1, background: '#F6F5F1', border: '1.5px solid #E3E1DA', borderRadius: 12,
+                  padding: '12px 14px', color: '#0D0C09', fontSize: 14, resize: 'none',
                   outline: 'none', lineHeight: 1.5, fontFamily: 'inherit' }}
               />
               <button onClick={handleSend} disabled={streaming || !input.trim()}
-                style={{ background: streaming || !input.trim() ? '#1E293B' : e.color,
-                  color: streaming || !input.trim() ? '#475569' : '#fff',
+                style={{ background: streaming || !input.trim() ? '#E3E1DA' : e.color,
+                  color: streaming || !input.trim() ? '#9E9891' : '#fff',
                   border: 'none', borderRadius: 10, width: 44, height: 44,
                   fontSize: 18, cursor: streaming || !input.trim() ? 'not-allowed' : 'pointer',
                   flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -861,30 +865,31 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
                 {streaming ? '⏸' : '↑'}
               </button>
             </div>
-            <div style={{ fontSize: 11, color: '#334155', marginTop: 8, textAlign: 'center' }}>
+            <div style={{ fontSize: 11, color: '#9E9891', marginTop: 8, textAlign: 'center' }}>
               Real API calls · Approval required before any action · Keys encrypted
             </div>
           </div>
         </main>
 
         {/* ── RIGHT: Capabilities ── */}
-        <aside style={{ borderLeft: '1px solid #1E293B', overflow: 'auto',
-          padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em',
+        <aside style={{ borderLeft: '1.5px solid #E3E1DA', overflow: 'auto',
+          padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 10,
+          background: '#FFFFFF' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#78746E', letterSpacing: '0.08em',
             textTransform: 'uppercase', marginBottom: 4 }}>What I Can Do</div>
 
           {e.capabilities.map((cap, i) => (
-            <details key={i} style={{ borderRadius: 8, background: '#0F172A',
-              border: '1px solid #1E293B', padding: '10px 12px' }}>
+            <details key={i} style={{ borderRadius: 8, background: '#F6F5F1',
+              border: '1.5px solid #E3E1DA', padding: '10px 12px' }}>
               <summary style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
-                fontSize: 12, fontWeight: 600, color: '#E2E8F0', listStyle: 'none' }}>
+                fontSize: 12, fontWeight: 600, color: '#0D0C09', listStyle: 'none' }}>
                 <span>{cap.icon}</span>
                 <span>{cap.area}</span>
               </summary>
               <ul style={{ margin: '10px 0 0', padding: '0 0 0 8px', listStyle: 'none',
                 display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {(cap.scenarios ?? []).map((s: string, j: number) => (
-                  <li key={j} style={{ fontSize: 11, color: '#94A3B8', lineHeight: 1.5,
+                  <li key={j} style={{ fontSize: 11, color: '#78746E', lineHeight: 1.5,
                     cursor: 'pointer', padding: '2px 0' }}
                     onClick={() => { setInput(s); textareaRef.current?.focus() }}>
                     › {s}
@@ -895,18 +900,18 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
           ))}
 
           {/* How it works */}
-          <div style={{ marginTop: 4, fontSize: 11, fontWeight: 700, color: '#64748B',
+          <div style={{ marginTop: 4, fontSize: 11, fontWeight: 700, color: '#78746E',
             letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>How I Work</div>
           {e.howItWorks.map((step, i) => (
             <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <div style={{ width: 20, height: 20, borderRadius: '50%', background: e.color + '20',
+              <div style={{ width: 20, height: 20, borderRadius: '50%', background: e.color + '14',
                 color: e.color, fontSize: 11, fontWeight: 700, display: 'flex',
                 alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                 {i + 1}
               </div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#E2E8F0' }}>{step.step}</div>
-                <div style={{ fontSize: 11, color: '#64748B', marginTop: 2, lineHeight: 1.5 }}>{step.detail}</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#0D0C09' }}>{step.step}</div>
+                <div style={{ fontSize: 11, color: '#78746E', marginTop: 2, lineHeight: 1.5 }}>{step.detail}</div>
               </div>
             </div>
           ))}
@@ -934,10 +939,10 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
 
       <style>{`
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-        textarea::placeholder { color: #475569; }
+        textarea::placeholder { color: #9E9891; }
         details summary::-webkit-details-marker { display: none; }
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: #E3E1DA; border-radius: 2px; }
       `}</style>
     </div>
   )
