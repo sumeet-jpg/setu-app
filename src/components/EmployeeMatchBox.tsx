@@ -28,7 +28,7 @@ const PROMPTS = [
   'Run our content calendar and coordinate social media posting',
 ]
 
-export default function EmployeeMatchBox() {
+export default function EmployeeMatchBox({ count = 0 }: { count?: number }) {
   const [problem, setProblem] = useState('')
   const [loading, setLoading] = useState(false)
   const [matches, setMatches] = useState<Match[] | null>(null)
@@ -170,7 +170,7 @@ export default function EmployeeMatchBox() {
               <div style={{ marginTop: 16, textAlign: 'center' }}>
                 <Link href="/employees" style={{ fontSize: 13, color: GREEN, fontWeight: 600,
                   textDecoration: 'none', borderBottom: `1px solid ${GREEN}`, paddingBottom: 1 }}>
-                  Browse all {'{'}100{'}'} AI Employees →
+                  Browse all {count > 0 ? count : ''} AI Employees →
                 </Link>
               </div>
             </>

@@ -1059,6 +1059,8 @@ export const EMPLOYEES: EmployeeProfile[] = [
   ...EMPLOYEES_PART6,
 ]
 
+export const EMPLOYEE_COUNT = EMPLOYEES.length
+
 export const EMPLOYEE_BY_SLUG = Object.fromEntries(EMPLOYEES.map(e => [e.slug, e]))
 
 export function getEmployee(slug: string): EmployeeProfile | undefined {

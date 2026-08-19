@@ -72,7 +72,7 @@ export default function EmployeesClient() {
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
             <div>
               <h1 style={{ fontSize: 'clamp(32px,4.5vw,54px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '0 0 12px', color: '#fff', fontFamily: 'var(--font-space)', lineHeight: 1.04 }}>
-                100 AI Employees,<br />ready to hire
+                {EMPLOYEES.length} AI Employees,<br />ready to hire
               </h1>
               <p style={{ fontSize: 15, color: MUTED, margin: 0, lineHeight: 1.65 }}>The star gets the credit. Your AI Employee does the work. Interview free, hire when ready.</p>
             </div>

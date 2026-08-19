@@ -1,7 +1,7 @@
 // @ts-nocheck
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { EMPLOYEES } from '@/lib/employees/profiles'
+import { EMPLOYEES, EMPLOYEE_COUNT } from '@/lib/employees/profiles'
 import { SetuLogo } from '@/components/SetuLogo'
 import EmployeeMatchBox from '@/components/EmployeeMatchBox'
 
@@ -204,7 +204,7 @@ export default function HomePage() {
           </h2>
           <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>Type in plain English. No forms, no dropdowns.</p>
         </div>
-        <EmployeeMatchBox />
+        <EmployeeMatchBox count={EMPLOYEE_COUNT} />
       </div>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 32px' }}>
