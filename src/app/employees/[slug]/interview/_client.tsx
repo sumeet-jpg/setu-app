@@ -6,6 +6,16 @@ import { EMPLOYEE_BY_SLUG } from '@/lib/employees/profiles'
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 
+function getOrCreateId(key: string): string {
+  if (typeof window === 'undefined') return ''
+  let id = localStorage.getItem(key)
+  if (!id) {
+    id = crypto.randomUUID()
+    localStorage.setItem(key, id)
+  }
+  return id
+}
+
 export default function InterviewClient({ slug }: { slug: string }) {
   const e = EMPLOYEE_BY_SLUG[slug]
 
@@ -13,6 +23,9 @@ export default function InterviewClient({ slug }: { slug: string }) {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [started, setStarted] = useState(false)
+  // Persistent anonymous identity so memory accumulates across visits
+  const [userId] = useState(() => getOrCreateId('setu_user_id'))
+  const [sessionId] = useState(() => crypto.randomUUID())
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -52,7 +65,7 @@ export default function InterviewClient({ slug }: { slug: string }) {
       const res = await fetch('/api/employees/interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: e.slug, messages: history }),
+        body: JSON.stringify({ slug: e.slug, messages: history, userId, sessionId }),
       })
 
       if (!res.ok) throw new Error('API error')

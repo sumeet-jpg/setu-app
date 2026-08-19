@@ -660,80 +660,75 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
 
         {/* ── Brain Architecture ── */}
         <div style={{ marginBottom: 56 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
-            textTransform: 'uppercase', marginBottom: 20 }}>How {e.name} Thinks</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 24 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
+              textTransform: 'uppercase' }}>How {e.name} Thinks</div>
+            <div style={{ fontSize: 11, color: DIM }}>6-layer intelligence architecture</div>
+          </div>
 
-          {/* Layer 1 — Knowledge */}
+          {/* ─ Layer 1: Domain Mastery ─ */}
           <div style={{ background: '#fff', border: `2px solid ${e.color}30`,
             borderRadius: '16px 16px 4px 4px', padding: '28px 32px',
             position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
             <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: e.color }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-              gap: 16, marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
               <div>
                 <div style={{ fontSize: 10, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 1 · Knowledge Base</div>
+                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 1 · Domain Mastery</div>
                 <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  {e.years} years of {e.dept} domain expertise
+                  {e.years} years of {e.dept} expertise — baked in at deploy
                 </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65 }}>
-                  Deep speciality baked in at hire — frameworks, tools, methodologies, and hard-won domain judgment from {e.years} years in the field. This is what {e.name} knows without you telling them anything.
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
+                  Named frameworks, tools at feature depth, hard-won judgment from {e.years} years in the field.
+                  What {e.name} knows without you telling them anything.
                 </div>
               </div>
               <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#16A34A',
-                background: '#DCFCE7', padding: '5px 12px', borderRadius: 20,
-                border: '1px solid #BBF7D0' }}>● Live</div>
+                background: '#DCFCE7', padding: '5px 12px', borderRadius: 20, border: '1px solid #BBF7D0' }}>● Live</div>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {e.knows.slice(0, 8).map((k: string) => (
+              {e.knows.slice(0, 10).map((k: string) => (
                 <span key={k} style={{ fontSize: 11, padding: '5px 11px', borderRadius: 8,
-                  background: e.color + '0D', border: `1px solid ${e.color}25`,
-                  color: e.color, fontWeight: 600 }}>{k}</span>
+                  background: e.color + '0D', border: `1px solid ${e.color}25`, color: e.color, fontWeight: 600 }}>{k}</span>
               ))}
             </div>
           </div>
 
-          {/* Connector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px',
-            height: 28, background: '#F6F5F1',
+          {/* connector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
             borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
             <div style={{ flex: 1, height: 1, background: GRAY }} />
-            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>
-              ↓  enriched by
-            </div>
+            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  remembered in</div>
             <div style={{ flex: 1, height: 1, background: GRAY }} />
           </div>
 
-          {/* Layer 2 — Memory */}
-          <div style={{ background: '#fff', border: `1.5px solid ${GRAY}`,
-            borderRadius: 4, padding: '28px 32px',
-            position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
+          {/* ─ Layer 2: Episodic Memory ─ */}
+          <div style={{ background: '#fff', border: '1.5px solid #EDE9FE',
+            borderRadius: 4, padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
             <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#6366F1' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-              gap: 16, marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
               <div>
                 <div style={{ fontSize: 10, fontWeight: 700, color: '#6366F1', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 2 · Session Memory</div>
+                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 2 · Episodic Memory</div>
                 <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Remembers every task, decision, and result
+                  Remembers every conversation, task, and outcome — forever
                 </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65 }}>
-                  {e.name} maintains a persistent record of everything done for your business. Each session picks up where the last left off — no re-briefing, no lost context.
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
+                  No re-briefing, no context loss. Every session starts exactly where the last ended. The longer you work together, the sharper {e.name} gets.
                 </div>
               </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: MUTED,
-                background: '#F6F5F1', padding: '5px 12px', borderRadius: 20,
-                border: `1px solid ${GRAY}` }}>After hire</div>
+              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#6366F1',
+                background: '#EDE9FE', padding: '5px 12px', borderRadius: 20, border: '1px solid #C4B5FD' }}>Builds after hire</div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
               {[
-                { icon: '💬', label: 'Conversation log', desc: 'Full history of every session and exchange' },
-                { icon: '✅', label: 'Task record', desc: 'What was done, when, and the outcome' },
-                { icon: '🔐', label: 'Decision log', desc: 'Approvals granted, overrides made — all auditable' },
+                { icon: '💬', label: 'Conversation log', desc: 'Full history of every exchange' },
+                { icon: '✅', label: 'Task record', desc: 'What was done and when' },
+                { icon: '🔐', label: 'Decision log', desc: 'Approvals, overrides — auditable' },
+                { icon: '📊', label: 'Outcome tracking', desc: 'What worked, what didn\'t' },
               ].map(item => (
-                <div key={item.label} style={{ background: '#F6F5F1', borderRadius: 10,
-                  padding: '14px 16px', border: `1px solid ${GRAY}` }}>
-                  <div style={{ fontSize: 20, marginBottom: 8 }}>{item.icon}</div>
+                <div key={item.label} style={{ background: '#F5F3FF', borderRadius: 10, padding: '14px 16px', border: '1px solid #EDE9FE' }}>
+                  <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
                   <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
                 </div>
@@ -741,47 +736,167 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
             </div>
           </div>
 
-          {/* Connector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px',
-            height: 28, background: '#F6F5F1',
+          {/* connector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
             borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
             <div style={{ flex: 1, height: 1, background: GRAY }} />
-            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>
-              ↓  grounded in
-            </div>
+            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  grounded in</div>
             <div style={{ flex: 1, height: 1, background: GRAY }} />
           </div>
 
-          {/* Layer 3 — Company Knowledge */}
-          <div style={{ background: '#fff', border: `1.5px solid ${GRAY}`,
-            borderRadius: '4px 4px 16px 16px', padding: '28px 32px',
-            position: 'relative', overflow: 'hidden' }}>
+          {/* ─ Layer 3: Company Intelligence ─ */}
+          <div style={{ background: '#fff', border: '1.5px solid #FEF3C7',
+            borderRadius: 4, padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
             <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#F59E0B' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-              gap: 16, marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
               <div>
                 <div style={{ fontSize: 10, fontWeight: 700, color: '#B45309', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 3 · Company Knowledge</div>
+                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 3 · Company Intelligence</div>
                 <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Learns your business from what you share
+                  Learns your business from everything you share
                 </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65 }}>
-                  Feed {e.name} your documents, website, SOPs, and playbooks. {e.name} indexes everything and draws on it when making decisions — no re-briefing needed each session.
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
+                  Feed {e.name} your documents, website, SOPs, product catalog, and org chart. Indexed and drawn on when making every decision — your business context, always available.
                 </div>
               </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: MUTED,
-                background: '#F6F5F1', padding: '5px 12px', borderRadius: 20,
-                border: `1px solid ${GRAY}` }}>Configure after hire</div>
+              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#B45309',
+                background: '#FFFBEB', padding: '5px 12px', borderRadius: 20, border: '1px solid #FDE68A' }}>Configure after hire</div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
               {[
                 { icon: '📄', label: 'Documents', desc: 'PDFs, Notion pages, Google Docs' },
-                { icon: '🌐', label: 'Your website', desc: 'URL-indexed, read on every session' },
-                { icon: '📋', label: 'SOPs & playbooks', desc: 'Standard processes, always accessible' },
+                { icon: '🌐', label: 'Your website', desc: 'Indexed and read each session' },
+                { icon: '📋', label: 'SOPs & playbooks', desc: 'Standard processes, always on' },
+                { icon: '🏢', label: 'Org chart', desc: 'Who\'s who in your company' },
+                { icon: '📦', label: 'Product catalog', desc: 'What you sell, how it\'s positioned' },
               ].map(item => (
-                <div key={item.label} style={{ background: '#FFFBEB', borderRadius: 10,
-                  padding: '14px 16px', border: '1px solid #FDE68A40' }}>
-                  <div style={{ fontSize: 20, marginBottom: 8 }}>{item.icon}</div>
+                <div key={item.label} style={{ background: '#FFFBEB', borderRadius: 10, padding: '14px 16px', border: '1px solid #FDE68A50' }}>
+                  <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
+                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* connector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
+            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
+            <div style={{ flex: 1, height: 1, background: GRAY }} />
+            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  knows by name</div>
+            <div style={{ flex: 1, height: 1, background: GRAY }} />
+          </div>
+
+          {/* ─ Layer 4: Relationship Memory ─ */}
+          <div style={{ background: '#fff', border: '1.5px solid #FCE7F3',
+            borderRadius: 4, padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#EC4899' }} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#BE185D', letterSpacing: '0.1em',
+                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 4 · Relationship Memory</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+                  Knows who's in your world — and their full history
+                </div>
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
+                  Every customer, lead, partner, and stakeholder accumulates context over time. {e.name} remembers names, histories, and preferences so you never re-introduce anyone.
+                </div>
+              </div>
+              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#BE185D',
+                background: '#FDF2F8', padding: '5px 12px', borderRadius: 20, border: '1px solid #FBCFE8' }}>Builds after hire</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
+              {[
+                { icon: '🤝', label: 'Customers', desc: 'History, preferences, deal context' },
+                { icon: '🎯', label: 'Leads', desc: 'Qualification notes and touchpoints' },
+                { icon: '🔗', label: 'Partners', desc: 'Relationship context and agreements' },
+                { icon: '👥', label: 'Stakeholders', desc: 'Internal contacts and their priorities' },
+              ].map(item => (
+                <div key={item.label} style={{ background: '#FDF2F8', borderRadius: 10, padding: '14px 16px', border: '1px solid #FBCFE850' }}>
+                  <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
+                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* connector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
+            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
+            <div style={{ flex: 1, height: 1, background: GRAY }} />
+            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  monitors</div>
+            <div style={{ flex: 1, height: 1, background: GRAY }} />
+          </div>
+
+          {/* ─ Layer 5: Market Intelligence ─ */}
+          <div style={{ background: '#fff', border: '1.5px solid #CFFAFE',
+            borderRadius: 4, padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#06B6D4' }} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#0E7490', letterSpacing: '0.1em',
+                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 5 · Market Intelligence</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+                  Always watching {e.dept.toLowerCase()} signals — never running on stale knowledge
+                </div>
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
+                  {e.name} monitors industry news, competitor moves, and regulatory changes in their domain. Every session starts with current intelligence — not frozen training data.
+                </div>
+              </div>
+              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#0E7490',
+                background: '#ECFEFF', padding: '5px 12px', borderRadius: 20, border: '1px solid #A5F3FC' }}>Live feed</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
+              {[
+                { icon: '📰', label: 'Industry signals', desc: 'Domain news filtered for relevance' },
+                { icon: '🏴', label: 'Competitor moves', desc: 'Tracked and summarised weekly' },
+                { icon: '⚖️', label: 'Regulatory updates', desc: 'Compliance changes in your sector' },
+                { icon: '📈', label: 'Trend alerts', desc: 'Emerging shifts before they peak' },
+              ].map(item => (
+                <div key={item.label} style={{ background: '#ECFEFF', borderRadius: 10, padding: '14px 16px', border: '1px solid #A5F3FC50' }}>
+                  <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
+                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* connector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
+            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
+            <div style={{ flex: 1, height: 1, background: GRAY }} />
+            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  calibrates to</div>
+            <div style={{ flex: 1, height: 1, background: GRAY }} />
+          </div>
+
+          {/* ─ Layer 6: Learning Loop ─ */}
+          <div style={{ background: '#fff', border: '1.5px solid #EDE9FE',
+            borderRadius: '4px 4px 16px 16px', padding: '28px 32px', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#8B5CF6' }} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED', letterSpacing: '0.1em',
+                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 6 · Learning Loop</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+                  Gets sharper every session — calibrated to you specifically
+                </div>
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
+                  {e.name} tracks what approaches worked for YOUR business specifically. Communication style, decision thresholds, quality standards — all adapt over time. Week 10 is measurably better than week 1.
+                </div>
+              </div>
+              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#7C3AED',
+                background: '#F5F3FF', padding: '5px 12px', borderRadius: 20, border: '1px solid #DDD6FE' }}>Compounds over time</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
+              {[
+                { icon: '🎨', label: 'Style calibration', desc: 'Tone and format matched to your team' },
+                { icon: '⚡', label: 'Workflow preferences', desc: 'How you like to work, learned over time' },
+                { icon: '🏆', label: 'Quality benchmarks', desc: 'Your standards, remembered forever' },
+              ].map(item => (
+                <div key={item.label} style={{ background: '#F5F3FF', borderRadius: 10, padding: '14px 16px', border: '1px solid #EDE9FE' }}>
+                  <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
                   <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
                 </div>
