@@ -55,7 +55,6 @@ export default function EmployeesClient() {
       }}>
         <SetuLogo size={30} color="#22c55e" wordColor={TEXT} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Link href="/whatsapp" style={{ fontSize: 13, color: '#4ade80', textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>WhatsApp</Link>
           <Link href="/pricing" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Pricing</Link>
           <Link href="/flows" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Build your own</Link>
           <Link href="/signin" style={{ fontSize: 13, color: '#c7d2fe', textDecoration: 'none', padding: '8px 16px', borderRadius: 8, letterSpacing: '-0.01em', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', fontFamily: 'var(--font-space)', fontWeight: 600 }}>Sign in</Link>
@@ -68,14 +67,14 @@ export default function EmployeesClient() {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '56px 32px 40px', position: 'relative' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 700, color: '#a5b4fc', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 16, padding: '5px 14px', borderRadius: 24, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', fontFamily: 'var(--font-space)' }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px rgba(34,197,94,0.8)', display: 'inline-block' }} />
-            Stuntmen &amp; Stuntwomen
+            AI Employees
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
             <div>
               <h1 style={{ fontSize: 'clamp(32px,4.5vw,54px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '0 0 12px', color: '#fff', fontFamily: 'var(--font-space)', lineHeight: 1.04 }}>
-                100 Stuntmen &amp; Stuntwomen,<br />ready to hire
+                100 AI Employees,<br />ready to hire
               </h1>
-              <p style={{ fontSize: 15, color: MUTED, margin: 0, lineHeight: 1.65 }}>The star gets the credit. Your Stuntman does the work. Interview free, hire when ready.</p>
+              <p style={{ fontSize: 15, color: MUTED, margin: 0, lineHeight: 1.65 }}>The star gets the credit. Your AI Employee does the work. Interview free, hire when ready.</p>
             </div>
             <Link href="/flows" style={{
               flexShrink: 0,

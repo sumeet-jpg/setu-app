@@ -132,7 +132,7 @@ export default function HomePage() {
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.09em', textTransform: 'uppercase', padding: '5px 14px', borderRadius: 6, background: GREEN_L, marginBottom: 28 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: GREEN_M, display: 'inline-block' }} />
-            100 Stuntmen &amp; Stuntwomen · Hiring now
+            100 AI Employees · Hiring now
           </div>
 
           <h1 style={{ fontSize: 'clamp(44px,5vw,72px)', fontWeight: 800, letterSpacing: '-0.055em', margin: '0 0 24px', color: INK, lineHeight: 1.0, fontFamily: F }}>
@@ -140,7 +140,7 @@ export default function HomePage() {
           </h1>
 
           <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.72, maxWidth: 460, margin: '0 0 40px', fontWeight: 400 }}>
-            100 Stuntmen &amp; Stuntwomen — CMO, CFO, COO and 97 more. They do the heavy work. You stay in control. Interview any of them free.
+            100 AI Employees — CMO, CFO, COO and 97 more. They do the heavy work. You stay in control. Interview any of them free.
           </p>
 
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -155,7 +155,7 @@ export default function HomePage() {
           {/* Stats */}
           <div style={{ display: 'flex', gap: 36, marginTop: 52, paddingTop: 36, borderTop: `1px solid ${GRAY}` }}>
             {[
-              { value: '100', label: 'Stuntmen & Stuntwomen' },
+              { value: '100', label: 'AI Employees' },
               { value: '10,000+', label: 'Agents deployed' },
               { value: '$0', label: 'To interview' },
               { value: '48h', label: 'To go live' },
@@ -217,34 +217,13 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── FEATURED EMPLOYEES ── */}
-        <section style={{ marginBottom: 104 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
-            <div>
-              <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Meet the team</span>
-              <h2 style={{ fontSize: 'clamp(26px,3.5vw,40px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '10px 0 0', color: INK, lineHeight: 1.1 }}>
-                Featured employees
-              </h2>
-            </div>
-            <Link href="/employees" style={{ fontSize: 14, color: GREEN, textDecoration: 'none', fontWeight: 600, letterSpacing: '-0.01em', paddingBottom: 4, borderBottom: `1.5px solid ${GREEN}` }}>
-              View all 100 →
-            </Link>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-            {featured.map(e => (
-              <EmployeeCard key={e.slug} employee={e} />
-            ))}
-          </div>
-        </section>
-
         {/* ── FULL DIRECTORY ── */}
         <section style={{ marginBottom: 104 }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 40 }}>
             <div>
-              <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>The full team</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Browse AI Employees</span>
               <h2 style={{ fontSize: 'clamp(26px,3.5vw,40px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '10px 0 0', color: INK, lineHeight: 1.1 }}>
-                All {EMPLOYEES.length} employees
+                All {EMPLOYEES.length} AI Employees
               </h2>
             </div>
             <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>Interview any of them free — no account needed.</p>
