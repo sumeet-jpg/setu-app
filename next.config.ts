@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
   // Disable X-Powered-By header
   poweredByHeader: false,
 
+  async redirects() {
+    return [
+      { source: '/flows', destination: '/employees', permanent: false },
+    ]
+  },
+
   // Enforce HTTPS headers in production
   async headers() {
     if (process.env.NEXT_PUBLIC_APP_ENV !== "production") return [];

@@ -7,15 +7,14 @@ import { EMPLOYEES } from '@/lib/employees/profiles'
 import { SetuLogo } from '@/components/SetuLogo'
 
 /* ─── Design tokens ─── */
-const BG = '#070B18'
-const SURFACE = '#0D1526'
-const CARD = '#111E35'
-const BORDER = 'rgba(148,163,184,0.1)'
-const GLOW_BORDER = 'rgba(99,102,241,0.35)'
-const TEXT = '#F1F5F9'
-const MUTED = '#94A3B8'
-const DIM = '#475569'
-const ACCENT = '#6366F1'
+const BG = '#F6F5F1'
+const WHITE = '#FFFFFF'
+const INK = '#0D0C09'
+const GREEN = '#0E5C34'
+const GREEN_L = '#EAF5EE'
+const GRAY = '#E3E1DA'
+const MUTED = '#78746E'
+const DIM = '#9E9891'
 
 type Tier = 'consumer' | 'business' | 'growth' | 'enterprise'
 
@@ -30,7 +29,6 @@ const TIERS: Array<{
   features: string[]
   cta: string
   ctaHref: string
-  deptFilter?: string
 }> = [
   {
     id: 'consumer',
@@ -51,7 +49,6 @@ const TIERS: Array<{
     ],
     cta: 'Browse Starter Employees',
     ctaHref: '/employees',
-    deptFilter: 'WhatsApp & Messaging',
   },
   {
     id: 'business',
@@ -59,7 +56,7 @@ const TIERS: Array<{
     emoji: '🚀',
     tagline: 'Core business functions covered',
     range: '$499 – $999 /mo',
-    color: ACCENT,
+    color: '#1A5C8A',
     highlight: true,
     features: [
       'Marketing, Sales & RevOps employees',
@@ -146,51 +143,44 @@ const FAQS = [
 export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
-  // Quick price check: min and max across all 100 employees
   const allPrices = EMPLOYEES.map(e => e.pricing.monthly).sort((a, b) => a - b)
   const minPrice = allPrices[0]
-  const maxPrice = allPrices[allPrices.length - 1]
 
   return (
-    <div style={{ minHeight: '100vh', background: BG, color: TEXT, fontFamily: 'var(--font-inter)' }}>
+    <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: 'var(--font-jakarta)' }}>
       <style>{`
         .pricing-card { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
-        .pricing-card:hover { transform: translateY(-4px); }
+        .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 8px 40px rgba(14,92,52,0.10), 0 2px 8px rgba(0,0,0,0.04); border-color: rgba(14,92,52,0.30) !important; }
         .pricing-cta { transition: all 0.2s ease; }
         .pricing-cta:hover { opacity: 0.85; }
         .faq-item { transition: background 0.15s ease; }
-        .faq-item:hover { background: rgba(99,102,241,0.04) !important; }
-        .check-icon::before { content: '✓'; font-weight: 800; }
+        .faq-item:hover { background: rgba(14,92,52,0.03) !important; }
       `}</style>
 
       {/* Nav */}
       <nav style={{
-        borderBottom: `1px solid ${BORDER}`,
+        borderBottom: `1px solid ${GRAY}`,
         padding: '0 24px',
         height: 60,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         position: 'sticky', top: 0, zIndex: 50,
-        background: 'rgba(7,11,24,0.9)',
-        backdropFilter: 'blur(20px)',
+        background: WHITE,
       }}>
-        <SetuLogo size={30} color="#22c55e" wordColor={TEXT} />
+        <SetuLogo size={30} color={GREEN} wordColor={INK} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8 }}>Employees</Link>
-          <Link href="/mcp" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8 }}>MCP</Link>
-          <Link href="/signin" style={{ fontSize: 13, color: '#c7d2fe', textDecoration: 'none', padding: '8px 16px', borderRadius: 8, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', fontFamily: 'var(--font-space)', fontWeight: 600 }}>Sign in</Link>
+          <Link href="/quiz" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8 }}>Which role?</Link>
+          <Link href="/signin" style={{ fontSize: 13, color: WHITE, textDecoration: 'none', padding: '8px 18px', borderRadius: 8, background: INK, fontWeight: 700 }}>Sign in</Link>
         </div>
       </nav>
 
-      {/* Ambient glow */}
-      <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '800px', height: '500px', background: 'radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.18) 0%, transparent 60%)', pointerEvents: 'none' }} />
-
       {/* Hero */}
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '80px 24px 60px', textAlign: 'center', position: 'relative' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 700, color: '#a5b4fc', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 20, padding: '5px 14px', borderRadius: 24, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', fontFamily: 'var(--font-space)' }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px rgba(34,197,94,0.8)', display: 'inline-block' }} />
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '80px 24px 60px', textAlign: 'center' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 20, padding: '5px 14px', borderRadius: 24, background: GREEN_L, border: `1px solid rgba(14,92,52,0.25)` }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: GREEN, boxShadow: '0 0 8px rgba(14,92,52,0.55)', display: 'inline-block' }} />
           Transparent Pricing
         </div>
-        <h1 style={{ fontSize: 'clamp(36px,6vw,64px)', fontWeight: 900, letterSpacing: '-0.06em', margin: '0 0 20px', color: '#fff', fontFamily: 'var(--font-space)', lineHeight: 1.0 }}>
+        <h1 style={{ fontSize: 'clamp(36px,6vw,60px)', fontWeight: 900, letterSpacing: '-0.06em', margin: '0 0 20px', color: INK, lineHeight: 1.0 }}>
           From WhatsApp bot<br />to Chief of Staff
         </h1>
         <p style={{ fontSize: 17, color: MUTED, margin: '0 0 16px', lineHeight: 1.7, maxWidth: 560, marginLeft: 'auto', marginRight: 'auto' }}>
@@ -198,7 +188,7 @@ export default function PricingPage() {
         </p>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginTop: 8 }}>
           {['No setup fee', 'Monthly billing', 'Cancel anytime', 'Free interview'].map(b => (
-            <span key={b} style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: 'rgba(255,255,255,0.05)', border: `1px solid ${BORDER}`, color: MUTED }}>{b}</span>
+            <span key={b} style={{ fontSize: 12, padding: '5px 12px', borderRadius: 20, background: WHITE, border: `1px solid ${GRAY}`, color: MUTED }}>{b}</span>
           ))}
         </div>
       </div>
@@ -211,51 +201,48 @@ export default function PricingPage() {
               key={tier.id}
               className="pricing-card"
               style={{
-                background: tier.highlight ? `linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.05) 100%)` : CARD,
-                border: `1px solid ${tier.highlight ? GLOW_BORDER : BORDER}`,
+                background: WHITE,
+                border: `1.5px solid ${tier.highlight ? GREEN : GRAY}`,
                 borderRadius: 24,
                 padding: '32px 28px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 0,
                 position: 'relative',
-                boxShadow: tier.highlight ? '0 0 40px rgba(99,102,241,0.12), inset 0 1px 0 rgba(99,102,241,0.2)' : 'none',
+                boxShadow: tier.highlight ? '0 4px 24px rgba(14,92,52,0.12)' : '0 1px 4px rgba(0,0,0,0.04)',
               }}
             >
               {tier.highlight && (
-                <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', fontSize: 11, fontWeight: 800, color: '#fff', background: 'linear-gradient(135deg, #6366f1, #7c3aed)', padding: '4px 14px', borderRadius: 20, letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', fontFamily: 'var(--font-space)', boxShadow: '0 4px 16px rgba(99,102,241,0.5)' }}>
+                <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', fontSize: 11, fontWeight: 800, color: '#fff', background: GREEN, padding: '4px 14px', borderRadius: 20, letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', boxShadow: '0 4px 16px rgba(14,92,52,0.35)' }}>
                   Most Popular
                 </div>
               )}
 
               <div style={{ fontSize: 32, marginBottom: 12 }}>{tier.emoji}</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: tier.color, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontFamily: 'var(--font-space)' }}>{tier.label}</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.04em', marginBottom: 4, fontFamily: 'var(--font-space)' }}>{tier.range}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: tier.color, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>{tier.label}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: INK, letterSpacing: '-0.04em', marginBottom: 4 }}>{tier.range}</div>
               <div style={{ fontSize: 13, color: MUTED, marginBottom: 28, lineHeight: 1.5 }}>{tier.tagline}</div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1, marginBottom: 28 }}>
                 {tier.features.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                    <span style={{ color: tier.color, fontSize: 13, fontWeight: 800, flexShrink: 0, marginTop: 1 }}>✓</span>
-                    <span style={{ fontSize: 13, color: '#CBD5E1', lineHeight: 1.5 }}>{f}</span>
+                    <span style={{ color: tier.highlight ? GREEN : MUTED, fontSize: 13, fontWeight: 800, flexShrink: 0, marginTop: 1 }}>✓</span>
+                    <span style={{ fontSize: 13, color: MUTED, lineHeight: 1.5 }}>{f}</span>
                   </div>
                 ))}
               </div>
 
               <Link
-                href={tier.ctaHref + (tier.id === 'consumer' ? '' : '')}
+                href={tier.ctaHref}
                 className="pricing-cta"
                 style={{
                   display: 'block', padding: '13px 0',
                   borderRadius: 12, textAlign: 'center',
-                  background: tier.highlight
-                    ? 'linear-gradient(135deg, #6366f1, #7c3aed)'
-                    : 'rgba(255,255,255,0.05)',
-                  border: tier.highlight ? 'none' : `1px solid ${BORDER}`,
-                  color: '#fff',
+                  background: tier.highlight ? GREEN : BG,
+                  border: tier.highlight ? 'none' : `1.5px solid ${GRAY}`,
+                  color: tier.highlight ? '#fff' : INK,
                   fontSize: 13, fontWeight: 700, textDecoration: 'none',
-                  fontFamily: 'var(--font-space)', letterSpacing: '-0.01em',
-                  boxShadow: tier.highlight ? '0 8px 24px rgba(99,102,241,0.35)' : 'none',
+                  letterSpacing: '-0.01em',
+                  boxShadow: tier.highlight ? '0 6px 20px rgba(14,92,52,0.28)' : 'none',
                 }}
               >
                 {tier.cta}
@@ -265,9 +252,9 @@ export default function PricingPage() {
         </div>
 
         {/* Interview CTA */}
-        <div style={{ marginTop: 60, textAlign: 'center', padding: '48px 24px', borderRadius: 24, border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.04)' }}>
+        <div style={{ marginTop: 60, textAlign: 'center', padding: '48px 24px', borderRadius: 24, border: `1.5px solid ${GRAY}`, background: WHITE }}>
           <div style={{ fontSize: 32, marginBottom: 16 }}>🎙️</div>
-          <h2 style={{ fontSize: 'clamp(20px,3vw,28px)', fontWeight: 800, letterSpacing: '-0.04em', margin: '0 0 10px', color: '#fff', fontFamily: 'var(--font-space)' }}>
+          <h2 style={{ fontSize: 'clamp(20px,3vw,28px)', fontWeight: 800, letterSpacing: '-0.04em', margin: '0 0 10px', color: INK }}>
             Interview before you hire
           </h2>
           <p style={{ fontSize: 14, color: MUTED, margin: '0 auto 28px', lineHeight: 1.7, maxWidth: 480 }}>
@@ -275,9 +262,9 @@ export default function PricingPage() {
           </p>
           <Link href="/employees" style={{
             padding: '13px 32px', borderRadius: 12,
-            background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
+            background: INK,
             color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none',
-            fontFamily: 'var(--font-space)', boxShadow: '0 8px 28px rgba(99,102,241,0.35)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
           }}>
             Browse all 100 employees →
           </Link>
@@ -285,7 +272,7 @@ export default function PricingPage() {
 
         {/* FAQ */}
         <div style={{ marginTop: 80, maxWidth: 700, marginLeft: 'auto', marginRight: 'auto' }}>
-          <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '0 0 40px', color: '#fff', fontFamily: 'var(--font-space)', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '0 0 40px', color: INK, textAlign: 'center' }}>
             Frequently asked
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -293,7 +280,7 @@ export default function PricingPage() {
               <div
                 key={i}
                 className="faq-item"
-                style={{ borderRadius: 14, border: `1px solid ${openFaq === i ? 'rgba(99,102,241,0.25)' : BORDER}`, overflow: 'hidden', background: openFaq === i ? 'rgba(99,102,241,0.05)' : 'transparent' }}
+                style={{ borderRadius: 14, border: `1px solid ${openFaq === i ? 'rgba(14,92,52,0.3)' : GRAY}`, overflow: 'hidden', background: openFaq === i ? GREEN_L : 'transparent' }}
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
@@ -301,8 +288,8 @@ export default function PricingPage() {
                     width: '100%', padding: '18px 20px',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
                     background: 'transparent', border: 'none', cursor: 'pointer',
-                    color: TEXT, fontSize: 14, fontWeight: 600, textAlign: 'left',
-                    fontFamily: 'var(--font-inter)',
+                    color: INK, fontSize: 14, fontWeight: 600, textAlign: 'left',
+                    fontFamily: 'inherit',
                   }}
                 >
                   <span>{faq.q}</span>
@@ -322,10 +309,10 @@ export default function PricingPage() {
         <div style={{ marginTop: 80, textAlign: 'center' }}>
           <p style={{ fontSize: 13, color: DIM, marginBottom: 20 }}>Still have questions?</p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/employees" style={{ padding: '12px 24px', borderRadius: 10, background: 'linear-gradient(135deg, #6366f1, #7c3aed)', color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: 'var(--font-space)' }}>
+            <Link href="/employees" style={{ padding: '12px 24px', borderRadius: 10, background: INK, color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
               Browse employees →
             </Link>
-            <a href="mailto:hello@setuagents.com" style={{ padding: '12px 24px', borderRadius: 10, background: 'transparent', border: `1px solid ${BORDER}`, color: MUTED, fontSize: 13, fontWeight: 600, textDecoration: 'none', fontFamily: 'var(--font-space)' }}>
+            <a href="mailto:hello@setuagents.com" style={{ padding: '12px 24px', borderRadius: 10, background: WHITE, border: `1.5px solid ${GRAY}`, color: MUTED, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
               Email us
             </a>
           </div>

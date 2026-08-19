@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     template: "%s | Setu",
   },
   description:
-    "Hire AI Employees that command fleets of specialized agents. Marketing Manager, CFO, Compliance Officer and 17 more — interview free, go live in days.",
+    "Hire AI Employees that command fleets of specialized agents. 100 roles across Marketing, Finance, Ops, Sales, HR, and more — interview free, go live in days.",
   metadataBase: new URL("https://setuagents.com"),
   openGraph: {
     siteName: "Setu AI Employees",

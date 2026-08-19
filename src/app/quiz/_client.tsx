@@ -3,12 +3,13 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { SetuLogo } from '@/components/SetuLogo'
 
-const BG = '#07091C'
-const SURFACE = '#0D1428'
-const CARD = '#101A30'
-const BORDER = 'rgba(148,163,184,0.08)'
-const MUTED = '#94A3B8'
-const DIM = '#475569'
+const BG = '#F6F5F1'
+const WHITE = '#FFFFFF'
+const INK = '#0D0C09'
+const GREEN = '#0E5C34'
+const GRAY = '#E3E1DA'
+const MUTED = '#78746E'
+const DIM = '#9E9891'
 
 const Qs = [
   {
@@ -128,25 +129,25 @@ export default function QuizClient() {
   const also = done ? (ALSO[answers[0]] || ALSO['whatsapp']) : []
 
   return (
-    <div style={{ minHeight: '100vh', background: BG, color: '#F1F5F9', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', lineHeight: 1.6 }}>
+    <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: 'var(--font-jakarta)', lineHeight: 1.6 }}>
       {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(7,9,28,0.94)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${BORDER}`, padding: '0 24px', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <SetuLogo size={28} color="#22c55e" wordColor="#F1F5F9" />
+      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: WHITE, borderBottom: `1px solid ${GRAY}`, padding: '0 24px', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <SetuLogo size={28} color={GREEN} wordColor={INK} />
         <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none' }}>Browse all 100 employees →</Link>
       </nav>
 
       <div style={{ maxWidth: 600, margin: '0 auto', padding: '48px 24px 64px' }}>
         {/* Progress */}
-        <div style={{ height: 3, background: 'rgba(99,102,241,0.12)', borderRadius: 3, marginBottom: 40, overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#6366f1,#7c3aed)', borderRadius: 3, transition: 'width 0.4s ease' }} />
+        <div style={{ height: 3, background: 'rgba(14,92,52,0.10)', borderRadius: 3, marginBottom: 40, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#0E5C34,#1A9655)', borderRadius: 3, transition: 'width 0.4s ease' }} />
         </div>
 
         {!done && (() => {
           const q = Qs[step]
           return (
-            <div key={step} style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 22, padding: 32 }}>
+            <div key={step} style={{ background: WHITE, border: `1px solid ${GRAY}`, borderRadius: 22, padding: 32 }}>
               <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: MUTED, marginBottom: 12 }}>Question {step + 1} of {Qs.length}</div>
-              <div style={{ fontSize: 'clamp(20px,4vw,26px)', fontWeight: 800, letterSpacing: '-0.04em', color: '#fff', marginBottom: 8, lineHeight: 1.2 }}>{q.q}</div>
+              <div style={{ fontSize: 'clamp(20px,4vw,26px)', fontWeight: 800, letterSpacing: '-0.04em', color: INK, marginBottom: 8, lineHeight: 1.2 }}>{q.q}</div>
               <div style={{ fontSize: 14, color: MUTED, marginBottom: 28, lineHeight: 1.6 }}>{q.sub}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {q.opts.map((o, idx) => (
@@ -154,8 +155,8 @@ export default function QuizClient() {
                     key={idx}
                     onClick={() => choose(o.tag, idx)}
                     style={{
-                      background: picked === idx ? 'rgba(99,102,241,0.1)' : CARD,
-                      border: `1.5px solid ${picked === idx ? '#6366f1' : BORDER}`,
+                      background: picked === idx ? 'rgba(14,92,52,0.08)' : WHITE,
+                      border: `1.5px solid ${picked === idx ? GREEN : GRAY}`,
                       borderRadius: 14,
                       padding: '16px 20px',
                       cursor: 'pointer',
@@ -169,7 +170,7 @@ export default function QuizClient() {
                   >
                     <span style={{ fontSize: 22, flexShrink: 0 }}>{o.icon}</span>
                     <div>
-                      <div style={{ fontSize: 14, color: '#F1F5F9', fontWeight: 600, lineHeight: 1.4 }}>{o.text}</div>
+                      <div style={{ fontSize: 14, color: INK, fontWeight: 600, lineHeight: 1.4 }}>{o.text}</div>
                       <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{o.sub}</div>
                     </div>
                   </button>
@@ -180,40 +181,40 @@ export default function QuizClient() {
         })()}
 
         {done && rec && (
-          <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 22, padding: 36, textAlign: 'center' }}>
+          <div style={{ background: WHITE, border: `1px solid ${GRAY}`, borderRadius: 22, padding: 36, textAlign: 'center' }}>
             <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: MUTED, marginBottom: 20 }}>Your match</div>
             <div style={{ width: 80, height: 80, borderRadius: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, margin: '0 auto 20px', background: `${rec.color}18`, border: `2px solid ${rec.color}30`, boxShadow: `0 0 40px ${rec.color}18` }}>{rec.emoji}</div>
-            <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: '-0.05em', color: '#fff', marginBottom: 4 }}>{rec.name}</div>
+            <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: '-0.05em', color: INK, marginBottom: 4 }}>{rec.name}</div>
             <div style={{ fontSize: 14, color: MUTED, marginBottom: 6 }}>{rec.title}</div>
             <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.06em', color: rec.color, marginBottom: 24 }}>{rec.price}</div>
 
-            <div style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.12)', borderRadius: 12, padding: '14px 18px', marginBottom: 24, textAlign: 'left' }}>
+            <div style={{ background: 'rgba(14,92,52,0.05)', border: '1px solid rgba(14,92,52,0.12)', borderRadius: 12, padding: '14px 18px', marginBottom: 24, textAlign: 'left' }}>
               <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: MUTED, marginBottom: 10 }}>Why this match</div>
               {rec.match.map((m, i) => (
-                <div key={i} style={{ fontSize: 13, color: '#CBD5E1', marginBottom: 6, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                <div key={i} style={{ fontSize: 13, color: INK, marginBottom: 6, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                   <span style={{ color: rec.color, marginTop: 2, flexShrink: 0 }}>✓</span>{m}
                 </div>
               ))}
             </div>
 
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
-              <Link href={`/employees/${rec.slug}/interview`} style={{ padding: '13px 28px', borderRadius: 13, background: 'linear-gradient(135deg,#6366f1,#7c3aed)', color: '#fff', fontSize: 14, fontWeight: 800, textDecoration: 'none', boxShadow: '0 6px 24px rgba(99,102,241,0.35)' }}>
+              <Link href={`/employees/${rec.slug}/interview`} style={{ padding: '13px 28px', borderRadius: 13, background: GREEN, color: '#fff', fontSize: 14, fontWeight: 800, textDecoration: 'none', boxShadow: '0 6px 24px rgba(14,92,52,0.28)' }}>
                 Interview {rec.name} free →
               </Link>
-              <Link href={`/employees/${rec.slug}/hire`} style={{ padding: '13px 22px', borderRadius: 13, background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', color: '#a5b4fc', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>
+              <Link href={`/employees/${rec.slug}/hire`} style={{ padding: '13px 22px', borderRadius: 13, background: 'rgba(14,92,52,0.06)', border: '1px solid rgba(14,92,52,0.2)', color: GREEN, fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>
                 Hire now
               </Link>
             </div>
             <div style={{ fontSize: 12, color: DIM }}>Free to interview · No credit card · Starts in 48 hours</div>
 
             {also.length > 0 && (
-              <div style={{ marginTop: 28, paddingTop: 24, borderTop: `1px solid ${BORDER}` }}>
+              <div style={{ marginTop: 28, paddingTop: 24, borderTop: `1px solid ${GRAY}` }}>
                 <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: MUTED, marginBottom: 14 }}>You might also need</div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(150px,1fr))', gap: 10 }}>
                   {also.map(a => (
-                    <Link key={a.slug} href={`/employees/${a.slug}/interview`} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: 14, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
+                    <Link key={a.slug} href={`/employees/${a.slug}/interview`} style={{ background: BG, border: `1px solid ${GRAY}`, borderRadius: 14, padding: 14, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
                       <div style={{ fontSize: 24, marginBottom: 6 }}>{a.emoji}</div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: '#F1F5F9' }}>{a.name}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: INK }}>{a.name}</div>
                       <div style={{ fontSize: 11, color: MUTED }}>{a.sub} · {a.price}</div>
                     </Link>
                   ))}

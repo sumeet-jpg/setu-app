@@ -54,7 +54,7 @@ export default function EmployeesClient() {
         <SetuLogo size={30} color={GREEN} wordColor={INK} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Link href="/pricing" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Pricing</Link>
-          <Link href="/flows" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Build your own</Link>
+          <Link href="/pricing" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Pricing</Link>
           <Link href="/signin" style={{ fontSize: 13, color: WHITE, textDecoration: 'none', padding: '8px 18px', borderRadius: 8, letterSpacing: '-0.01em', background: INK, fontWeight: 700 }}>Sign in</Link>
         </div>
       </nav>
@@ -73,7 +73,7 @@ export default function EmployeesClient() {
               </h1>
               <p style={{ fontSize: 15, color: MUTED, margin: 0, lineHeight: 1.65 }}>The star gets the credit. Your AI Employee does the work. Interview free, hire when ready.</p>
             </div>
-            <Link href="/flows" style={{
+            <Link href="/quiz" style={{
               flexShrink: 0,
               padding: '12px 24px', borderRadius: 12,
               background: WHITE, border: `1.5px solid ${GRAY}`,
@@ -82,7 +82,7 @@ export default function EmployeesClient() {
               whiteSpace: 'nowrap',
               boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
             }}>
-              + Build your own employee
+              Which role do I need? →
             </Link>
           </div>
         </div>
@@ -134,6 +134,12 @@ export default function EmployeesClient() {
           </div>
         </div>
 
+        {/* Quiz promo */}
+        <div style={{ marginBottom: 20, padding: '11px 18px', borderRadius: 12, background: 'rgba(14,92,52,0.06)', border: '1px solid rgba(14,92,52,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+          <span style={{ fontSize: 13, color: INK, fontWeight: 500 }}>Not sure which role fits your business?</span>
+          <Link href="/quiz" style={{ fontSize: 12, fontWeight: 700, color: GREEN, textDecoration: 'none', padding: '6px 14px', borderRadius: 8, background: WHITE, border: `1px solid rgba(14,92,52,0.22)`, whiteSpace: 'nowrap' }}>Take the 4-question quiz →</Link>
+        </div>
+
         {/* Results count */}
         <div style={{ marginBottom: 20, fontSize: 12, color: DIM, letterSpacing: '0.02em' }}>
           {filtered.length} stunt{filtered.length !== 1 ? 'men & stuntwomen' : 'man/stuntwoman'} {dept !== 'All' ? `in ${dept}` : 'across all departments'}
@@ -175,19 +181,19 @@ export default function EmployeesClient() {
           boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
         }}>
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>Canvas Builder</div>
-            <h3 style={{ fontSize: 'clamp(20px,3vw,28px)', fontWeight: 800, letterSpacing: '-0.04em', margin: '0 0 10px', color: INK }}>Don't see the right employee?</h3>
-            <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.65, maxWidth: 460 }}>Use our visual canvas to wire up any AI Employee for any workflow unique to your business.</p>
+            <div style={{ fontSize: 10, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>Not sure which role?</div>
+            <h3 style={{ fontSize: 'clamp(20px,3vw,28px)', fontWeight: 800, letterSpacing: '-0.04em', margin: '0 0 10px', color: INK }}>Find your perfect AI Employee match</h3>
+            <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.65, maxWidth: 460 }}>Take our 4-question quiz and we'll match you to the right AI Employee for your budget and bottleneck.</p>
           </div>
           <div style={{ flexShrink: 0 }}>
-            <Link href="/flows" style={{
+            <Link href="/quiz" style={{
               padding: '13px 28px', borderRadius: 12,
               background: GREEN,
               color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none',
               whiteSpace: 'nowrap', textAlign: 'center', display: 'block',
               boxShadow: '0 8px 28px rgba(14,92,52,0.22)',
             }}>
-              Open Canvas →
+              Take the Quiz →
             </Link>
           </div>
         </div>

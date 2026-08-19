@@ -116,7 +116,7 @@ export default function HomePage() {
       <nav style={{ background: WHITE, borderBottom: `1px solid ${GRAY}`, padding: '0 32px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <SetuLogo size={30} color={GREEN} wordColor={INK} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {[['All Employees', '/employees'], ['Enterprise', '/enterprise'], ['Compare', '/compare'], ['Canvas', '/flows']].map(([label, href]) => (
+          {[['All Employees', '/employees'], ['Enterprise', '/enterprise'], ['Compare', '/compare'], ['Pricing', '/pricing']].map(([label, href]) => (
             <Link key={href} href={href} className="nav-link" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }}>{label}</Link>
           ))}
           <Link href="/quiz" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }} className="nav-link">Which role?</Link>
@@ -131,7 +131,7 @@ export default function HomePage() {
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.09em', textTransform: 'uppercase', padding: '5px 14px', borderRadius: 6, background: GREEN_L, marginBottom: 28 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: GREEN_M, display: 'inline-block' }} />
-            100 AI Employees · Hiring now
+            100 AI Employees · Interview free
           </div>
 
           <h1 style={{ fontSize: 'clamp(44px,5vw,72px)', fontWeight: 800, letterSpacing: '-0.055em', margin: '0 0 24px', color: INK, lineHeight: 1.0, fontFamily: F }}>
@@ -171,7 +171,7 @@ export default function HomePage() {
         <div>
           <VideoHero />
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 12, color: MUTED }}>30-second overview · Arthur voices it</span>
+            <span style={{ fontSize: 12, color: MUTED }}>30-second overview · unmute for narration</span>
             <Link href="/employees" style={{ fontSize: 12, fontWeight: 700, color: GREEN, textDecoration: 'none', marginLeft: 'auto' }}>Browse the team →</Link>
           </div>
         </div>
@@ -179,7 +179,7 @@ export default function HomePage() {
 
       {/* ── MARQUEE ── */}
       <div style={{ borderTop: `1px solid ${GRAY}`, borderBottom: `1px solid ${GRAY}`, padding: '12px 0', overflow: 'hidden', background: WHITE }}>
-        <div style={{ display: 'flex', gap: 8, animation: 'marquee 300s linear infinite', width: 'max-content' }}>
+        <div style={{ display: 'flex', gap: 8, animation: 'marquee 60s linear infinite', width: 'max-content' }}>
           {[...EMPLOYEES, ...EMPLOYEES].map((e, i) => (
             <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12, color: MUTED, padding: '5px 14px', borderRadius: 6, border: `1px solid ${GRAY}`, whiteSpace: 'nowrap', flexShrink: 0, fontWeight: 500 }}>
               <span style={{ fontSize: 13 }}>{e.emoji}</span>
@@ -252,8 +252,8 @@ export default function HomePage() {
             </p>
           </div>
           <div style={{ flexShrink: 0, textAlign: 'center' }}>
-            <Link href="/flows" className="ghost-btn" style={{ display: 'inline-block', padding: '13px 30px', borderRadius: 11, background: GREEN_L, border: `1.5px solid ${GREEN}`, color: GREEN, fontSize: 14, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              Open Canvas →
+            <Link href="/employees" className="ghost-btn" style={{ display: 'inline-block', padding: '13px 30px', borderRadius: 11, background: GREEN_L, border: `1.5px solid ${GREEN}`, color: GREEN, fontSize: 14, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+              Browse the team →
             </Link>
             <p style={{ fontSize: 12, color: DIM, marginTop: 10, textAlign: 'center' }}>Free to build</p>
           </div>
