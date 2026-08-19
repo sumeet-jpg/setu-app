@@ -658,6 +658,138 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
           </div>
         )}
 
+        {/* ── Brain Architecture ── */}
+        <div style={{ marginBottom: 56 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
+            textTransform: 'uppercase', marginBottom: 20 }}>How {e.name} Thinks</div>
+
+          {/* Layer 1 — Knowledge */}
+          <div style={{ background: '#fff', border: `2px solid ${e.color}30`,
+            borderRadius: '16px 16px 4px 4px', padding: '28px 32px',
+            position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: e.color }} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+              gap: 16, marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
+                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 1 · Knowledge Base</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+                  {e.years} years of {e.dept} domain expertise
+                </div>
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65 }}>
+                  Deep speciality baked in at hire — frameworks, tools, methodologies, and hard-won domain judgment from {e.years} years in the field. This is what {e.name} knows without you telling them anything.
+                </div>
+              </div>
+              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#16A34A',
+                background: '#DCFCE7', padding: '5px 12px', borderRadius: 20,
+                border: '1px solid #BBF7D0' }}>● Live</div>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {e.knows.slice(0, 8).map((k: string) => (
+                <span key={k} style={{ fontSize: 11, padding: '5px 11px', borderRadius: 8,
+                  background: e.color + '0D', border: `1px solid ${e.color}25`,
+                  color: e.color, fontWeight: 600 }}>{k}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Connector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px',
+            height: 28, background: '#F6F5F1',
+            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
+            <div style={{ flex: 1, height: 1, background: GRAY }} />
+            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>
+              ↓  enriched by
+            </div>
+            <div style={{ flex: 1, height: 1, background: GRAY }} />
+          </div>
+
+          {/* Layer 2 — Memory */}
+          <div style={{ background: '#fff', border: `1.5px solid ${GRAY}`,
+            borderRadius: 4, padding: '28px 32px',
+            position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#6366F1' }} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+              gap: 16, marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#6366F1', letterSpacing: '0.1em',
+                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 2 · Session Memory</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+                  Remembers every task, decision, and result
+                </div>
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65 }}>
+                  {e.name} maintains a persistent record of everything done for your business. Each session picks up where the last left off — no re-briefing, no lost context.
+                </div>
+              </div>
+              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: MUTED,
+                background: '#F6F5F1', padding: '5px 12px', borderRadius: 20,
+                border: `1px solid ${GRAY}` }}>After hire</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
+              {[
+                { icon: '💬', label: 'Conversation log', desc: 'Full history of every session and exchange' },
+                { icon: '✅', label: 'Task record', desc: 'What was done, when, and the outcome' },
+                { icon: '🔐', label: 'Decision log', desc: 'Approvals granted, overrides made — all auditable' },
+              ].map(item => (
+                <div key={item.label} style={{ background: '#F6F5F1', borderRadius: 10,
+                  padding: '14px 16px', border: `1px solid ${GRAY}` }}>
+                  <div style={{ fontSize: 20, marginBottom: 8 }}>{item.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
+                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Connector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px',
+            height: 28, background: '#F6F5F1',
+            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
+            <div style={{ flex: 1, height: 1, background: GRAY }} />
+            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>
+              ↓  grounded in
+            </div>
+            <div style={{ flex: 1, height: 1, background: GRAY }} />
+          </div>
+
+          {/* Layer 3 — Company Knowledge */}
+          <div style={{ background: '#fff', border: `1.5px solid ${GRAY}`,
+            borderRadius: '4px 4px 16px 16px', padding: '28px 32px',
+            position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#F59E0B' }} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+              gap: 16, marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#B45309', letterSpacing: '0.1em',
+                  textTransform: 'uppercase', marginBottom: 6 }}>Layer 3 · Company Knowledge</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+                  Learns your business from what you share
+                </div>
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65 }}>
+                  Feed {e.name} your documents, website, SOPs, and playbooks. {e.name} indexes everything and draws on it when making decisions — no re-briefing needed each session.
+                </div>
+              </div>
+              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: MUTED,
+                background: '#F6F5F1', padding: '5px 12px', borderRadius: 20,
+                border: `1px solid ${GRAY}` }}>Configure after hire</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
+              {[
+                { icon: '📄', label: 'Documents', desc: 'PDFs, Notion pages, Google Docs' },
+                { icon: '🌐', label: 'Your website', desc: 'URL-indexed, read on every session' },
+                { icon: '📋', label: 'SOPs & playbooks', desc: 'Standard processes, always accessible' },
+              ].map(item => (
+                <div key={item.label} style={{ background: '#FFFBEB', borderRadius: 10,
+                  padding: '14px 16px', border: '1px solid #FDE68A40' }}>
+                  <div style={{ fontSize: 20, marginBottom: 8 }}>{item.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
+                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Interview CTA banner */}
         <div style={{ background: INK, borderRadius: 20, padding: '36px 40px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
