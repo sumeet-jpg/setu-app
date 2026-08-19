@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { EMPLOYEES } from '@/lib/employees/profiles'
 import { SetuLogo } from '@/components/SetuLogo'
+import EmployeeMatchBox from '@/components/EmployeeMatchBox'
 
 const BASE = 'https://setuagents.com'
 
@@ -192,6 +193,18 @@ export default function HomePage() {
             </span>
           ))}
         </div>
+      </div>
+
+      {/* ── PROBLEM MATCHER ── */}
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '64px 32px 0' }}>
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Find your match</span>
+          <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '10px 0 8px', color: INK, lineHeight: 1.1 }}>
+            Describe your problem — we'll match the right AI Employee
+          </h2>
+          <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>Type in plain English. No forms, no dropdowns.</p>
+        </div>
+        <EmployeeMatchBox />
       </div>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 32px' }}>
@@ -454,34 +467,3 @@ function HeroEmployeeCard({ employee: e }: { employee: any }) {
   )
 }
 
-function EmployeeCard({ employee: e }: { employee: any }) {
-  return (
-    <Link href={`/employees/${e.slug}`} className="emp-card" style={{ display: 'flex', flexDirection: 'column', background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 18, padding: '24px', textDecoration: 'none', gap: 14, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2.5, background: e.color, opacity: 0.7 }} />
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-        <div style={{ width: 50, height: 50, borderRadius: 14, background: `${e.color}12`, border: `1.5px solid ${e.color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>
-          {e.emoji}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, marginBottom: 4, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{e.dept}</div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: INK, letterSpacing: '-0.03em', lineHeight: 1.2 }}>{e.name}</div>
-          <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{e.title}</div>
-        </div>
-      </div>
-      <p style={{ fontSize: 13, color: MUTED, lineHeight: 1.65, margin: 0, flexGrow: 1 }}>{e.tagline}</p>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 12, borderTop: `1px solid ${GRAY}` }}>
-        <div style={{ display: 'flex', gap: 18 }}>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: INK }}>{e.years}yr</div>
-            <div style={{ fontSize: 10, color: DIM }}>experience</div>
-          </div>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: INK }}>{e.agentCount}</div>
-            <div style={{ fontSize: 10, color: DIM }}>agents</div>
-          </div>
-        </div>
-        <span style={{ fontSize: 13, fontWeight: 800, color: GREEN }}>{e.pricing.label}</span>
-      </div>
-    </Link>
-  )
-}
