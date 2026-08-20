@@ -67,12 +67,23 @@ export async function PATCH(req: NextRequest) {
 
     const supabase = getSupabase()
 
-    const statusMap: Record<string, string> = {
-      cancel: 'cancelled',
-      pause:  'paused',
-      resume: 'trial',
+    // For resume: determine correct target status from the subscription record
+    let newStatus: string
+    if (action === 'cancel') {
+      newStatus = 'cancelled'
+    } else if (action === 'pause') {
+      newStatus = 'paused'
+    } else {
+      // resume: use trial if trial_ends_at is still in the future, else active
+      const { data: current } = await supabase
+        .from('hired_subscriptions')
+        .select('trial_ends_at, activated_at')
+        .eq('user_id', userId)
+        .eq('employee_slug', slug)
+        .maybeSingle()
+      const trialStillValid = current?.trial_ends_at && new Date(current.trial_ends_at) > new Date()
+      newStatus = trialStillValid ? 'trial' : 'active'
     }
-    const newStatus = statusMap[action]
 
     const updates: Record<string, unknown> = {
       status:     newStatus,

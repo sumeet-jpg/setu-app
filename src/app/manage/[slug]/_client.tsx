@@ -367,7 +367,7 @@ export default function ManageClient({
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {isPaused && (
+              {isPaused ? (
                 <button
                   onClick={async () => {
                     await fetch('/api/manage/subscription', {
@@ -380,6 +380,21 @@ export default function ManageClient({
                   style={{ padding: '7px 16px', borderRadius: 9, background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
                 >
                   Resume
+                </button>
+              ) : isActive && (
+                <button
+                  title="Pause keeps your locked rate — use when you need a break without losing your price"
+                  onClick={async () => {
+                    await fetch('/api/manage/subscription', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId, slug, action: 'pause' }),
+                    })
+                    loadAll()
+                  }}
+                  style={{ padding: '7px 16px', borderRadius: 9, background: 'rgba(148,163,184,0.08)', border: '1px solid rgba(148,163,184,0.2)', color: C.muted, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  Pause
                 </button>
               )}
               <button
