@@ -141,8 +141,19 @@ export default function MyEmployeesPage() {
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+                    {isTrial && trialDays !== null && trialDays <= 4 && (
+                      <Link href={`/manage/${sub.employee_slug}`} style={{
+                        padding: '9px 18px', borderRadius: 10, background: AMBER, color: '#fff',
+                        fontSize: 13, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap',
+                      }}>
+                        Activate — ${price}/mo →
+                      </Link>
+                    )}
                     <Link href={`/manage/${sub.employee_slug}`} style={{
-                      padding: '9px 18px', borderRadius: 10, background: INK, color: '#fff',
+                      padding: '9px 18px', borderRadius: 10,
+                      background: isTrial && trialDays !== null && trialDays <= 4 ? WHITE : INK,
+                      border: isTrial && trialDays !== null && trialDays <= 4 ? `1.5px solid ${GRAY}` : 'none',
+                      color: isTrial && trialDays !== null && trialDays <= 4 ? MUTED : '#fff',
                       fontSize: 13, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap',
                     }}>
                       Manage →
