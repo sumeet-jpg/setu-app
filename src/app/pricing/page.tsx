@@ -32,11 +32,19 @@ function currentPrice(): number {
 
 function nextMonthPrice(): number { return currentPrice() + STEP }
 
-// Days until 1st of next month (when price increases)
+// Days until the next actual price increase:
+// Before Sept 2026 launch: until Oct 1 (first real step-up)
+// Otherwise: until 1st of next month
 function daysUntilIncrease(): number {
-  const now   = new Date()
-  const next  = new Date(now.getFullYear(), now.getMonth() + 1, 1)
-  return Math.ceil((next.getTime() - now.getTime()) / 86400000)
+  const now = new Date()
+  let nextHike: Date
+  if (now < LAUNCH_DATE) {
+    // Before launch: first step-up is Oct 1 2026
+    nextHike = new Date('2026-10-01')
+  } else {
+    nextHike = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  }
+  return Math.max(1, Math.ceil((nextHike.getTime() - now.getTime()) / 86400000))
 }
 
 const WHAT_YOU_GET = [
