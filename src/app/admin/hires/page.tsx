@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getEmployeeHires } from '@/lib/services/admin.service'
+import { getEmployeeHires, getHireSubscriptions } from '@/lib/services/admin.service'
 import { PageHeader } from '@/components/admin/ui/PageHeader'
 import { EmptyState } from '@/components/admin/ui/EmptyState'
 import { HireStatusUpdater, HireNotesEditor } from './hire-actions'
@@ -35,10 +35,20 @@ export default async function HiresPage({
 }) {
   const { status, employee } = await searchParams
   let hires: any[] = []
+  let subs: any[] = []
   try {
-    hires = await getEmployeeHires({ status: status || undefined, employee_slug: employee || undefined })
+    [hires, subs] = await Promise.all([
+      getEmployeeHires({ status: status || undefined, employee_slug: employee || undefined }),
+      getHireSubscriptions(),
+    ])
   } catch {
-    hires = []
+    hires = []; subs = []
+  }
+
+  // Build a lookup: email+slug → subscription record
+  const subLookup: Record<string, any> = {}
+  for (const s of subs) {
+    subLookup[`${s.owner_email}|${s.employee_slug}`] = s
   }
 
   // Summary counts
@@ -98,7 +108,7 @@ export default async function HiresPage({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/50">
-                {['Employee', 'Contact', 'Use Case', 'Timeline', 'Status', 'Notes', 'Date'].map(h => (
+                {['Employee', 'Contact', 'Subscription', 'Use Case', 'Timeline', 'Status', 'Notes', 'Date'].map(h => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -131,6 +141,27 @@ export default async function HiresPage({
                     <a href={`mailto:${hire.email}`} className="text-xs text-primary hover:underline">{hire.email}</a>
                     <p className="text-xs text-muted-foreground mt-0.5">{hire.company}{hire.role ? ` · ${hire.role}` : ''}</p>
                     {hire.company_size && <p className="text-xs text-muted-foreground">{hire.company_size} employees</p>}
+                  </td>
+
+                  {/* Subscription */}
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {(() => {
+                      const sub = subLookup[`${hire.email}|${hire.employee_slug}`]
+                      if (!sub) return <span className="text-xs text-muted-foreground">—</span>
+                      const daysLeft = sub.trial_ends_at
+                        ? Math.max(0, Math.ceil((new Date(sub.trial_ends_at).getTime() - Date.now()) / 86400000))
+                        : null
+                      const price = sub.monthly_price_cents ? `$${Math.round(sub.monthly_price_cents / 100)}/mo` : '$49/mo'
+                      return (
+                        <div>
+                          {sub.status === 'trial' && <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">{daysLeft}d left</span>}
+                          {sub.status === 'active' && <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Active</span>}
+                          {sub.status === 'cancelled' && <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">Cancelled</span>}
+                          <p className="text-xs text-muted-foreground mt-0.5">{price} · locked</p>
+                          <Link href={`/manage/${hire.employee_slug}`} className="text-xs text-primary hover:underline">Hub →</Link>
+                        </div>
+                      )
+                    })()}
                   </td>
 
                   {/* Use Case */}

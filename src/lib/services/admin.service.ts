@@ -110,6 +110,15 @@ export async function getEmployeeHires(opts?: { status?: string; employee_slug?:
   return data ?? [];
 }
 
+export async function getHireSubscriptions() {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("hired_subscriptions")
+    .select("owner_email, employee_slug, status, trial_ends_at, monthly_price_cents, billing_months, activated_at")
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}
+
 export async function updateHireStatus(id: string, status: string, admin_notes?: string) {
   const db = createAdminClient();
   const updates: Record<string, string> = { status };
