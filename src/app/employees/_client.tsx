@@ -1,9 +1,14 @@
 // @ts-nocheck
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { EMPLOYEES, DEPT_ORDER, getStuntTitle } from '@/lib/employees/profiles'
 import { SetuLogo } from '@/components/SetuLogo'
+
+function getStoredUserId(): string {
+  if (typeof window === 'undefined') return ''
+  return localStorage.getItem('setu_user_id') ?? ''
+}
 
 /* ─── Design tokens ─── */
 const GREEN  = '#0E5C34'
@@ -17,6 +22,21 @@ const DIM    = '#9E9891'
 export default function EmployeesClient() {
   const [dept, setDept] = useState('All')
   const [search, setSearch] = useState('')
+  const [hiredSlugs, setHiredSlugs] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    const userId = getStoredUserId()
+    if (!userId) return
+    fetch(`/api/manage/my-employees?userId=${userId}`)
+      .then(r => r.json())
+      .then(d => {
+        const active = (d.subscriptions ?? [])
+          .filter((s: any) => s.status === 'trial' || s.status === 'active' || s.status === 'paused')
+          .map((s: any) => s.employee_slug)
+        setHiredSlugs(new Set(active))
+      })
+      .catch(() => {})
+  }, [])
 
   const depts = ['All', ...DEPT_ORDER.filter(d => EMPLOYEES.some(e => e.dept === d))]
 
@@ -149,7 +169,7 @@ export default function EmployeesClient() {
         {/* Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
           {filtered.map(e => (
-            <EmployeeCard key={e.slug} e={e} />
+            <EmployeeCard key={e.slug} e={e} isHired={hiredSlugs.has(e.slug)} />
           ))}
         </div>
 
@@ -203,7 +223,7 @@ export default function EmployeesClient() {
   )
 }
 
-function EmployeeCard({ e }: { e: any }) {
+function EmployeeCard({ e, isHired }: { e: any; isHired?: boolean }) {
   return (
     <div className="setu-card-hover" style={{
       background: WHITE,
@@ -266,34 +286,68 @@ function EmployeeCard({ e }: { e: any }) {
 
       {/* CTAs */}
       <div style={{ display: 'flex', gap: 8 }}>
-        <Link
-          href={`/employees/${e.slug}/interview`}
-          className="setu-interview-btn"
-          style={{
-            flex: 1, padding: '10px 0', borderRadius: 10,
-            background: 'transparent',
-            border: `1.5px solid ${e.color}35`,
-            color: e.color, fontSize: 13, fontWeight: 600,
-            textDecoration: 'none', textAlign: 'center',
-            letterSpacing: '-0.01em',
-            transition: 'all 0.15s ease',
-          }}
-        >
-          Interview {e.name.split(' ')[0]}
-        </Link>
-        <Link
-          href={`/employees/${e.slug}`}
-          style={{
-            flex: 1, padding: '10px 0', borderRadius: 10,
-            background: GREEN,
-            color: '#fff', fontSize: 13, fontWeight: 700,
-            textDecoration: 'none', textAlign: 'center',
-            boxShadow: '0 4px 14px rgba(14,92,52,0.20)',
-            letterSpacing: '-0.01em',
-          }}
-        >
-          View Profile →
-        </Link>
+        {isHired ? (
+          <>
+            <Link
+              href={`/employees/${e.slug}/interview`}
+              className="setu-interview-btn"
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: 10,
+                background: 'transparent',
+                border: `1.5px solid ${e.color}35`,
+                color: e.color, fontSize: 13, fontWeight: 600,
+                textDecoration: 'none', textAlign: 'center',
+                letterSpacing: '-0.01em',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              Chat
+            </Link>
+            <Link
+              href={`/manage/${e.slug}`}
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: 10,
+                background: INK,
+                color: '#fff', fontSize: 13, fontWeight: 700,
+                textDecoration: 'none', textAlign: 'center',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Manage →
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link
+              href={`/employees/${e.slug}/interview`}
+              className="setu-interview-btn"
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: 10,
+                background: 'transparent',
+                border: `1.5px solid ${e.color}35`,
+                color: e.color, fontSize: 13, fontWeight: 600,
+                textDecoration: 'none', textAlign: 'center',
+                letterSpacing: '-0.01em',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              Interview {e.name.split(' ')[0]}
+            </Link>
+            <Link
+              href={`/employees/${e.slug}`}
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: 10,
+                background: GREEN,
+                color: '#fff', fontSize: 13, fontWeight: 700,
+                textDecoration: 'none', textAlign: 'center',
+                boxShadow: '0 4px 14px rgba(14,92,52,0.20)',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              View Profile →
+            </Link>
+          </>
+        )}
       </div>
     </div>
   )
