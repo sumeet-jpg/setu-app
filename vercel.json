@@ -20,6 +20,10 @@
     {
       "path": "/api/cron/decay",
       "schedule": "0 3 * * 1"
+    },
+    {
+      "path": "/api/cron/trials",
+      "schedule": "0 8 * * *"
     }
   ]
 }
