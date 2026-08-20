@@ -42,6 +42,7 @@ export default function ManageClient({
   const [pendingActions, setPendingActions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showActivate, setShowActivate] = useState(false)
+  const [checkingOut, setCheckingOut]   = useState(false)
   const [showCancel, setShowCancel]     = useState(false)
   const [cancelReason, setCancelReason] = useState('')
   const [cancelling, setCancelling]     = useState(false)
@@ -91,6 +92,28 @@ export default function ManageClient({
   }, [userId, slug])
 
   useEffect(() => { loadAll() }, [loadAll])
+
+  async function handlePayNow() {
+    if (!userId || checkingOut) return
+    setCheckingOut(true)
+    try {
+      const res = await fetch('/api/checkout/dodo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, employee_slug: slug }),
+      })
+      const data = await res.json()
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url
+      } else {
+        alert(data.error ?? 'Could not start checkout. Try WhatsApp or email below.')
+      }
+    } catch {
+      alert('Could not start checkout. Try WhatsApp or email below.')
+    } finally {
+      setCheckingOut(false)
+    }
+  }
 
   async function handleCancel() {
     setCancelling(true)
@@ -478,7 +501,7 @@ export default function ManageClient({
               Activate {employeeName}
             </h2>
             <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.7, margin: '0 0 24px', textAlign: 'center' }}>
-              Your locked rate is <strong style={{ color: C.text }}>${monthlyPrice}/month</strong> — permanently. New signups after next month pay more. Billing is handled by a human right now; we'll email you a payment link within a few hours.
+              Your locked rate is <strong style={{ color: C.text }}>${monthlyPrice}/month</strong> — permanently. New signups after this month pay more.
             </p>
 
             <div style={{ background: C.card, borderRadius: 12, padding: '16px 18px', marginBottom: 24 }}>
@@ -496,22 +519,35 @@ export default function ManageClient({
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button
+                onClick={handlePayNow}
+                disabled={checkingOut}
+                style={{
+                  display: 'block', width: '100%', textAlign: 'center', padding: '13px 20px', borderRadius: 11,
+                  background: C.accent, color: '#fff', fontSize: 14, fontWeight: 700,
+                  border: 'none', cursor: checkingOut ? 'wait' : 'pointer', fontFamily: 'inherit',
+                  opacity: checkingOut ? 0.7 : 1,
+                }}
+              >
+                {checkingOut ? 'Opening checkout…' : `Pay $${monthlyPrice}/mo — activate now →`}
+              </button>
               <a
                 href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '918951066630'}?text=${encodeURIComponent(`Hi Sumeet, I'd like to activate ${employeeName} at my locked rate of $${monthlyPrice}/month. Employee: ${slug}`)}`}
                 target="_blank" rel="noopener noreferrer"
                 style={{
-                  display: 'block', textAlign: 'center', padding: '12px 20px', borderRadius: 11,
-                  background: '#25D366', color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none',
+                  display: 'block', textAlign: 'center', padding: '11px 20px', borderRadius: 11,
+                  background: 'transparent', border: `1px solid rgba(37,211,102,0.4)`,
+                  color: '#25D366', fontSize: 13, fontWeight: 600, textDecoration: 'none',
                 }}
               >
-                WhatsApp to activate →
+                WhatsApp instead →
               </a>
               <a
                 href={`mailto:${BILLING_EMAIL}?subject=Activate ${employeeName} — $${monthlyPrice}/mo&body=Hi, I'd like to activate ${employeeName} at my locked rate of $${monthlyPrice}/month. My employee slug is: ${slug}.`}
                 style={{
-                  display: 'block', textAlign: 'center', padding: '12px 20px', borderRadius: 11,
-                  background: 'transparent', border: `1px solid rgba(99,102,241,0.4)`,
-                  color: '#818cf8', fontSize: 13, fontWeight: 600, textDecoration: 'none',
+                  display: 'block', textAlign: 'center', padding: '11px 20px', borderRadius: 11,
+                  background: 'transparent', border: `1px solid ${C.border}`,
+                  color: C.muted, fontSize: 13, fontWeight: 600, textDecoration: 'none',
                 }}
               >
                 Email instead →
@@ -524,10 +560,6 @@ export default function ManageClient({
                 Continue trial
               </button>
             </div>
-
-            <p style={{ fontSize: 11, color: C.muted, textAlign: 'center', marginTop: 16, lineHeight: 1.6 }}>
-              We'll set up automated billing soon. For now, reply to the email and we'll send a payment link within a few hours.
-            </p>
           </div>
         </div>
       )}
