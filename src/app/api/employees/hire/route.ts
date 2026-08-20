@@ -53,6 +53,13 @@ export async function POST(req: NextRequest) {
     // userId from the client (localStorage-based anonymous id)
     const userId = body.userId ?? null
     if (userId) {
+      // Get current platform price (step-up model: $49 at launch, +$10/month from Oct 2026)
+      let priceCents = 4900
+      try {
+        const { data: priceRow } = await supabase.rpc('current_platform_price_cents')
+        if (typeof priceRow === 'number' && priceRow >= 4900) priceCents = priceRow
+      } catch { /* migration not yet applied — use launch price */ }
+
       const trialEnd = new Date(Date.now() + 14 * 86400000).toISOString()
       await supabase
         .from('hired_subscriptions')
@@ -71,7 +78,7 @@ export async function POST(req: NextRequest) {
           status:          'trial',
           trial_started_at: new Date().toISOString(),
           trial_ends_at:   trialEnd,
-          monthly_price_cents: 4900,   // $49 — launch price, locked at hire time
+          monthly_price_cents: priceCents,  // locked at hire time, steps up $10/month from Oct
           price_locked_at: new Date().toISOString(),
           updated_at:      new Date().toISOString(),
         }, { onConflict: 'user_id,employee_slug' })
