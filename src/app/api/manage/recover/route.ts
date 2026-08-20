@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
-import { getServerEnv } from '@/lib/env'
+// getServerEnv removed — reads env vars directly to avoid strict validation crash
 
 // POST { email }
 // Looks up all hired_subscriptions where contact_email matches,
@@ -25,8 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true })
     }
 
-    const env = getServerEnv()
-    const resend = new Resend(env.RESEND_API_KEY)
+    const resend = new Resend(process.env.RESEND_API_KEY!)
 
     const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://setuagents.com'
 
@@ -54,7 +53,7 @@ export async function POST(req: NextRequest) {
     }).join('')
 
     await resend.emails.send({
-      from: env.FROM_EMAIL,
+      from: process.env.FROM_EMAIL ?? 'hello@setuagents.com',
       to: email,
       subject: `Your Setu AI Employee links`,
       html: `

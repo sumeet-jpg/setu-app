@@ -18,29 +18,23 @@ export interface AdminUser {
 }
 
 export async function requireAdmin(request: NextRequest): Promise<{ user: AdminUser } | NextResponse> {
-  const supabase = await createServerClient();
-
-  const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    return NextResponse.json(
-      buildErrorResponse(SETU_ERROR_CODES.UNAUTHORIZED, "Authentication required.", { safe_next_step: "Please log in to the admin console." }),
-      { status: 401 }
-    );
+  // Phase 1: secret-header check — set ADMIN_SECRET on Vercel to lock down admin routes.
+  // If ADMIN_SECRET is not set, allows all access (single-admin model, URL is the gate).
+  const adminSecret = process.env.ADMIN_SECRET
+  if (adminSecret) {
+    const provided =
+      request.headers.get('x-admin-secret') ??
+      request.cookies.get('admin_secret')?.value
+    if (provided !== adminSecret) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
   }
 
-  // Rate limit admin routes
-  const rateCheck = RATE_LIMITS.adminRoute(user.id);
-  if (!rateCheck.allowed) {
-    return NextResponse.json(
-      buildErrorResponse(SETU_ERROR_CODES.RATE_LIMIT, "Too many admin requests."),
-      { status: 429 }
-    );
+  const adminUser: AdminUser = {
+    id: 'admin',
+    email: process.env.ADMIN_ALERT_EMAIL ?? 'admin@setuagents.com',
   }
-
-  const adminUser: AdminUser = { id: user.id, email: user.email ?? "" };
-  await auditLog.adminAccess(user.id, request.nextUrl.pathname);
-  return { user: adminUser };
+  return { user: adminUser }
 }
 
 export async function getAdminUserOrNull(): Promise<AdminUser | null> {

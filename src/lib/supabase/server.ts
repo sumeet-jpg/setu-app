@@ -52,18 +52,21 @@ export async function createServerClient() {
  * Service-role admin client — bypasses RLS.
  * Use ONLY for trusted server-side operations (seeding, admin routes, internal agents).
  * NEVER use for user-facing queries without explicit tenant filtering.
+ *
+ * Reads SUPABASE_SERVICE_ROLE_KEY directly — does NOT go through getServerEnv()
+ * so a missing optional env var doesn't crash routes that only need Supabase.
  */
 export function createAdminClient() {
-  const env = getServerEnv();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !serviceKey) {
+    throw new Error('[Setu] NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required')
+  }
 
-  return createClient<Database>(
-    clientEnv.NEXT_PUBLIC_SUPABASE_URL,
-    env.SUPABASE_SERVICE_ROLE_KEY,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    }
-  );
+  return createClient<Database>(url, serviceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
 }
