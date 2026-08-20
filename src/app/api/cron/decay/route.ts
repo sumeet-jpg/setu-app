@@ -42,6 +42,67 @@ export async function POST(req: NextRequest) {
       console.error('[decay cron trial expiry]', e)
     }
 
+    // ── Day-3 and Day-10 follow-up emails ───────────────────────────────────
+    let followupCount = 0
+    try {
+      if (process.env.RESEND_API_KEY) {
+        const resend = new Resend(process.env.RESEND_API_KEY)
+        const from  = process.env.FROM_EMAIL ?? 'hello@setuagents.com'
+        const base  = process.env.NEXT_PUBLIC_APP_URL ?? 'https://setuagents.com'
+        const now   = new Date()
+
+        for (const [minDays, maxDays, subject, body] of [
+          [2, 4,
+           'How is {employee_name} working out?',
+           '<p style="color:#6b7280;font-size:14px;margin:0 0 16px;line-height:1.7">You hired <strong style="color:#111">{employee_name}</strong> 3 days ago. Have you had a chance to chat?</p><p style="color:#6b7280;font-size:14px;margin:0 0 20px;line-height:1.7">The first few sessions are where the magic starts — {employee_name} learns your preferences, your tools, and how you work. By session 5, you\'ll notice a real difference.</p>',
+          ],
+          [9, 11,
+           '{name} trial: 4 days left — lock in ${price}/mo forever',
+           '<p style="color:#6b7280;font-size:14px;margin:0 0 16px;line-height:1.7">Your free trial of <strong style="color:#111">{employee_name}</strong> ends in 4 days.</p><p style="color:#6b7280;font-size:14px;margin:0 0 20px;line-height:1.7">Activate before it expires and you keep <strong style="color:#111">${price}/month</strong> locked in forever. New signups after October pay $10 more — and every month after that is $10 higher still.</p>',
+          ],
+        ] as any) {
+          const from_date = new Date(now.getTime() - maxDays * 86400000)
+          const to_date   = new Date(now.getTime() - minDays * 86400000)
+
+          const { data: followups } = await supabase
+            .from('hired_subscriptions')
+            .select('owner_email, owner_name, employee_name, employee_slug, monthly_price_cents')
+            .eq('status', 'trial')
+            .gt('trial_started_at', from_date.toISOString())
+            .lte('trial_started_at', to_date.toISOString())
+
+          for (const sub of (followups ?? [])) {
+            if (!sub.owner_email) continue
+            const firstName = (sub.owner_name ?? '').split(' ')[0] || 'there'
+            const price = sub.monthly_price_cents ? Math.round(sub.monthly_price_cents / 100) : 49
+            const subjectFilled = (subject as string).replace('{name}', firstName).replace('{employee_name}', sub.employee_name ?? sub.employee_slug).replace('{price}', String(price))
+            const bodyFilled = (body as string).replace(/{name}/g, firstName).replace(/{employee_name}/g, sub.employee_name ?? sub.employee_slug).replace(/{price}/g, String(price))
+
+            await resend.emails.send({
+              from,
+              to: sub.owner_email,
+              subject: subjectFilled,
+              html: `
+                <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px">
+                  <h2 style="font-size:20px;font-weight:800;color:#111;margin:0 0 12px">Hi ${firstName} 👋</h2>
+                  ${bodyFilled}
+                  <a href="${base}/manage/${sub.employee_slug}" style="display:inline-block;padding:12px 24px;background:#111;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
+                    Open manage hub →
+                  </a>
+                  <p style="font-size:12px;color:#9ca3af;margin-top:24px;line-height:1.6">
+                    Questions? Reply to this email.<br>Setu · setuagents.com
+                  </p>
+                </div>
+              `,
+            }).catch(() => {})
+            followupCount++
+          }
+        }
+      }
+    } catch (e) {
+      console.error('[decay cron followups]', e)
+    }
+
     // ── Trial expiry reminders ───────────────────────────────────────────────
     let remindedCount = 0
     try {
@@ -112,6 +173,7 @@ export async function POST(req: NextRequest) {
       decayed: result?.decayed_count ?? 0,
       at_floor: result?.zeroed_count ?? 0,
       trials_expired: expiredCount,
+      followup_emails_sent: followupCount,
       trial_reminders_sent: remindedCount,
       ran_at: new Date().toISOString(),
     })
