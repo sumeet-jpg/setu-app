@@ -161,6 +161,41 @@ export async function PATCH(req: NextRequest) {
       } catch { /* non-fatal */ }
     }
 
+    // Pause confirmation email
+    if (action === 'pause' && updated?.owner_email && process.env.RESEND_API_KEY) {
+      try {
+        const resend    = new Resend(process.env.RESEND_API_KEY)
+        const from      = process.env.FROM_EMAIL ?? 'hello@setuagents.com'
+        const base      = process.env.NEXT_PUBLIC_APP_URL ?? 'https://setuagents.com'
+        const firstName = (updated.owner_name ?? '').split(' ')[0] || 'there'
+        const empName   = updated.employee_name ?? slug
+        const price     = updated.monthly_price_cents ? Math.round(updated.monthly_price_cents / 100) : 49
+
+        await resend.emails.send({
+          from,
+          to: updated.owner_email,
+          subject: `${empName} paused — your rate is still locked`,
+          html: `
+            <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;background:#0B0D14;border-radius:16px;overflow:hidden">
+              <div style="padding:32px">
+                <p style="color:#94a3b8;font-size:13px;margin:0 0 4px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">SETU · Paused</p>
+                <h2 style="font-size:20px;font-weight:800;color:#fff;margin:8px 0 16px;letter-spacing:-0.03em">
+                  ${firstName}, ${empName} is paused
+                </h2>
+                <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 16px">
+                  Your subscription is paused. You won't be billed while paused, and your locked rate of <strong style="color:#fff">$${price}/month</strong> is preserved — resume anytime and you pick up exactly where you left off.
+                </p>
+                <a href="${base}/manage/${slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
+                  Resume ${empName} →
+                </a>
+                <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu · setuagents.com</p>
+              </div>
+            </div>
+          `,
+        }).catch(() => {})
+      } catch { /* non-fatal */ }
+    }
+
     return NextResponse.json({ ok: true, status: newStatus })
   } catch (err) {
     console.error('[manage/subscription PATCH]', err)
