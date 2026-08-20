@@ -65,6 +65,11 @@ export default async function EmployeeProfilePage({ params }: { params: Promise<
     capabilities: e.capabilities,
     tools: e.tools,
     howItWorks: e.howItWorks,
+    // Architecture fields — were stripped, causing Systems 0/6/7 to show placeholder content
+    characterCore:  e.characterCore,
+    watchPatterns:  e.watchPatterns,
+    kpis:           e.kpis,
+    autonomyModes:  e.autonomyModes,
   }
 
   return (
