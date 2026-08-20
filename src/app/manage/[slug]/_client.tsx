@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
+const BILLING_EMAIL = 'hello@setuagents.com'
+
 function getOrCreateUserId(): string {
   if (typeof window === 'undefined') return ''
   let id = localStorage.getItem('setu_user_id')
@@ -30,6 +32,7 @@ export default function ManageClient({
   const [calibration, setCalibration] = useState<any>(null)
   const [pendingActions, setPendingActions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [showActivate, setShowActivate] = useState(false)
 
   const C = {
     bg:      '#0B0D14',
@@ -96,8 +99,8 @@ export default function ManageClient({
       {/* Header */}
       <div style={{ borderBottom: `1px solid ${C.border}`, background: C.surface, padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <Link href="/employees" style={{ fontSize: 12, color: C.muted, textDecoration: 'none', padding: '5px 10px', borderRadius: 7, border: `1px solid ${C.border}` }}>
-            ← All employees
+          <Link href="/my-employees" style={{ fontSize: 12, color: C.muted, textDecoration: 'none', padding: '5px 10px', borderRadius: 7, border: `1px solid ${C.border}` }}>
+            ← My Employees
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 34, height: 34, borderRadius: 10, background: `${employeeColor}18`, border: `1.5px solid ${employeeColor}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>
@@ -116,9 +119,9 @@ export default function ManageClient({
             <div style={{ padding: '5px 12px', borderRadius: 20, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 12, color: C.amber, fontWeight: 600 }}>
               {trialDays}d left in trial
             </div>
-            <div style={{ padding: '6px 14px', borderRadius: 8, background: C.accent, color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+            <button onClick={() => setShowActivate(true)} style={{ padding: '6px 14px', borderRadius: 8, background: C.accent, color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', fontFamily: 'inherit' }}>
               Activate — ${monthlyPrice}/mo
-            </div>
+            </button>
           </div>
         )}
         {isActive && (
@@ -260,6 +263,64 @@ export default function ManageClient({
         )}
 
       </div>
+
+      {/* Activation modal */}
+      {showActivate && (
+        <div onClick={() => setShowActivate(false)} style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: C.surface, border: `1px solid ${C.border}`, borderRadius: 20,
+            padding: '36px 32px', maxWidth: 460, width: '100%',
+          }}>
+            <div style={{ fontSize: 36, marginBottom: 16, textAlign: 'center' }}>🔐</div>
+            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.04em', margin: '0 0 10px', textAlign: 'center' }}>
+              Activate {employeeName}
+            </h2>
+            <p style={{ fontSize: 14, color: C.muted, lineHeight: 1.7, margin: '0 0 24px', textAlign: 'center' }}>
+              Your locked rate is <strong style={{ color: C.text }}>${monthlyPrice}/month</strong> — permanently. New signups after next month pay more. Billing is handled by a human right now; we'll email you a payment link within a few hours.
+            </p>
+
+            <div style={{ background: C.card, borderRadius: 12, padding: '16px 18px', marginBottom: 24 }}>
+              {[
+                { label: 'Locked rate', value: `$${monthlyPrice}/month` },
+                { label: 'Billing cycle', value: 'Monthly' },
+                { label: 'Payment method', value: 'UPI / Card / Wire' },
+                { label: 'Cancel anytime', value: 'Yes' },
+              ].map(r => (
+                <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 10, alignItems: 'center' }}>
+                  <span style={{ color: C.muted }}>{r.label}</span>
+                  <span style={{ color: C.text, fontWeight: 700 }}>{r.value}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <a
+                href={`mailto:${BILLING_EMAIL}?subject=Activate ${employeeName} — $${monthlyPrice}/mo&body=Hi, I'd like to activate ${employeeName} at my locked rate of $${monthlyPrice}/month. My employee slug is: ${slug}.`}
+                style={{
+                  display: 'block', textAlign: 'center', padding: '12px 20px', borderRadius: 11,
+                  background: '#6366F1', color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none',
+                }}
+              >
+                Email to activate →
+              </a>
+              <button onClick={() => setShowActivate(false)} style={{
+                padding: '11px 20px', borderRadius: 11, background: 'transparent',
+                border: `1px solid ${C.border}`, color: C.muted, fontSize: 13, fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}>
+                Continue trial
+              </button>
+            </div>
+
+            <p style={{ fontSize: 11, color: C.muted, textAlign: 'center', marginTop: 16, lineHeight: 1.6 }}>
+              We'll set up automated billing soon. For now, reply to the email and we'll send a payment link within a few hours.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
