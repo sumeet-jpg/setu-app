@@ -671,7 +671,7 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
           <div style={{ marginBottom: 48 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
               textTransform: 'uppercase', marginBottom: 16 }}>What {e.name} Can Do</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
               {e.capabilities.map((cap, i) => (
                 <div key={i} style={{ background: '#fff', border: `1.5px solid ${GRAY}`, borderRadius: 14,
                   padding: '20px', cursor: 'pointer' }} onClick={scrollToInterview}>
