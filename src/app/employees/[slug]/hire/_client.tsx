@@ -1,6 +1,6 @@
 // @ts-nocheck
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { EMPLOYEE_BY_SLUG } from '@/lib/employees/profiles'
 import { SetuLogo } from '@/components/SetuLogo'
@@ -22,6 +22,20 @@ export default function HireClient({ slug }: { slug: string }) {
   const [form, setForm] = useState({ name: '', email: '', company: '', role: '', size: '', use_case: '', timeline: '' })
   const [status, setStatus] = useState<Status>('idle')
   const [errMsg, setErrMsg] = useState('')
+  const [alreadyHired, setAlreadyHired] = useState(false)
+
+  useEffect(() => {
+    const userId = getOrCreateUserId()
+    if (!userId || !slug) return
+    fetch(`/api/manage/subscription?userId=${userId}&slug=${slug}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'trial' || d.status === 'active' || d.status === 'paused') {
+          setAlreadyHired(true)
+        }
+      })
+      .catch(() => {})
+  }, [slug])
 
   const BG = '#F6F5F1'
   const WHITE = '#FFFFFF'
@@ -38,6 +52,39 @@ export default function HireClient({ slug }: { slug: string }) {
           <div style={{ fontSize: 48, marginBottom: 16 }}>🤔</div>
           <h1 style={{ fontSize: 24, fontWeight: 700 }}>Employee not found</h1>
           <Link href="/employees" style={{ color: GREEN, textDecoration: 'none', marginTop: 16, display: 'block' }}>← Back to employees</Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (alreadyHired) {
+    return (
+      <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', color: INK, fontFamily: 'var(--font-jakarta)', padding: 24 }}>
+        <div style={{ textAlign: 'center', maxWidth: 440 }}>
+          <div style={{ width: 72, height: 72, borderRadius: 22, background: `${e.color}15`, border: `2px solid ${e.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, margin: '0 auto 20px' }}>
+            {e.emoji}
+          </div>
+          <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: '-0.05em', margin: '0 0 10px' }}>
+            You've already hired {e.name}
+          </h1>
+          <p style={{ fontSize: 15, color: MUTED, margin: '0 0 32px', lineHeight: 1.7 }}>
+            {e.name} is part of your team. Head to the management hub to chat, review memory, and calibrate trust.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 280, margin: '0 auto' }}>
+            <Link href={`/manage/${slug}`} style={{
+              display: 'block', textAlign: 'center', padding: '13px 24px', borderRadius: 12,
+              background: GREEN, color: '#fff', fontSize: 15, fontWeight: 800, textDecoration: 'none',
+              boxShadow: '0 4px 18px rgba(14,92,52,0.25)',
+            }}>
+              Go to manage hub →
+            </Link>
+            <Link href={`/employees/${slug}/interview`} style={{
+              display: 'block', textAlign: 'center', padding: '11px 24px', borderRadius: 12,
+              background: WHITE, border: `1.5px solid ${GRAY}`, color: MUTED, fontSize: 14, fontWeight: 600, textDecoration: 'none',
+            }}>
+              Chat with {e.name}
+            </Link>
+          </div>
         </div>
       </div>
     )
