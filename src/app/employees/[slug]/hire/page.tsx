@@ -2,6 +2,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getEmployee, EMPLOYEES } from '@/lib/employees/profiles'
+import { createAdminClient } from '@/lib/supabase/server'
 import HireClient from './_client'
 
 export async function generateStaticParams() {
@@ -34,5 +35,14 @@ export default async function HirePage({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const e = getEmployee(slug)
   if (!e) notFound()
-  return <HireClient slug={slug} />
+
+  // Get current platform price (step-up model); falls back to $49 pre-migration
+  let currentPriceCents = 4900
+  try {
+    const supabase = createAdminClient()
+    const { data } = await supabase.rpc('current_platform_price_cents')
+    if (typeof data === 'number' && data >= 4900) currentPriceCents = data
+  } catch { /* migration not applied yet */ }
+
+  return <HireClient slug={slug} currentPriceCents={currentPriceCents} />
 }

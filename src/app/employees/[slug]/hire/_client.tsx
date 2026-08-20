@@ -16,7 +16,8 @@ function getOrCreateUserId(): string {
   return id
 }
 
-export default function HireClient({ slug }: { slug: string }) {
+export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: string; currentPriceCents?: number }) {
+  const currentPrice = Math.round(currentPriceCents / 100)
   const e = EMPLOYEE_BY_SLUG[slug]
   const router = useRouter()
   const [form, setForm] = useState({ name: '', email: '', company: '', role: '', size: '', use_case: '', timeline: '' })
@@ -229,7 +230,7 @@ export default function HireClient({ slug }: { slug: string }) {
             }}>
               {status === 'loading' ? 'Submitting…' : `Start 14-day free trial →`}
             </button>
-            <p style={{ fontSize: 11, color: DIM, textAlign: 'center', margin: 0 }}>No credit card required · 14 days free · $49/mo after, locked at this price</p>
+            <p style={{ fontSize: 11, color: DIM, textAlign: 'center', margin: 0 }}>No credit card required · 14 days free · ${currentPrice}/mo after, locked at this price</p>
           </form>
         </div>
 
@@ -245,7 +246,7 @@ export default function HireClient({ slug }: { slug: string }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
               {[
                 { label: '14-day free trial', value: 'No card needed' },
-                { label: 'Then $49/month', value: 'price locked at hire' },
+                { label: `Then $${currentPrice}/month`, value: 'price locked at hire' },
                 { label: 'Agent fleet', value: `${e.agentCount} agents` },
                 { label: 'Department', value: e.dept },
               ].map(r => (
