@@ -82,8 +82,17 @@ export default function InterviewClient({ slug }: { slug: string }) {
   const [userId] = useState(() => getOrCreateId('setu_user_id'))
   const [sessionId] = useState(() => crypto.randomUUID())
   const [actions, setActions] = useState<ActionProposal[]>([])
+  const [isHired, setIsHired] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (!userId || !slug) return
+    fetch(`/api/manage/subscription?userId=${userId}&slug=${slug}`)
+      .then(r => r.json())
+      .then(d => { if (d.status === 'trial' || d.status === 'active') setIsHired(true) })
+      .catch(() => {})
+  }, [userId, slug])
 
   const MUTED = '#94A3B8'
   const BG = '#0F172A'
@@ -273,7 +282,9 @@ export default function InterviewClient({ slug }: { slug: string }) {
         background: 'rgba(15,23,42,0.9)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', flexShrink: 0,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <Link href={`/employees/${e.slug}`} style={{ fontSize: 13, color: MUTED, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 8, background: 'rgba(148,163,184,0.06)', border: `1px solid ${BORDER}` }}>← Back</Link>
+          <Link href={isHired ? `/manage/${e.slug}` : `/employees/${e.slug}`} style={{ fontSize: 13, color: MUTED, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 8, background: 'rgba(148,163,184,0.06)', border: `1px solid ${BORDER}` }}>
+            ← {isHired ? 'Manage' : 'Back'}
+          </Link>
           <div style={{ width: 36, height: 36, borderRadius: 11, background: `${e.color}20`, border: `1.5px solid ${e.color}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, boxShadow: `0 0 20px ${e.color}20` }}>{e.emoji}</div>
           <div>
             <div style={{ fontSize: 14.5, fontWeight: 700, color: '#fff', fontFamily: 'var(--font-space)', letterSpacing: '-0.02em' }}>{e.name}</div>
