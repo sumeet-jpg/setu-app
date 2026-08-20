@@ -302,6 +302,19 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
   const stuntTitle = getStuntTitle(e.name)
   const userId = typeof window !== 'undefined' ? getUserId() : ''
 
+  // Subscription state — check if user has already hired this employee
+  const [subStatus, setSubStatus] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!userId) return
+    fetch(`/api/manage/subscription?userId=${userId}&slug=${e.slug}`)
+      .then(r => r.json())
+      .then(d => { if (d.status) setSubStatus(d.status) })
+      .catch(() => {})
+  }, [userId, e.slug])
+
+  const isHired = subStatus === 'trial' || subStatus === 'active' || subStatus === 'paused'
+
   // Tool state
   const [connected, setConnected] = useState<ConnectedTool[]>([])
   const [loadingTools, setLoadingTools] = useState(true)
@@ -616,21 +629,39 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
               14-day free trial · No credit card needed
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <button onClick={scrollToInterview}
-                style={{ width: '100%', background: INK, color: '#fff', border: 'none',
-                  borderRadius: 10, padding: '13px 0', fontWeight: 700, fontSize: 14,
-                  cursor: 'pointer', letterSpacing: '-0.01em' }}>
-                Interview for Free →
-              </button>
-              <Link href={`/employees/${e.slug}/hire`}
-                style={{ display: 'block', textAlign: 'center', background: e.color + '10',
-                  color: e.color, border: `1.5px solid ${e.color}30`, borderRadius: 10,
-                  padding: '12px 0', fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-                Start free trial →
-              </Link>
+              {isHired ? (
+                <>
+                  <Link href={`/manage/${e.slug}`}
+                    style={{ display: 'block', textAlign: 'center', background: '#0E5C34',
+                      color: '#fff', borderRadius: 10, padding: '13px 0', fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+                    Manage {e.name} →
+                  </Link>
+                  <button onClick={scrollToInterview}
+                    style={{ width: '100%', background: 'transparent', color: INK, border: `1.5px solid ${e.color}30`,
+                      borderRadius: 10, padding: '12px 0', fontWeight: 600, fontSize: 13,
+                      cursor: 'pointer' }}>
+                    Chat now →
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button onClick={scrollToInterview}
+                    style={{ width: '100%', background: INK, color: '#fff', border: 'none',
+                      borderRadius: 10, padding: '13px 0', fontWeight: 700, fontSize: 14,
+                      cursor: 'pointer', letterSpacing: '-0.01em' }}>
+                    Interview for Free →
+                  </button>
+                  <Link href={`/employees/${e.slug}/hire`}
+                    style={{ display: 'block', textAlign: 'center', background: e.color + '10',
+                      color: e.color, border: `1.5px solid ${e.color}30`, borderRadius: 10,
+                      padding: '12px 0', fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+                    Start free trial →
+                  </Link>
+                </>
+              )}
             </div>
             <div style={{ fontSize: 11, color: DIM, marginTop: 14, textAlign: 'center' }}>
-              Interview is free · No card needed · Cancel anytime
+              {isHired ? `${subStatus === 'trial' ? 'Trial active' : 'Subscription active'} · Price locked` : 'Interview is free · No card needed · Cancel anytime'}
             </div>
           </div>
         </div>
