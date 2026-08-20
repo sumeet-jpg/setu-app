@@ -159,6 +159,16 @@ export default function ManageClient({
             Active · ${monthlyPrice}/mo
           </div>
         )}
+        {isPaused && (
+          <div style={{ padding: '5px 12px', borderRadius: 20, background: 'rgba(148,163,184,0.08)', border: '1px solid rgba(148,163,184,0.2)', fontSize: 12, color: C.muted, fontWeight: 600 }}>
+            Paused
+          </div>
+        )}
+        {isCancelled && (
+          <div style={{ padding: '5px 12px', borderRadius: 20, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 12, color: '#ef4444', fontWeight: 600 }}>
+            Cancelled
+          </div>
+        )}
       </div>
 
       <div style={{ maxWidth: 960, margin: '0 auto', padding: '36px 24px' }}>
