@@ -9,7 +9,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 
 export async function getDashboardStats() {
   const db = createAdminClient();
-  const [blueprints, leads, approvals, killSwitches, auditLogs, agents] =
+  const [blueprints, leads, approvals, killSwitches, auditLogs, agents, subStats] =
     await Promise.all([
       db.from("generated_blueprints").select("id", { count: "exact" }).eq("status", "pending_review"),
       db.from("leads").select("id", { count: "exact" }).eq("status", "new"),
@@ -17,7 +17,17 @@ export async function getDashboardStats() {
       db.from("kill_switches").select("id", { count: "exact" }).eq("is_active", true),
       db.from("audit_logs").select("id, event_type, severity, description, created_at").order("created_at", { ascending: false }).limit(5),
       db.from("agents").select("id", { count: "exact" }).eq("is_public", true),
+      db.from("hired_subscriptions").select("status, monthly_price_cents").catch(() => ({ data: null })),
     ]);
+
+  // Compute subscription metrics
+  const subs = (subStats as any)?.data ?? []
+  const trialsCount  = subs.filter((s: any) => s.status === 'trial').length
+  const activeCount  = subs.filter((s: any) => s.status === 'active').length
+  const mrr = subs
+    .filter((s: any) => s.status === 'active')
+    .reduce((acc: number, s: any) => acc + (s.monthly_price_cents ?? 4900), 0) / 100
+
   return {
     blueprints_pending: blueprints.count ?? 0,
     leads_new: leads.count ?? 0,
@@ -25,6 +35,9 @@ export async function getDashboardStats() {
     kill_switches_active: killSwitches.count ?? 0,
     agents_total: agents.count ?? 0,
     recent_audit_logs: auditLogs.data ?? [],
+    sub_trials: trialsCount,
+    sub_active: activeCount,
+    sub_mrr: mrr,
   };
 }
 

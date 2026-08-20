@@ -13,6 +13,9 @@ export default async function AdminDashboardPage() {
     kill_switches_active: 0,
     agents_total: 0,
     recent_audit_logs: [] as Array<{ id: string; event_type: string; severity: string; description: string; created_at: string }>,
+    sub_trials: 0,
+    sub_active: 0,
+    sub_mrr: 0,
   };
 
   try {
@@ -35,6 +38,20 @@ export default async function AdminDashboardPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground">Admin Console</h1>
         <p className="mt-1 text-sm text-muted-foreground">Setu AI Operations Control Plane</p>
+      </div>
+
+      {/* Subscription revenue strip */}
+      <div className="mb-6 grid grid-cols-3 gap-3">
+        {[
+          { label: 'Active subscriptions', value: stats.sub_active, color: 'text-emerald-600', href: '/admin/subscriptions?status=active' },
+          { label: 'Trials in progress', value: stats.sub_trials, color: 'text-amber-600', href: '/admin/subscriptions?status=trial' },
+          { label: 'MRR', value: `$${stats.sub_mrr.toLocaleString('en-US', { minimumFractionDigits: 0 })}`, color: 'text-blue-600', href: '/admin/subscriptions' },
+        ].map(s => (
+          <a key={s.label} href={s.href} className="rounded-xl border border-border bg-card p-5 hover:border-primary/30 transition-colors">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{s.label}</p>
+            <p className={`mt-2 text-3xl font-bold tabular-nums ${s.color}`}>{s.value}</p>
+          </a>
+        ))}
       </div>
 
       {/* Runtime banner */}
