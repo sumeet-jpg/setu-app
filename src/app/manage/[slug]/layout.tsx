@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { getEmployee } from '@/lib/employees/profiles'
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const e = getEmployee(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const e = getEmployee(slug)
   if (!e) return { title: 'Manage Employee | Setu' }
   return {
     title: `Manage ${e.name} — ${e.title} | Setu`,

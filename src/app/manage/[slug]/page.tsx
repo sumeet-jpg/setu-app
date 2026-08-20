@@ -1,8 +1,9 @@
 import { getEmployee } from '@/lib/employees/profiles'
 import ManageClient from './_client'
 
-export default function ManagePage({ params }: { params: { slug: string } }) {
-  const employee = getEmployee(params.slug)
+export default async function ManagePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const employee = getEmployee(slug)
   if (!employee) {
     return (
       <div style={{ minHeight: '100vh', background: '#0B0D14', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'system-ui' }}>

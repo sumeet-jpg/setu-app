@@ -198,7 +198,7 @@ export default function SignInPage() {
       <div style={{ marginTop: 40, display: 'flex', gap: 32, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
         {[
           { value: '100', label: 'AI Employees' },
-          { value: '$199', label: 'Starting from' },
+          { value: '$49', label: 'Starting from' },
           { value: 'Free', label: 'to interview' },
         ].map(s => (
           <div key={s.label} style={{ textAlign: 'center' }}>
