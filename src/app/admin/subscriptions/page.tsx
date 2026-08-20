@@ -60,6 +60,14 @@ export default function AdminSubscriptionsPage() {
     setUpdating(null)
   }
 
+  async function sendHubLink(email: string) {
+    await fetch('/api/manage/recover', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+  }
+
   const counts = subs.reduce<Record<string, number>>((acc, s) => {
     acc[s.status] = (acc[s.status] ?? 0) + 1
     return acc
@@ -201,6 +209,15 @@ export default function AdminSubscriptionsPage() {
                           className="text-xs px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 font-semibold hover:bg-amber-200 disabled:opacity-50"
                         >
                           Reactivate Trial
+                        </button>
+                      )}
+                      {sub.owner_email && (
+                        <button
+                          onClick={() => sendHubLink(sub.owner_email)}
+                          title="Send manage hub recovery link to subscriber's email"
+                          className="text-xs px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 font-semibold hover:bg-indigo-100 border border-indigo-200"
+                        >
+                          Send link
                         </button>
                       )}
                     </div>
