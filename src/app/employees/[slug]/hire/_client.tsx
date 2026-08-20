@@ -5,10 +5,20 @@ import Link from 'next/link'
 import { EMPLOYEE_BY_SLUG } from '@/lib/employees/profiles'
 import { SetuLogo } from '@/components/SetuLogo'
 
+import { useRouter } from 'next/navigation'
+
 type Status = 'idle' | 'loading' | 'success' | 'error'
+
+function getOrCreateUserId(): string {
+  if (typeof window === 'undefined') return ''
+  let id = localStorage.getItem('setu_user_id')
+  if (!id) { id = crypto.randomUUID(); localStorage.setItem('setu_user_id', id) }
+  return id
+}
 
 export default function HireClient({ slug }: { slug: string }) {
   const e = EMPLOYEE_BY_SLUG[slug]
+  const router = useRouter()
   const [form, setForm] = useState({ name: '', email: '', company: '', role: '', size: '', use_case: '', timeline: '' })
   const [status, setStatus] = useState<Status>('idle')
   const [errMsg, setErrMsg] = useState('')
@@ -38,16 +48,19 @@ export default function HireClient({ slug }: { slug: string }) {
     if (!form.name || !form.email || !form.company || !form.use_case) return
     setStatus('loading')
     try {
+      const userId = getOrCreateUserId()
       const res = await fetch('/api/employees/hire', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, employee_slug: e.slug, employee_name: e.name, employee_title: e.title }),
+        body: JSON.stringify({ ...form, employee_slug: e.slug, employee_name: e.name, employee_title: e.title, userId }),
       })
       const j = await res.json()
       if (!res.ok) throw new Error(j.error ?? 'Failed')
       if (typeof window !== 'undefined' && (window as any).fbq) {
         (window as any).fbq('track', 'Lead', { content_name: e.name, content_category: e.dept })
       }
+      // Redirect to self-service management hub
+      router.push(`/manage/${e.slug}`)
       setStatus('success')
     } catch (err: any) {
       setErrMsg(err.message ?? 'Something went wrong')
@@ -167,9 +180,9 @@ export default function HireClient({ slug }: { slug: string }) {
               opacity: status === 'loading' ? 0.7 : 1,
               boxShadow: '0 6px 20px rgba(14,92,52,0.28)',
             }}>
-              {status === 'loading' ? 'Submitting…' : `Hire ${e.name} — ${e.pricing.label} →`}
+              {status === 'loading' ? 'Submitting…' : `Start 14-day free trial →`}
             </button>
-            <p style={{ fontSize: 11, color: DIM, textAlign: 'center', margin: 0 }}>No credit card required. Sumeet reaches out within 24 hours.</p>
+            <p style={{ fontSize: 11, color: DIM, textAlign: 'center', margin: 0 }}>No credit card required · 14 days free · $49/mo after, locked at this price</p>
           </form>
         </div>
 
@@ -184,9 +197,9 @@ export default function HireClient({ slug }: { slug: string }) {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
               {[
-                { label: 'Starting price', value: e.pricing.label },
+                { label: '14-day free trial', value: 'No card needed' },
+                { label: 'Then $49/month', value: 'price locked at hire' },
                 { label: 'Agent fleet', value: `${e.agentCount} agents` },
-                { label: 'Experience', value: `${e.years} years` },
                 { label: 'Department', value: e.dept },
               ].map(r => (
                 <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, alignItems: 'center' }}>

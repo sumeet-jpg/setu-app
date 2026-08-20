@@ -15,5 +15,11 @@
     }
   ],
   "rewrites": [],
-  "redirects": []
+  "redirects": [],
+  "crons": [
+    {
+      "path": "/api/cron/decay",
+      "schedule": "0 3 * * 1"
+    }
+  ]
 }

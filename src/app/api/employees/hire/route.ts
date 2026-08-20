@@ -49,6 +49,35 @@ export async function POST(req: NextRequest) {
       .select()
       .single()
 
+    // Create subscription record with 14-day trial + price lock
+    // userId from the client (localStorage-based anonymous id)
+    const userId = body.userId ?? null
+    if (userId) {
+      const trialEnd = new Date(Date.now() + 14 * 86400000).toISOString()
+      await supabase
+        .from('hired_subscriptions')
+        .upsert({
+          user_id:         userId,
+          employee_slug,
+          employee_name:   employee_name ?? null,
+          employee_title:  employee_title ?? null,
+          owner_name:      name,
+          owner_email:     email,
+          owner_company:   company,
+          owner_role:      role ?? null,
+          company_size:    size ?? null,
+          use_case:        use_case ?? null,
+          timeline:        timeline ?? null,
+          status:          'trial',
+          trial_started_at: new Date().toISOString(),
+          trial_ends_at:   trialEnd,
+          monthly_price_cents: 4900,   // $49 — launch price, locked at hire time
+          price_locked_at: new Date().toISOString(),
+          updated_at:      new Date().toISOString(),
+        }, { onConflict: 'user_id,employee_slug' })
+        .catch(e => console.error('[hire subscription]', e))
+    }
+
     if (dbErr) {
       console.error('[Setu hire DB] FAILED TO SAVE — hire lost from DB:', dbErr.message, { name, email, company, employee_slug })
       // Continue sending emails so the prospect gets a response,
@@ -148,7 +177,7 @@ export async function POST(req: NextRequest) {
       `,
     }).catch(err => console.error('[Setu hire prospect email]', err))
 
-    return NextResponse.json({ success: true, id: hire?.id ?? null, db_saved: !dbErr })
+    return NextResponse.json({ success: true, id: hire?.id ?? null, db_saved: !dbErr, manage_url: `/manage/${employee_slug}` })
   } catch (err: any) {
     console.error('[Setu hire API]', err)
     return NextResponse.json({ error: err.message ?? 'Internal error' }, { status: 500 })
