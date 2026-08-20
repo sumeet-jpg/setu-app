@@ -560,12 +560,29 @@ export default function ManageClient({
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {/* Pause as a softer alternative for active subscribers */}
+              {isActive && (
+                <button
+                  onClick={async () => {
+                    await fetch('/api/manage/subscription', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId, slug, action: 'pause' }),
+                    })
+                    await loadAll()
+                    setShowCancel(false)
+                  }}
+                  style={{ padding: '12px 20px', borderRadius: 11, background: C.accent, color: '#fff', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  Pause instead — keep my locked rate
+                </button>
+              )}
               <button
                 onClick={handleCancel}
                 disabled={cancelling}
-                style={{ padding: '12px 20px', borderRadius: 11, background: '#ef4444', color: '#fff', fontSize: 14, fontWeight: 700, border: 'none', cursor: cancelling ? 'wait' : 'pointer', opacity: cancelling ? 0.7 : 1, fontFamily: 'inherit' }}
+                style={{ padding: '12px 20px', borderRadius: 11, background: isActive ? 'transparent' : '#ef4444', border: isActive ? `1px solid rgba(239,68,68,0.4)` : 'none', color: isActive ? '#ef4444' : '#fff', fontSize: isActive ? 13 : 14, fontWeight: 700, cursor: cancelling ? 'wait' : 'pointer', opacity: cancelling ? 0.7 : 1, fontFamily: 'inherit' }}
               >
-                {cancelling ? 'Cancelling…' : 'Yes, cancel subscription'}
+                {cancelling ? 'Cancelling…' : isActive ? 'Cancel anyway (rate lost)' : 'Yes, cancel subscription'}
               </button>
               <button
                 onClick={() => setShowCancel(false)}
