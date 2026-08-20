@@ -65,12 +65,34 @@ export default function AdminSubscriptionsPage() {
     return acc
   }, {})
 
+  const mrr = subs
+    .filter(s => s.status === 'active')
+    .reduce((sum, s) => sum + (s.monthly_price_cents ?? 4900), 0) / 100
+
+  const trialMrr = subs
+    .filter(s => s.status === 'trial')
+    .reduce((sum, s) => sum + (s.monthly_price_cents ?? 4900), 0) / 100
+
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Subscriptions</h1>
-        <p className="text-sm text-muted-foreground mt-1">{subs.length} total · manage trial conversions and billing status</p>
+      <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Subscriptions</h1>
+          <p className="text-sm text-muted-foreground mt-1">{subs.length} total · manage trial conversions and billing status</p>
+        </div>
+        {!loading && (
+          <div className="flex gap-4">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-center">
+              <div className="text-xl font-bold text-emerald-700">${mrr.toFixed(0)}</div>
+              <div className="text-xs font-medium text-emerald-600 mt-0.5">MRR (active)</div>
+            </div>
+            <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-3 text-center">
+              <div className="text-xl font-bold text-amber-700">${trialMrr.toFixed(0)}</div>
+              <div className="text-xs font-medium text-amber-600 mt-0.5">Potential MRR (trials)</div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Stats */}
