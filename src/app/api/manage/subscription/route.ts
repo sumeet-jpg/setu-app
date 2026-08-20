@@ -96,14 +96,16 @@ export async function PATCH(req: NextRequest) {
 
     if (error) throw error
 
-    // Notify admin when someone cancels so Sumeet can follow up
+    // Send emails on cancel: admin alert + subscriber confirmation
     if (action === 'cancel' && process.env.RESEND_API_KEY) {
       try {
-        const resend = new Resend(process.env.RESEND_API_KEY)
+        const resend    = new Resend(process.env.RESEND_API_KEY)
         const adminEmail = process.env.ADMIN_ALERT_EMAIL ?? 'sumeet@setuagents.com'
         const from      = process.env.FROM_EMAIL ?? 'hello@setuagents.com'
+        const base      = process.env.NEXT_PUBLIC_APP_URL ?? 'https://setuagents.com'
         const price     = updated?.monthly_price_cents ? Math.round(updated.monthly_price_cents / 100) : 49
 
+        // Admin alert
         await resend.emails.send({
           from,
           to: adminEmail,
@@ -125,6 +127,37 @@ export async function PATCH(req: NextRequest) {
             </div>
           `,
         }).catch(() => {})
+
+        // Subscriber confirmation
+        if (updated?.owner_email) {
+          const firstName = (updated.owner_name ?? '').split(' ')[0] || 'there'
+          const empName   = updated.employee_name ?? slug
+          await resend.emails.send({
+            from,
+            to: updated.owner_email,
+            subject: `${empName} subscription cancelled`,
+            html: `
+              <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;background:#0B0D14;border-radius:16px;overflow:hidden">
+                <div style="padding:32px">
+                  <p style="color:#94a3b8;font-size:13px;margin:0 0 4px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">SETU · Cancellation confirmed</p>
+                  <h2 style="font-size:20px;font-weight:800;color:#fff;margin:8px 0 16px;letter-spacing:-0.03em">
+                    ${firstName}, your ${empName} subscription has been cancelled
+                  </h2>
+                  <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 16px">
+                    Your subscription is now cancelled. You won't be billed going forward.
+                  </p>
+                  <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 24px">
+                    If you change your mind, your locked rate of <strong style="color:#fff">$${price}/month</strong> is still available if you reactivate within 30 days. After that, you'll pay the then-current rate.
+                  </p>
+                  <a href="${base}/employees/${slug}/hire" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
+                    Reactivate at $${price}/mo →
+                  </a>
+                  <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu · setuagents.com</p>
+                </div>
+              </div>
+            `,
+          }).catch(() => {})
+        }
       } catch { /* non-fatal */ }
     }
 
