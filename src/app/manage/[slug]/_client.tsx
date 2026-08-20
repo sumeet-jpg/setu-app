@@ -33,6 +33,10 @@ export default function ManageClient({
   const [pendingActions, setPendingActions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showActivate, setShowActivate] = useState(false)
+  const [showCancel, setShowCancel]     = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
+  const [cancelling, setCancelling]     = useState(false)
+  const [cancelled, setCancelled]       = useState(false)
 
   const C = {
     bg:      '#0B0D14',
@@ -79,9 +83,26 @@ export default function ManageClient({
 
   useEffect(() => { loadAll() }, [loadAll])
 
+  async function handleCancel() {
+    setCancelling(true)
+    try {
+      await fetch('/api/manage/subscription', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, slug, action: 'cancel', reason: cancelReason }),
+      })
+      setCancelled(true)
+      setShowCancel(false)
+    } finally {
+      setCancelling(false)
+    }
+  }
+
   const trialDays = sub?.trial_ends_at ? daysRemaining(sub.trial_ends_at) : null
   const isTrial = sub?.status === 'trial'
   const isActive = sub?.status === 'active'
+  const isPaused = sub?.status === 'paused'
+  const isCancelled = cancelled || sub?.status === 'cancelled'
   const monthlyPrice = sub?.monthly_price_cents ? (sub.monthly_price_cents / 100).toFixed(0) : '49'
 
   // Urgency: next month's price
@@ -262,6 +283,34 @@ export default function ManageClient({
           </div>
         )}
 
+        {/* Cancel / manage subscription */}
+        {!loading && !isCancelled && (isTrial || isActive || isPaused) && (
+          <div style={{ marginTop: 12, padding: '20px 24px', background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 3 }}>Subscription settings</div>
+              <div style={{ fontSize: 12, color: C.muted }}>
+                {isTrial ? `Trial ends in ${trialDays} day${trialDays !== 1 ? 's' : ''}` : isActive ? `Active · $${monthlyPrice}/mo locked` : 'Paused'}
+              </div>
+            </div>
+            <button
+              onClick={() => setShowCancel(true)}
+              style={{ padding: '7px 16px', borderRadius: 9, background: 'transparent', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              Cancel subscription
+            </button>
+          </div>
+        )}
+
+        {/* Cancelled state */}
+        {isCancelled && (
+          <div style={{ marginTop: 12, padding: '20px 24px', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#ef4444', marginBottom: 4 }}>Subscription cancelled</div>
+            <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>
+              Your access continues until the end of your current period. If this was a mistake, email <a href={`mailto:${BILLING_EMAIL}`} style={{ color: '#818cf8' }}>{BILLING_EMAIL}</a> and we'll restore it.
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* Activation modal */}
@@ -298,13 +347,24 @@ export default function ManageClient({
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <a
+                href={`https://wa.me/918951066630?text=${encodeURIComponent(`Hi Sumeet, I'd like to activate ${employeeName} at my locked rate of $${monthlyPrice}/month. Employee: ${slug}`)}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{
+                  display: 'block', textAlign: 'center', padding: '12px 20px', borderRadius: 11,
+                  background: '#25D366', color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none',
+                }}
+              >
+                WhatsApp to activate →
+              </a>
+              <a
                 href={`mailto:${BILLING_EMAIL}?subject=Activate ${employeeName} — $${monthlyPrice}/mo&body=Hi, I'd like to activate ${employeeName} at my locked rate of $${monthlyPrice}/month. My employee slug is: ${slug}.`}
                 style={{
                   display: 'block', textAlign: 'center', padding: '12px 20px', borderRadius: 11,
-                  background: '#6366F1', color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none',
+                  background: 'transparent', border: `1px solid rgba(99,102,241,0.4)`,
+                  color: '#818cf8', fontSize: 13, fontWeight: 600, textDecoration: 'none',
                 }}
               >
-                Email to activate →
+                Email instead →
               </a>
               <button onClick={() => setShowActivate(false)} style={{
                 padding: '11px 20px', borderRadius: 11, background: 'transparent',
@@ -318,6 +378,52 @@ export default function ManageClient({
             <p style={{ fontSize: 11, color: C.muted, textAlign: 'center', marginTop: 16, lineHeight: 1.6 }}>
               We'll set up automated billing soon. For now, reply to the email and we'll send a payment link within a few hours.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel confirmation modal */}
+      {showCancel && (
+        <div onClick={() => setShowCancel(false)} style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: C.surface, border: `1px solid ${C.border}`, borderRadius: 20,
+            padding: '32px 28px', maxWidth: 420, width: '100%',
+          }}>
+            <div style={{ fontSize: 30, marginBottom: 14, textAlign: 'center' }}>⚠️</div>
+            <h2 style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 10px', textAlign: 'center' }}>
+              Cancel subscription?
+            </h2>
+            <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.7, margin: '0 0 20px', textAlign: 'center' }}>
+              You'll lose your locked rate of <strong style={{ color: C.text }}>${monthlyPrice}/month</strong> permanently. If you re-subscribe later, you'll pay the then-current rate.
+            </p>
+            <div style={{ marginBottom: 18 }}>
+              <label style={{ fontSize: 11, color: C.muted, letterSpacing: '0.06em', fontFamily: 'monospace', display: 'block', marginBottom: 7 }}>REASON (OPTIONAL)</label>
+              <textarea
+                value={cancelReason}
+                onChange={e => setCancelReason(e.target.value)}
+                placeholder="What could we have done better?"
+                rows={3}
+                style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1px solid ${C.border}`, background: C.card, color: C.text, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', outline: 'none', boxSizing: 'border-box' }}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                style={{ padding: '12px 20px', borderRadius: 11, background: '#ef4444', color: '#fff', fontSize: 14, fontWeight: 700, border: 'none', cursor: cancelling ? 'wait' : 'pointer', opacity: cancelling ? 0.7 : 1, fontFamily: 'inherit' }}
+              >
+                {cancelling ? 'Cancelling…' : 'Yes, cancel subscription'}
+              </button>
+              <button
+                onClick={() => setShowCancel(false)}
+                style={{ padding: '11px 20px', borderRadius: 11, background: 'transparent', border: `1px solid ${C.border}`, color: C.muted, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+              >
+                Keep subscription
+              </button>
+            </div>
           </div>
         </div>
       )}
