@@ -290,7 +290,7 @@ export default function ManageClient({
                   Activate now — ${monthlyPrice}/mo locked →
                 </button>
                 <a
-                  href={`https://wa.me/918951066630?text=${encodeURIComponent(`Hi, I want to activate ${employeeName} before my trial ends. Slug: ${slug}`)}`}
+                  href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '918951066630'}?text=${encodeURIComponent(`Hi, I want to activate ${employeeName} before my trial ends. Slug: ${slug}`)}`}
                   target="_blank" rel="noopener noreferrer"
                   style={{ padding: '9px 18px', borderRadius: 9, background: 'rgba(37,211,102,0.12)', border: '1px solid rgba(37,211,102,0.30)', color: '#22c55e', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}
                 >
@@ -497,7 +497,7 @@ export default function ManageClient({
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <a
-                href={`https://wa.me/918951066630?text=${encodeURIComponent(`Hi Sumeet, I'd like to activate ${employeeName} at my locked rate of $${monthlyPrice}/month. Employee: ${slug}`)}`}
+                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '918951066630'}?text=${encodeURIComponent(`Hi Sumeet, I'd like to activate ${employeeName} at my locked rate of $${monthlyPrice}/month. Employee: ${slug}`)}`}
                 target="_blank" rel="noopener noreferrer"
                 style={{
                   display: 'block', textAlign: 'center', padding: '12px 20px', borderRadius: 11,
