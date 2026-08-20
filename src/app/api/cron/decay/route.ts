@@ -28,6 +28,20 @@ export async function POST(req: NextRequest) {
     const result = Array.isArray(data) ? data[0] : data
     console.log('[decay cron] Complete:', result)
 
+    // ── Mark expired trials as cancelled ────────────────────────────────────
+    let expiredCount = 0
+    try {
+      const { data: expiredTrials, error: expErr } = await supabase
+        .from('hired_subscriptions')
+        .update({ status: 'cancelled', cancelled_at: new Date().toISOString(), cancel_reason: 'trial_expired', updated_at: new Date().toISOString() })
+        .eq('status', 'trial')
+        .lt('trial_ends_at', new Date().toISOString())
+        .select('id')
+      if (!expErr) expiredCount = expiredTrials?.length ?? 0
+    } catch (e) {
+      console.error('[decay cron trial expiry]', e)
+    }
+
     // ── Trial expiry reminders ───────────────────────────────────────────────
     let remindedCount = 0
     try {
@@ -97,6 +111,7 @@ export async function POST(req: NextRequest) {
       ok: true,
       decayed: result?.decayed_count ?? 0,
       at_floor: result?.zeroed_count ?? 0,
+      trials_expired: expiredCount,
       trial_reminders_sent: remindedCount,
       ran_at: new Date().toISOString(),
     })
