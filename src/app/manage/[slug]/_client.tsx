@@ -298,15 +298,32 @@ export default function ManageClient({
             <div>
               <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 3 }}>Subscription settings</div>
               <div style={{ fontSize: 12, color: C.muted }}>
-                {isTrial ? `Trial ends in ${trialDays} day${trialDays !== 1 ? 's' : ''}` : isActive ? `Active · $${monthlyPrice}/mo locked` : 'Paused'}
+                {isTrial ? `Trial ends in ${trialDays} day${trialDays !== 1 ? 's' : ''}` : isActive ? `Active · $${monthlyPrice}/mo locked` : 'Paused — click Resume to reactivate'}
               </div>
             </div>
-            <button
-              onClick={() => setShowCancel(true)}
-              style={{ padding: '7px 16px', borderRadius: 9, background: 'transparent', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
-            >
-              Cancel subscription
-            </button>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {isPaused && (
+                <button
+                  onClick={async () => {
+                    await fetch('/api/manage/subscription', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId, slug, action: 'resume' }),
+                    })
+                    loadAll()
+                  }}
+                  style={{ padding: '7px 16px', borderRadius: 9, background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  Resume
+                </button>
+              )}
+              <button
+                onClick={() => setShowCancel(true)}
+                style={{ padding: '7px 16px', borderRadius: 9, background: 'transparent', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+              >
+                Cancel subscription
+              </button>
+            </div>
           </div>
         )}
 
