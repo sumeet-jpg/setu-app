@@ -148,7 +148,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Resolves 80% of support tickets inside WhatsApp before a human ever sees them.',
     intro: "Aarav handles your customer support queue on WhatsApp — triage, resolution, escalation. He knows when to solve it himself and when to hand it to a human with full context. Response time drops from hours to seconds.",
     agentCount: 63,
-    pricing: { monthly: 39, label: '$39/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['WhatsApp support flows', 'Ticket triage & routing', 'FAQ deflection', 'Escalation protocols', 'CSAT measurement', 'Multi-language support', 'Order and delivery queries', 'Refund and return handling', 'Human handoff with context'],
     capabilities: [
       { area: 'Instant Resolution', icon: '⚡', blurb: 'Solve common issues without any human involvement.', scenarios: ['Answer shipping and delivery questions', 'Process return and refund requests', 'Reset passwords and account access', 'Provide order status updates in real time'] },
@@ -280,7 +280,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Qualifies every inbound WhatsApp lead so your sales team only talks to people who are ready to buy.',
     intro: "Nisha sits at the top of your WhatsApp funnel. When someone messages you, she runs them through a qualification flow — budget, timeline, use case — and scores them. Only the qualified ones land in your sales team's inbox.",
     agentCount: 31,
-    pricing: { monthly: 29, label: '$29/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Lead qualification frameworks', 'BANT scoring', 'Conversational qualification', 'CRM lead pushing', 'Follow-up sequences', 'Appointment booking', 'Disqualification flows', 'Multi-language outreach'],
     capabilities: [
       { area: 'Qualification Flows', icon: '🔍', blurb: 'BANT in a conversation that feels natural.', scenarios: ['Run multi-step qualification in a WhatsApp chat', 'Score leads 1-10 based on your ICP criteria', 'Identify timeline and budget without being pushy', 'Disqualify politely and redirect unfit leads'] },
@@ -411,7 +411,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Turns every Instagram comment and DM into a qualified lead or completed sale.',
     intro: "Tara manages your Instagram DMs like a full-time social commerce manager. She responds to comments with DM triggers, qualifies leads, sends product links, and closes sales — all from the Instagram inbox.",
     agentCount: 38,
-    pricing: { monthly: 39, label: '$39/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Instagram DM automation', 'Comment-to-DM triggers', 'Story reply management', 'Social commerce', 'Influencer DM coordination', 'Lead qualification via chat', 'Instagram Shopping integration', 'Broadcast DM campaigns'],
     capabilities: [
       { area: 'Comment & Story Automation', icon: '💬', blurb: 'Every public interaction captured and converted.', scenarios: ['Auto-DM everyone who comments a keyword', 'Respond to story replies with product links', 'Capture leads from paid ad comments', 'Trigger DM flows from reel engagements'] },
@@ -542,7 +542,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'One inbox to rule them all — WhatsApp, Instagram, SMS, email, and Telegram unified.',
     intro: "Dev manages conversations across every messaging channel from a single workflow. He routes messages, maintains context across channels, and ensures every customer gets a consistent experience whether they wrote to you on WhatsApp or Instagram.",
     agentCount: 83,
-    pricing: { monthly: 59, label: '$59/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Omnichannel inbox management', 'Cross-channel context preservation', 'Message routing logic', 'WhatsApp + Instagram + SMS + Telegram + Email', 'Unified customer profiles', 'Channel preference learning', 'Escalation routing', 'SLA management across channels'],
     capabilities: [
       { area: 'Unified Inbox', icon: '📥', blurb: 'All channels, one coherent conversation view.', scenarios: ['Route messages from any channel to the right queue', 'Preserve conversation context across channel switches', 'Identify repeat customers across channels', 'De-duplicate conversations from the same user'] },
@@ -673,7 +673,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Designs and deploys AI chatbots that actually solve problems instead of frustrating customers.',
     intro: "Arjun designs chatbot experiences that work. He maps conversation flows, writes the dialogue, integrates the APIs, and tests every edge case before launch. The result: a bot that customers don't want to escape from.",
     agentCount: 97,
-    pricing: { monthly: 129, label: '$129/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Conversational design', 'NLU/NLP architecture', 'Flow mapping', 'Intent classification', 'Entity extraction', 'API integration', 'Fallback and escalation design', 'A/B testing dialogue', 'Bot analytics and tuning'],
     capabilities: [
       { area: 'Conversation Design', icon: '🗺️', blurb: 'Flows that feel human, not like a phone tree.', scenarios: ['Map end-to-end conversation journeys', 'Write dialogue for every intent and fallback', 'Design escalation paths that preserve dignity', 'Localise bot flows for different markets'] },
@@ -937,7 +937,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Answers every call, qualifies every caller, and books every meeting — 24/7, zero hold time.',
     intro: "Vikram is your AI receptionist who never sleeps, never puts anyone on hold, and never transfers a call without full context. He answers inbound calls, qualifies callers, handles FAQs, and books appointments — in English, Hindi, or your regional language.",
     agentCount: 72,
-    pricing: { monthly: 69, label: '$69/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Voice AI and IVR design', 'Natural language call handling', 'Multi-language voice (Hindi/English/Regional)', 'Call qualification and scoring', 'Appointment booking via voice', 'CRM call logging', 'Call sentiment analysis', 'Escalation to human agents'],
     capabilities: [
       { area: 'Inbound Call Handling', icon: '📞', blurb: 'Every call answered, every caller understood.', scenarios: ['Handle inbound sales enquiries by voice', 'Answer FAQs without human involvement', 'Qualify callers with BANT questions', 'Collect callback preferences for busy periods'] },
@@ -1070,7 +1070,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Runs your entire e-commerce operation — listings, ads, pricing, and revenue optimisation.',
     intro: "Priya owns e-commerce from storefront to checkout. She optimises product listings, manages ads, fixes conversion drop-offs, runs sales events, and tracks every rupee of revenue. She's the person you'd hire if you wanted a VP of E-commerce at a fraction of the cost.",
     agentCount: 149,
-    pricing: { monthly: 189, label: '$189/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['E-commerce strategy', 'Product listing optimisation', 'Conversion rate optimisation', 'Paid media for e-commerce', 'Inventory forecasting', 'Pricing strategy', 'Marketplace management', 'D2C brand building', 'Email and SMS re-marketing', 'Category management'],
     capabilities: [
       { area: 'Store Optimisation', icon: '🏪', blurb: 'More traffic, better conversion, higher basket size.', scenarios: ['Audit product pages for conversion gaps', 'Write SEO-optimised product descriptions', 'Design A/B tests for landing pages', 'Optimise checkout flow for drop-off reduction'] },
@@ -1204,7 +1204,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Wins the Buy Box, dominates search, and grows your Amazon business systematically.',
     intro: "Rohit lives inside Seller Central. He optimises listings for A9 search, monitors competitors, manages PPC campaigns, handles account health, and builds the review strategy that keeps your BSR climbing. Amazon is a full-time job — Rohit makes it look easy.",
     agentCount: 114,
-    pricing: { monthly: 149, label: '$149/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Amazon A9 search algorithm', 'Listing optimisation (title/bullets/A+)', 'Amazon PPC and DSP', 'Buy Box strategy', 'Account health management', 'Competitor monitoring', 'Review generation strategy', 'FBA vs FBM decision-making', 'Brand Registry and protection', 'Lightning Deals and promotions'],
     capabilities: [
       { area: 'Listing & SEO', icon: '🔍', blurb: 'Top-of-search listings that convert.', scenarios: ['Keyword research and indexing strategy', 'Rewrite titles, bullets, and descriptions', 'Build A+ content for brand registry', 'Optimise backend search terms'] },
@@ -1339,7 +1339,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Grows Shopify stores through CRO, email flows, and retention — not just more ad spend.',
     intro: "Ananya is a Shopify specialist who understands that sustainable e-commerce growth comes from retention, not acquisition. She builds the email flows, optimises the store, sets up loyalty programmes, and fixes the checkout — so you get more revenue from the customers you already have.",
     agentCount: 88,
-    pricing: { monthly: 119, label: '$119/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Shopify store optimisation', 'Klaviyo email and SMS flows', 'Post-purchase retention', 'Loyalty programme setup', 'Checkout optimisation', 'Upsell and cross-sell apps', 'Customer LTV improvement', 'Subscription commerce', 'CRO testing methodology'],
     capabilities: [
       { area: 'Email & SMS Flows', icon: '✉️', blurb: 'Revenue-generating flows that run 24/7.', scenarios: ['Build welcome, abandon cart, win-back, and post-purchase flows', 'Segment by purchase history and LTV', 'Write email and SMS copy in your brand voice', 'A/B test subject lines, timings, and CTAs'] },
@@ -1472,7 +1472,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Builds D2C brands that people love, remember, and refer — not just buy from once.',
     intro: "Siya builds the brand layer that makes your D2C business defensible. She owns positioning, packaging narrative, visual consistency, community, and the story that makes customers choose you over a cheaper alternative.",
     agentCount: 119,
-    pricing: { monthly: 179, label: '$179/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['D2C brand strategy', 'Positioning and messaging', 'Brand identity and tone', 'Community building', 'Influencer and UGC strategy', 'Packaging and unboxing experience', 'Brand PR and press', 'Social brand management', 'Customer community platforms'],
     capabilities: [
       { area: 'Brand Strategy & Positioning', icon: '🎯', blurb: 'Clear, owned positioning that competitors can\'t copy.', scenarios: ['Define brand positioning and tone of voice', 'Build messaging hierarchy for every channel', 'Audit brand consistency across touchpoints', 'Develop brand story for founder-led content'] },
@@ -1605,7 +1605,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Manages Flipkart, Myntra, Meesho, Nykaa, and Amazon simultaneously — without losing your mind.',
     intro: "Kabir runs your multi-marketplace presence as a coordinated business, not a scattered experiment. He manages listings, pricing, fulfilment, and seller metrics across every platform and ensures you don't cannibilise your own margins.",
     agentCount: 133,
-    pricing: { monthly: 159, label: '$159/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Multi-marketplace management', 'Flipkart and Myntra seller portals', 'Meesho and Nykaa operations', 'Pricing strategy across channels', 'Fulfilment (FB-Flipkart/FBA/self-ship)', 'Account health across platforms', 'Return rate management', 'Category approval and onboarding'],
     capabilities: [
       { area: 'Multi-Platform Operations', icon: '🏪', blurb: 'All marketplaces managed from one strategy.', scenarios: ['Manage listings across Flipkart, Amazon, and Meesho', 'Maintain pricing parity or strategic differentiation', 'Coordinate flash sales across all platforms', 'Handle returns and refunds by platform policy'] },
@@ -1738,7 +1738,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Cuts your return rate by 30% and turns the returns that do happen into exchanges, not losses.',
     intro: "Farhan treats returns as a revenue recovery opportunity. He analyses why products come back, fixes the root causes, builds exchange-first flows, and manages the reverse logistics to minimise cost and time.",
     agentCount: 53,
-    pricing: { monthly: 69, label: '$69/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Return rate analysis', 'Reverse logistics management', 'Exchange-first return flows', 'Return reason analysis', 'Quality control feedback loops', 'Customer communication during returns', 'Return portal UX', 'WISMO (Where is my order) automation', 'Refund policy optimisation'],
     capabilities: [
       { area: 'Return Prevention', icon: '🛡️', blurb: 'Fix the reasons products come back.', scenarios: ['Analyse return reasons by SKU and category', 'Identify listing accuracy gaps driving returns', 'Flag size/fit issues for product page fixes', 'Reduce return rate by 20-30% within 90 days'] },
@@ -1870,7 +1870,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Never stock out on your top sellers, never overstock the slow ones — demand-driven inventory management.',
     intro: "Shreya runs demand forecasting and inventory management with the precision of a supply chain consultant. She predicts what you'll sell, when you'll run out, and how much to reorder — before you even notice the problem.",
     agentCount: 69,
-    pricing: { monthly: 79, label: '$79/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Demand forecasting', 'Safety stock calculation', 'Reorder point automation', 'Slow-moving inventory identification', 'Supplier lead time management', 'Multi-warehouse inventory', 'Stockout prediction', 'Markdown and liquidation strategy', 'SKU rationalisation'],
     capabilities: [
       { area: 'Demand Forecasting', icon: '🔮', blurb: 'Predict sales before they happen.', scenarios: ['Build SKU-level demand forecasts by season and trend', 'Adjust forecasts for promotions and events', 'Model new product demand from analogous SKUs', 'Flag forecast accuracy weekly and recalibrate'] },
@@ -2005,7 +2005,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Grows YouTube channels with strategy, SEO, and content that keeps viewers watching and subscribing.',
     intro: "Ayesha manages the full YouTube growth stack — strategy, SEO, scripting briefs, thumbnail copy, and analytics. She knows the algorithm, knows what makes people click, and knows what makes them stay. Subscribers who stay are worth more than views that don't convert.",
     agentCount: 107,
-    pricing: { monthly: 119, label: '$119/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['YouTube SEO and search ranking', 'Thumbnail and title optimisation', 'Content strategy and calendar', 'Analytics (CTR, AVD, retention)', 'Shorts strategy', 'Channel monetisation', 'Community tab engagement', 'Competitor analysis', 'YouTube Ads', 'Comment management'],
     capabilities: [
       { area: 'Strategy & SEO', icon: '🎯', blurb: 'Content people search for and stay to watch.', scenarios: ['Build a 90-day content calendar by pillar', 'Research high-volume, low-competition keywords', 'Optimise titles, descriptions, and tags for every video', 'Analyse competitors\' top videos for gaps'] },
@@ -2138,7 +2138,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Builds thought leadership on LinkedIn that generates inbound leads, not just likes.',
     intro: "Ishaan grows LinkedIn presence for founders, executives, and B2B brands. He writes posts that get shared, positions you as the go-to expert in your category, and measures everything in inbound conversations, not vanity metrics.",
     agentCount: 77,
-    pricing: { monthly: 99, label: '$99/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['LinkedIn algorithm and content formats', 'Thought leadership positioning', 'B2B lead generation via LinkedIn', 'Newsletter growth on LinkedIn', 'LinkedIn Sales Navigator outreach', 'Engagement pod strategy', 'Profile and banner optimisation', 'LinkedIn Ads for B2B', 'Company page management'],
     capabilities: [
       { area: 'Thought Leadership Content', icon: '✍️', blurb: 'Posts that build authority and generate inbound.', scenarios: ['Write 3-5 weekly posts in your voice and POV', 'Build a content pillar strategy by topic', 'Create carousel, text, and video script briefs', 'Develop a LinkedIn newsletter with weekly consistency'] },
@@ -2271,7 +2271,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Builds newsletters that people actually open, read, and forward — and monetises the audience.',
     intro: "Neha writes and grows newsletters that become a business asset. She handles strategy, editorial calendar, writing, sponsorship outreach, and subscriber growth — treating your newsletter as a media property, not a marketing afterthought.",
     agentCount: 48,
-    pricing: { monthly: 79, label: '$79/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Newsletter strategy and positioning', 'Editorial calendar management', 'Email copywriting', 'Subscriber growth tactics', 'Open and click optimisation', 'Sponsorship and monetisation', 'List segmentation', 'Beehiiv/Substack/Kit management', 'Referral programme setup'],
     capabilities: [
       { area: 'Editorial & Writing', icon: '✍️', blurb: 'Consistent, quality content your readers wait for.', scenarios: ['Build editorial calendar with topic and angle plan', 'Write the weekly or bi-weekly newsletter issue', 'Develop signature sections and recurring formats', 'Interview founders and experts for featured content'] },
@@ -2405,7 +2405,7 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
     tagline: 'Builds a pipeline of authentic creator content that outperforms polished ads every time.',
     intro: "Aarav manages your UGC and micro-influencer strategy from end to end — sourcing, briefing, contracting, receiving, and repurposing content. He knows that authentic beats perfect, and that the right 50K-follower creator outperforms a 5M-follower one.",
     agentCount: 84,
-    pricing: { monthly: 99, label: '$99/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['UGC strategy and creative briefs', 'Micro-influencer sourcing and vetting', 'Creator negotiation and contracting', 'Content receiving and approval', 'Content repurposing for ads', 'FTC/ASCI compliance', 'Creator relationship management', 'Campaign performance tracking', 'Niche creator communities'],
     capabilities: [
       { area: 'Creator Sourcing & Management', icon: '🤝', blurb: 'Right creators, right brief, right content.', scenarios: ['Source micro and nano influencers by niche and engagement', 'Vet creators for authentic audience and brand fit', 'Write detailed creative briefs for UGC content', 'Manage creator relationships and content calendar'] },
@@ -2528,3 +2528,4 @@ export const EMPLOYEES_PART2: EmployeeProfile[] = [
 ],
   },
 ]
+

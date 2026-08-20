@@ -14,7 +14,7 @@ export const EMPLOYEES_PART4: EmployeeProfile[] = [
     tagline: 'Runs clinic and hospital admin — appointments, billing, records, and patient communication.',
     intro: "Sunita manages the operational back-office of healthcare facilities. Appointment scheduling, patient reminders, billing and insurance claims, ABDM integration, and staff communication — she handles everything that isn't clinical but makes the clinical work possible.",
     agentCount: 152,
-    pricing: { monthly: 149, label: '$149/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Clinic and hospital appointment management', 'Patient registration and records', 'Health insurance billing and TPA claims', 'ABDM/ABHA integration', 'Lab report management', 'Doctor schedule management', 'Patient reminder automation', 'Discharge summary coordination', 'CGHS and government billing', 'Pharmacy management basics'],
     capabilities: [
       { area: 'Patient Operations', icon: '🏥', blurb: 'Zero missed appointments, zero lost records.', scenarios: ['Manage appointment booking across all specialities', 'Send automated reminders via WhatsApp and SMS', 'Handle patient registration and ABHA creation', 'Coordinate lab reports and follow-up scheduling'] },
@@ -170,7 +170,7 @@ I respond in markdown with ## headers. Every response opens with a one-sentence 
     tagline: 'Keeps patients engaged between appointments — improving outcomes and reducing no-shows.',
     intro: "Amit manages digital patient engagement for hospitals, clinics, and healthtech companies. Appointment reminders, medication adherence nudges, chronic care follow-ups, and health education content — he reduces no-shows and improves outcomes.",
     agentCount: 89,
-    pricing: { monthly: 119, label: '$119/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Patient engagement strategy', 'Appointment reminder automation', 'Medication adherence programmes', 'Chronic disease management communication', 'Post-discharge follow-up flows', 'Health education content', 'Patient satisfaction surveys', 'Teleconsultation coordination', 'WhatsApp health journeys', 'ABDM health records'],
     capabilities: [
       { area: 'Engagement Automation', icon: '💬', blurb: 'Patients who stay connected between visits.', scenarios: ['Automated appointment reminders and confirmations', 'Medication reminder sequences via WhatsApp/SMS', 'Post-discharge follow-up protocol automation', 'Chronic care check-in flows for diabetic, hypertensive patients'] },
@@ -326,7 +326,7 @@ I respond in markdown with ## headers. Patient journey designs are presented as 
     tagline: 'Runs corporate wellness programmes that reduce sick days, improve energy, and lower healthcare costs.',
     intro: "Roshni manages corporate wellness programmes that actually move the needle. She designs health challenges, mental wellness initiatives, nutrition education, and fitness programmes — and measures the impact on absenteeism, productivity, and healthcare claims.",
     agentCount: 66,
-    pricing: { monthly: 99, label: '$99/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Corporate wellness programme design', 'Mental health and EAP coordination', 'Fitness and nutrition challenges', 'Stress management workshops', 'Health screening camps', 'Absenteeism and productivity metrics', 'Employee health surveys', 'Health insurance cost reduction', 'Ergonomics and workplace health', 'Mindfulness programme facilitation'],
     capabilities: [
       { area: 'Wellness Programmes', icon: '🧘', blurb: 'Programmes that employees actually use.', scenarios: ['Design monthly health challenge with incentives', 'Run step count and hydration challenges', 'Organise virtual mental wellness workshops', 'Coordinate on-site health screening camps'] },
@@ -482,7 +482,7 @@ I respond in markdown with ## headers. Programme proposals use a structured layo
     tagline: 'Maximises healthcare revenue by getting claims right the first time and chasing every denial.',
     intro: "Gaurav manages the full medical billing and revenue cycle for clinics, hospitals, and healthtech companies. He increases first-pass claim acceptance rates, reduces denial days, and recovers revenue that's sitting in unpaid claims.",
     agentCount: 134,
-    pricing: { monthly: 179, label: '$179/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Medical coding (ICD-10, CPT, HCPCS)', 'Insurance claim submission', 'Denial management and appeals', 'Prior authorisation management', 'Patient billing and collections', 'Revenue cycle analytics', 'NABH billing standards', 'Cashless claim processing', 'Reimbursement rate negotiation', 'Healthcare AR management'],
     capabilities: [
       { area: 'Claim Management', icon: '🧾', blurb: 'Every claim submitted clean, every denial pursued.', scenarios: ['Review and submit insurance claims with accurate coding', 'Manage prior authorisation requests for procedures', 'Work denial queue with documentation for appeals', 'Track claims from submission to payment'] },
@@ -639,7 +639,7 @@ I respond in markdown with ## headers. AR reports use tables with payer columns 
     tagline: 'Creates medically accurate, SEO-optimised health content that patients trust and Google ranks.',
     intro: "Nandini creates health content that builds trust and drives patient acquisition. She writes doctor bios, symptom guides, condition explainers, and SEO articles — all medically reviewed, search-optimised, and written so real people actually understand them.",
     agentCount: 73,
-    pricing: { monthly: 99, label: '$99/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Medical content writing', 'Health SEO and symptom search', 'Doctor profile and bio content', 'Patient education materials', 'Disease awareness campaigns', 'Medical disclaimer and compliance', 'Health YouTube and podcast scripts', 'Social health education content', 'Hospital website content', 'Medical device and pharma content'],
     capabilities: [
       { area: 'Patient-Facing Content', icon: '✍️', blurb: 'Content patients trust and doctors approve.', scenarios: ['Write condition guides and symptom explainers', 'Create doctor profile and speciality pages', 'Build hospital/clinic website content', 'Produce health awareness social media content'] },
@@ -798,7 +798,7 @@ I respond in markdown with ## headers. Content briefs use a structured template:
     tagline: 'Launches and scales online courses that students complete, recommend, and pay for repeatedly.',
     intro: "Vishal manages the full lifecycle of online courses — from curriculum design to student success. He builds courses that have high completion rates, strong reviews, and repeat purchases. He treats education as a product business.",
     agentCount: 96,
-    pricing: { monthly: 119, label: '$119/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Online course design and curriculum', 'LMS management (Teachable, Thinkific, Graphy)', 'Video production coordination', 'Student onboarding flows', 'Course launch marketing', 'Completion rate optimisation', 'Certification and credential management', 'Community building for courses', 'Upsell and course extension strategy', 'Refund and satisfaction management'],
     capabilities: [
       { area: 'Curriculum & Production', icon: '🎓', blurb: 'Courses designed for completion, not just purchase.', scenarios: ['Design curriculum with learning objectives per module', 'Structure lessons for knowledge retention', 'Write module scripts and resource materials', 'Coordinate video production and editing workflow'] },
@@ -955,7 +955,7 @@ I respond in markdown with ## headers. Curriculum outlines use a module-by-modul
     tagline: 'Keeps students engaged, supported, and moving toward completion — so they finish and refer others.',
     intro: "Ankita manages the student experience after enrolment. She builds the onboarding journey, monitors engagement, sends timely interventions for at-risk students, manages Q&A, and tracks outcomes — turning learners into advocates.",
     agentCount: 61,
-    pricing: { monthly: 79, label: '$79/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Student onboarding and orientation', 'Learning engagement monitoring', 'At-risk student identification', 'Community management for learners', 'Q&A and doubt resolution management', 'Progress nudge automation', 'Graduation and certification workflows', 'Alumni engagement', 'Student satisfaction surveys', 'Refund prevention through engagement'],
     capabilities: [
       { area: 'Onboarding & Engagement', icon: '🤝', blurb: 'Students who start also finish.', scenarios: ['Build day-1 and week-1 onboarding sequences', 'Send progress nudges at key drop-off points', 'Manage community Q&A and peer learning', 'Celebrate milestones — first lesson, halfway, completion'] },
@@ -1112,7 +1112,7 @@ I respond in markdown with ## headers. At-risk reports use a table: student name
     tagline: 'Fills seats by converting enquiries into enrolments — fast, personal, and at scale.',
     intro: "Pallavi manages the admissions funnel for coaching institutes, colleges, and online education businesses. She converts enquiries into applications and applications into enrolments — with a personal touch that scales.",
     agentCount: 78,
-    pricing: { monthly: 99, label: '$99/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Admissions funnel design', 'Lead nurturing for education', 'Counselling call scripts', 'Application and enrolment management', 'Scholarship and financial aid communication', 'WhatsApp admissions automation', 'Education CRM management', 'Enquiry-to-enrolment conversion', 'Re-engagement of cold leads', 'Batch and intake management'],
     capabilities: [
       { area: 'Lead Nurturing & Counselling', icon: '🤝', blurb: 'Every enquiry handled like a personal counsellor.', scenarios: ['Qualify leads and score by intent and budget', 'Run automated WhatsApp and email nurture sequences', 'Handle objections about fees, outcomes, and schedule', 'Schedule and follow up on counselling calls'] },
@@ -1269,7 +1269,7 @@ I respond in markdown with ## headers. The admissions funnel is presented as a s
     tagline: 'Turns student data into curriculum decisions, engagement interventions, and business intelligence.',
     intro: "Deepak builds the analytics layer for education businesses. He tracks learner behaviour, identifies what's working and what's causing drop-off, and gives educators the data to improve outcomes and the business data to improve revenue.",
     agentCount: 104,
-    pricing: { monthly: 129, label: '$129/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Learning analytics and LRS', 'Student behaviour tracking', 'Completion and engagement metrics', 'Content performance analysis', 'Cohort analysis by segment', 'A/B testing curriculum', 'Education business KPIs', 'Predictive dropout modelling', 'Revenue and enrolment analytics', 'SCORM and xAPI integration'],
     capabilities: [
       { area: 'Learner Analytics', icon: '📊', blurb: 'Know which students are thriving and which are at risk.', scenarios: ['Track lesson completion and time-on-task by student', 'Build dropout prediction model by behaviour pattern', 'Identify which content drives the highest engagement', 'Cohort comparison by acquisition source and cohort'] },
@@ -1428,7 +1428,7 @@ I respond in markdown with ## headers. Analyses lead with the headline finding i
     tagline: 'Acts as your Chief of Staff — prioritising, filtering, delegating, and making sure nothing falls through.',
     intro: "Reena operates as your AI Chief of Staff — managing your priorities, ensuring leadership alignment, preparing board updates, tracking OKRs, and making sure everything that needs to happen, does. She gives you leverage without adding headcount.",
     agentCount: 241,
-    pricing: { monthly: 299, label: '$299/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Executive prioritisation and time leverage', 'OKR and goal tracking', 'Board and investor reporting', 'Leadership meeting facilitation', 'Cross-functional alignment', 'Strategic initiative tracking', 'CEO briefing preparation', 'Stakeholder communication management', 'Decision documentation', 'Organisational design support'],
     capabilities: [
       { area: 'Executive Operations', icon: '🗂️', blurb: 'Your priorities managed, your time protected.', scenarios: ['Weekly priority review and delegation tracking', 'Board update and investor memo preparation', 'OKR tracking and quarterly business review prep', 'Leadership team alignment and follow-up management'] },
@@ -1585,7 +1585,7 @@ I respond in markdown with ## headers. Board and leadership updates use the BLUF
     tagline: 'Operates at CMO level — brand strategy, demand generation, GTM, and board-ready marketing reporting.',
     intro: "Vivek thinks and operates like a CMO. He owns the marketing strategy, runs the GTM motion, manages the brand, and builds the board deck. He gives growth-stage companies a CMO-level perspective without the $400K salary.",
     agentCount: 287,
-    pricing: { monthly: 349, label: '$349/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Marketing strategy and GTM planning', 'Brand positioning and architecture', 'Demand generation and pipeline ownership', 'Marketing org design and team structure', 'Board reporting and marketing KPIs', 'Product marketing and category creation', 'Marketing technology stack', 'Content and thought leadership strategy', 'Media and PR strategy', 'Marketing budget allocation and MROI'],
     capabilities: [
       { area: 'Marketing Strategy & GTM', icon: '🎯', blurb: 'CMO-level thinking on your brand and growth.', scenarios: ['Build annual marketing strategy with channel mix', 'Design GTM plan for new product or market', 'Create brand positioning and messaging architecture', 'Plan marketing org structure for next 18 months'] },
@@ -1742,7 +1742,7 @@ I respond in markdown with ## headers. Marketing strategies use the classic SOST
     tagline: 'Operates at CTO level — architecture decisions, tech strategy, team structure, and board-ready technical reporting.',
     intro: "Pratik thinks like a CTO who's shipped products at scale. He reviews your technical architecture, informs engineering hiring decisions, defines your tech stack strategy, and translates technical complexity into language your board and investors understand.",
     agentCount: 312,
-    pricing: { monthly: 349, label: '$349/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Technical architecture and design patterns', 'Engineering team structure and hiring', 'Technology stack selection', 'Build vs buy decisions', 'Technical debt management', 'Engineering productivity metrics', 'Cloud and infrastructure strategy', 'Security and compliance architecture', 'API and platform strategy', 'Technical due diligence'],
     capabilities: [
       { area: 'Technical Strategy', icon: '🏗️', blurb: 'Architecture decisions that don\'t come back to haunt you.', scenarios: ['Evaluate and decide on technology stack', 'Design scalable system architecture', 'Build vs buy decision framework', 'Technical roadmap aligned with business goals'] },
@@ -1899,7 +1899,7 @@ I respond in markdown with ## headers. Architecture recommendations use a decisi
     tagline: 'Runs operations like a COO — process excellence, cross-functional alignment, and scaling systems.',
     intro: "Neeraj thinks like a COO who's scaled companies from 10 to 1,000 people. He designs operating systems, fixes broken processes, builds the metrics that matter, and ensures the business executes on strategy. He's the one who makes sure the machine actually runs.",
     agentCount: 263,
-    pricing: { monthly: 349, label: '$349/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Operating model design', 'Process documentation and improvement', 'Cross-functional meeting cadence', 'OKR implementation', 'Organisational scaling', 'Metrics and KPI design', 'BPO and outsourcing strategy', 'Customer experience operations', 'Unit economics and profitability analysis', 'Operational due diligence'],
     capabilities: [
       { area: 'Operating System Design', icon: '⚙️', blurb: 'A business that runs without you in every meeting.', scenarios: ['Design company operating cadence (daily/weekly/monthly)', 'Build the OKR framework and quarterly review process', 'Create cross-functional RACI and decision rights', 'Document and optimise all core business processes'] },
@@ -2058,7 +2058,7 @@ I respond in markdown with ## headers. Operating model documents use a structure
     tagline: 'Grows your product through the product — activation, viral loops, and conversion to paid.',
     intro: "Shweta builds and optimises the product-led growth engine. She owns activation rates, time-to-value, upgrade flows, and viral coefficients. She grows the user base through the product itself, not just marketing spend.",
     agentCount: 172,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['PLG strategy and framework', 'Activation and onboarding optimisation', 'Time-to-value reduction', 'Freemium-to-paid conversion', 'In-product upsell and expansion', 'Viral loops and referral mechanisms', 'Product usage analytics', 'A/B testing in-product flows', 'Expansion revenue strategy', 'PQL (Product Qualified Lead) identification'],
     capabilities: [
       { area: 'Activation & Onboarding', icon: '⚡', blurb: 'Users who activate in 10 minutes, not 10 days.', scenarios: ['Map and optimise the activation path to first value', 'Build in-product onboarding tour and empty states', 'Reduce time-to-value for new user segments', 'A/B test onboarding flow variations'] },
@@ -2215,7 +2215,7 @@ I respond in markdown with ## headers. PLG analyses lead with the funnel drop-of
     tagline: 'Identifies at-risk customers before they churn and intervenes with precision before it\'s too late.',
     intro: "Tara owns customer retention. She builds the health scoring model, identifies accounts about to churn, triggers the right intervention at the right time, and tracks the percentage of at-risk accounts saved. Retention is cheaper than acquisition — she makes it systematic.",
     agentCount: 118,
-    pricing: { monthly: 179, label: '$179/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Customer health scoring', 'Churn prediction modelling', 'At-risk account identification', 'Retention playbook design', 'Win-back campaign management', 'NPS and CSAT to churn correlation', 'Customer success intervention flows', 'Cancellation flow optimisation', 'Renewal management', 'Expansion as a retention tool'],
     capabilities: [
       { area: 'Health Scoring & Prediction', icon: '🔍', blurb: 'Know who\'s leaving before they know they are.', scenarios: ['Build customer health score by product usage signals', 'Predict churn 30-60-90 days in advance', 'Segment at-risk customers by churn reason', 'Alert CS team when account health drops below threshold'] },
@@ -2372,7 +2372,7 @@ I respond in markdown with ## headers. Retention reports lead with the NRR trend
     tagline: 'Builds communities around your product that drive acquisition, retention, and organic growth.',
     intro: "Mihir builds and manages product communities that become growth channels. Whether it's a Slack community, Discord server, user forum, or developer community, he programmes the content, manages the conversations, and turns members into advocates.",
     agentCount: 143,
-    pricing: { monthly: 129, label: '$129/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Community strategy and programming', 'Slack and Discord community management', 'Developer relations and DevRel', 'Community content calendar', 'Events and virtual meetups', 'Community metrics (DAU, engagement rate, NPS)', 'Ambassador and champion programmes', 'Forum and Reddit management', 'Community-led growth', 'Community operations and moderation'],
     capabilities: [
       { area: 'Community Building', icon: '🌐', blurb: 'A community that members show up to every day.', scenarios: ['Design community structure and channel architecture', 'Build weekly content and engagement programme', 'Run monthly community events and AMAs', 'Identify and activate power users as community leaders'] },
@@ -2529,7 +2529,7 @@ I respond in markdown with ## headers. Community health reports use a weekly met
     tagline: 'Builds referral programmes that turn your customers into your highest-converting sales channel.',
     intro: "Sanket designs and runs referral programmes that actually work. He researches the right incentive structure, builds the mechanics, writes the communication, and tracks referral attribution with precision. Word-of-mouth becomes a system, not luck.",
     agentCount: 79,
-    pricing: { monthly: 99, label: '$99/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Referral programme design', 'Incentive structure research', 'Referral mechanics and attribution', 'Double-sided vs single-sided incentives', 'In-product referral triggers', 'Referral email and SMS campaigns', 'Ambassador and affiliate programme management', 'Viral coefficient calculation', 'Referral fraud detection', 'Cross-product referral strategy'],
     capabilities: [
       { area: 'Programme Design & Launch', icon: '🔗', blurb: 'A referral programme that compounds over time.', scenarios: ['Research and design incentive structure by customer segment', 'Build referral mechanics and attribution system', 'Write referral invitation and follow-up communication', 'Launch referral programme with in-product and email triggers'] },
@@ -2686,7 +2686,7 @@ I respond in markdown with ## headers. Programme design documents use a structur
     tagline: 'Builds partnerships that generate revenue, distribution, and competitive moat — simultaneously.',
     intro: "Priti runs partnerships that move the business forward. She identifies the right partners, pitches the value exchange, negotiates the terms, and manages the ongoing relationship to ensure both sides keep winning.",
     agentCount: 156,
-    pricing: { monthly: 189, label: '$189/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Partnership strategy and prioritisation', 'Reseller and channel partner management', 'Technology integration partnerships', 'Co-marketing and co-selling', 'Partner contract negotiation', 'Partner enablement and training', 'Partnership analytics and attribution', 'Alliance management', 'Ecosystem strategy', 'Enterprise partnership development'],
     capabilities: [
       { area: 'Partner Development', icon: '🤝', blurb: 'The right partners, the right deal, the right terms.', scenarios: ['Identify high-potential partners by strategic fit and market access', 'Pitch the partnership value exchange compellingly', 'Negotiate partnership terms and revenue share', 'Onboard new partners with enablement materials'] },
@@ -2833,3 +2833,4 @@ I respond in markdown with ## headers. Partnership evaluations use a scoring mat
 ],
   },
 ]
+

@@ -14,7 +14,7 @@ export const EMPLOYEES_PART6: EmployeeProfile[] = [
     tagline: 'Builds brands that people recognise, trust, and buy — across every touchpoint.',
     intro: "Brixton manages brand architecture, visual identity, and brand voice across every channel your company owns. He conducts brand audits, runs competitive positioning workshops, develops brand guidelines, and monitors brand health metrics. Whether you're launching a new sub-brand, refreshing a tired identity, or protecting brand equity during a crisis, Brixton runs the playbook.",
     agentCount: 91,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Brand architecture & hierarchy', 'Visual identity systems', 'Brand voice & tone guidelines', 'Brand health metrics & tracking', 'Positioning & differentiation strategy', 'Competitive brand analysis', 'Brand guidelines & standards enforcement', 'Brand campaign strategy', 'Sub-brand & product brand management', 'Brand equity measurement', 'Rebrand & brand refresh management', 'Brand storytelling & narrative'],
     capabilities: [
       {
@@ -239,7 +239,7 @@ I respond in markdown with ## headers. Every output opens with a one-sentence bo
     tagline: 'Builds, grows, and energises communities that become your most powerful distribution channel.',
     intro: "Chloe turns customers, users, and prospects into an engaged community that advocates, refers, and retains. She manages online communities across forums, Discord, Slack, LinkedIn, and social channels, runs engagement programmes, surfaces user insights, and turns your most active members into advocates who drive growth you can't buy.",
     agentCount: 67,
-    pricing: { monthly: 119, label: '$119/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Online community strategy & management', 'Discord & Slack community operations', 'Social media community building', 'User advocacy & ambassador programmes', 'Community health metrics & reporting', 'Event programming & community calls', 'User-generated content strategy', 'Community-led growth', 'Moderation & community standards', 'Member journey & onboarding design', 'Feedback loops from community to product', 'Community SEO & content strategy'],
     capabilities: [
       {
@@ -465,7 +465,7 @@ I respond in markdown with ## headers. Community health reports use a weekly met
     tagline: 'Runs rapid growth experiments, finds the channels that compound, and scales what works.',
     intro: "Grit finds the fastest path from zero to traction. She designs and runs high-velocity growth experiments across acquisition, activation, and referral, uses data to kill losers fast and scale winners aggressively, and builds growth loops that compound over time. She has taken companies from 500 to 50,000 users and knows exactly which levers to pull at each stage.",
     agentCount: 83,
-    pricing: { monthly: 149, label: '$149/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Growth experimentation & A/B testing', 'Viral & referral loop design', 'Funnel optimisation & CRO', 'Product-led growth (PLG) mechanics', 'SEO-driven growth & programmatic SEO', 'Paid acquisition at scale', 'Activation & onboarding optimisation', 'Retention & resurrection mechanics', 'Growth analytics & attribution', 'Channel identification & prioritisation', 'North Star Metric & OMTM framework', 'Growth team & experiment velocity'],
     capabilities: [
       {
@@ -690,7 +690,7 @@ I respond in markdown with ## headers. The growth audit is presented as the AARR
     tagline: 'Turns raw data into decisions — dashboards, reports, and analytical insights the whole business acts on.',
     intro: "Dara transforms raw data into clear, actionable intelligence for every team in the business. She builds dashboards, runs ad hoc analyses, models business scenarios, and owns the data layer that makes revenue, product, and operations decisions defensible. If you need to know why something happened, what the data says to do next, or how to measure something that has never been measured before — Dara answers it.",
     agentCount: 112,
-    pricing: { monthly: 189, label: '$189/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['SQL & advanced data querying', 'Business intelligence & dashboard design', 'Revenue and cohort analytics', 'Product analytics & funnel analysis', 'Statistical analysis & A/B test evaluation', 'Data modelling & warehouse architecture', 'Financial modelling & scenario analysis', 'Customer segmentation & clustering', 'Attribution modelling', 'Data storytelling & executive reporting', 'ETL pipeline fundamentals', 'Predictive analytics & forecasting'],
     capabilities: [
       {
@@ -915,7 +915,7 @@ I respond in markdown with ## headers. Analysis outputs lead with the headline f
     tagline: 'Builds strategic partnerships that generate revenue, expand distribution, and unlock new markets.',
     intro: "Parker identifies, negotiates, and manages strategic partnerships that move the business forward. He builds integration partnerships, co-marketing alliances, distribution deals, and joint-venture arrangements that give the company access to audiences, capabilities, and revenue streams it could not build alone. He brings rigour to partnership evaluation and relationship management in equal measure.",
     agentCount: 58,
-    pricing: { monthly: 99, label: '$99/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Strategic partnership identification & evaluation', 'Technology & integration partnerships', 'Co-marketing & co-sell agreements', 'Distribution & OEM partnerships', 'Partnership contract negotiation fundamentals', 'Partner enablement & joint go-to-market', 'Partnership pipeline & revenue tracking', 'Agency & systems integrator partnerships', 'Marketplace & app store partnerships', 'Partner health scoring & lifecycle management', 'Industry alliance & association partnerships', 'Cross-functional partnership coordination'],
     capabilities: [
       {
@@ -1140,7 +1140,7 @@ I respond in markdown with ## headers. Partner evaluations use a scoring matrix 
     tagline: 'Designs end-to-end customer experiences that drive satisfaction, loyalty, and word-of-mouth growth.',
     intro: "Camille owns the complete customer experience from first touchpoint to loyal advocate. She maps customer journeys, identifies friction across every interaction, and works cross-functionally to eliminate it. She runs VoC programmes, manages CSAT and NPS, and designs experience standards that make customers feel genuinely valued — not just processed.",
     agentCount: 76,
-    pricing: { monthly: 149, label: '$149/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Customer journey mapping', 'Voice of customer (VoC) programme management', 'NPS, CSAT, and CES measurement', 'Service design & experience blueprinting', 'Customer feedback loop management', 'Cross-functional CX coordination', 'Customer effort score optimisation', 'Complaint handling & service recovery', 'CX technology stack management', 'Customer empathy research & personas', 'CX metrics, benchmarking & reporting', 'Employee experience impact on CX'],
     capabilities: [
       {
@@ -1365,7 +1365,7 @@ I respond in markdown with ## headers. Monthly CX reports lead with the headline
     tagline: 'Keeps the infrastructure reliable, deployments fast, and engineering teams shipping without fear.',
     intro: "Dev manages the full DevOps function: CI/CD pipelines, cloud infrastructure, monitoring and alerting, security compliance, and on-call operations. He works at the intersection of engineering and operations — making sure code ships fast, systems stay up, and engineers spend their time building products instead of fighting fires. He has managed infrastructure at series A through series C scale and knows how to right-size complexity at every stage.",
     agentCount: 94,
-    pricing: { monthly: 179, label: '$179/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['CI/CD pipeline design & management', 'Cloud infrastructure (AWS, GCP, Azure)', 'Infrastructure as Code (Terraform, Pulumi)', 'Kubernetes & container orchestration', 'Observability: metrics, logs, and traces', 'Incident management & on-call operations', 'Site Reliability Engineering (SRE) principles', 'Security compliance & DevSecOps', 'Cost optimisation & FinOps', 'Database operations & backup management', 'Deployment strategy & release management', 'Engineering platform & developer experience'],
     capabilities: [
       {
@@ -1578,3 +1578,4 @@ I respond in markdown with ## headers. DevOps health reports lead with the DORA 
 ],
   },
 ]
+

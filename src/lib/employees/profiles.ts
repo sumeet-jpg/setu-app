@@ -59,7 +59,7 @@ const EMPLOYEES_BASE: EmployeeProfile[] = [
     tagline: 'Plans the strategy, commands 208 specialist agents, and ships the work — end to end.',
     intro: "Marcus runs marketing the way a seasoned VP would. Give him a goal — grow pipeline, launch a feature, fix a funnel — and he plans it, tells you exactly which tools and accounts he needs, then directs his team of specialist agents to execute across every channel.",
     agentCount: 208,
-    pricing: { monthly: 249, label: '$249/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Brand positioning & messaging', 'Demand generation', 'Funnel & lifecycle marketing', 'Performance / paid media', 'SEO & content strategy', 'Email & marketing automation', 'Social & community', 'Product marketing & launches', 'ABM', 'Marketing analytics & attribution', 'CRO & landing pages', 'PR & communications', 'Budget & MROI management'],
     capabilities: [
       { area: 'Campaigns & Launches', icon: '🚀', blurb: 'End-to-end campaign planning and execution.', scenarios: ['Plan and run a full product-launch campaign', 'Build a 30/60/90-day GTM plan', 'Run a webinar promotion end-to-end', 'Spin up a seasonal / holiday push', 'Coordinate a multi-channel announcement', 'Re-engagement campaign for dormant users'] },
@@ -253,7 +253,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Keeps the revenue engine clean, fast, and visible — from pipeline to forecast.',
     intro: "Aria owns the revenue architecture. She cleans CRM data, fixes broken handoffs between sales and CS, builds the forecast your CFO can trust, and surfaces the deals at risk before they slip. She runs RevOps the way a well-funded ops team would — with processes, not spreadsheets.",
     agentCount: 156,
-    pricing: { monthly: 249, label: '$249/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['CRM architecture & hygiene', 'Pipeline management & velocity', 'Sales process design', 'Revenue forecasting', 'GTM attribution & funnel analysis', 'Sales & CS handoff design', 'Tech stack optimization', 'Quota & territory planning', 'Renewal & expansion ops', 'RevOps reporting & KPIs'],
     capabilities: [
       { area: 'CRM Hygiene & Architecture', icon: '🗄️', blurb: 'Clean data that reps and leadership can actually trust.', scenarios: ['Audit and clean CRM data quality', 'Fix duplicate accounts and contacts', 'Standardize stage definitions and exit criteria', 'Build required field enforcement rules', 'Auto-enrich leads with firmographic data', 'Create data health scoring dashboard'] },
@@ -445,7 +445,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Runs outbound at scale — sequences, personalization, and booked meetings every week.',
     intro: "Sam runs outbound the way a great sales development manager would — with tight sequencing, relentless follow-up, and personalization that doesn't feel like a template. He books meetings, qualifies prospects, and keeps the top of the funnel full without burning your list.",
     agentCount: 94,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Outbound prospecting & sequencing', 'Cold email & LinkedIn outreach', 'ICP targeting & list building', 'Multi-touch follow-up cadences', 'Personalization at scale', 'Call scripts & objection handling', 'CRM tracking & pipeline hygiene', 'Meeting booking & qualification', 'Sales development metrics'],
     capabilities: [
       { area: 'Prospecting & List Building', icon: '🎯', blurb: 'Qualified, targeted prospect lists built to your ICP.', scenarios: ['Build a targeted prospect list from firmographic criteria', 'Score and prioritize leads by fit and intent', 'Find decision-maker contacts for target accounts', 'Identify buying signals from web + social activity', 'Research target companies for personalization hooks'] },
@@ -585,7 +585,7 @@ OPERATIONAL PROTOCOL
     tagline: 'Onboards customers, drives adoption, and converts renewals into expansions.',
     intro: "Diana keeps customers successful and growing. She runs onboarding, tracks adoption signals, intervenes before churn happens, and finds expansion opportunities the account team would otherwise miss. She treats every account like it's her only one.",
     agentCount: 118,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Customer onboarding & activation', 'Health scoring & churn prediction', 'QBR preparation & delivery', 'Renewal management & negotiation', 'Expansion & upsell identification', 'Product adoption campaigns', 'Voice of customer programs', 'Executive relationship management', 'Escalation handling & recovery'],
     capabilities: [
       { area: 'Onboarding & Activation', icon: '🚀', blurb: 'Fast time-to-value for every new customer.', scenarios: ['Design a 30-60-90 day onboarding playbook', 'Send onboarding milestones and check-in sequences', 'Track feature adoption by account', 'Flag accounts stuck in onboarding', 'Build training resources and how-to guides', 'Run kickoff calls and success plan sessions'] },
@@ -777,7 +777,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Closes the books faster, matches every invoice, and gives leadership numbers they can trust.',
     intro: "Felix runs the financial close like a machine. He matches invoices to payments, flags exceptions before they become audit findings, manages the AP/AR queue, and delivers the month-end close on schedule. He gives your CFO numbers they can sign off on without losing a weekend.",
     agentCount: 142,
-    pricing: { monthly: 299, label: '$299/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Month-end close management', 'AP & AR automation', 'Invoice matching & reconciliation', 'Exception handling & escalation', 'Cash flow monitoring', 'Expense management & compliance', 'Financial reporting', 'Audit trail maintenance', 'Vendor payment management', 'Budget vs actuals tracking'],
     capabilities: [
       { area: 'Close & Reconciliation', icon: '📋', blurb: 'Month-end close that actually closes on time.', scenarios: ['Run a structured month-end close checklist', 'Match bank statements to GL entries', 'Reconcile accounts payable and receivable', 'Flag unmatched transactions for review', 'Produce audit-ready reconciliation reports', 'Track close progress against timeline'] },
@@ -969,7 +969,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Keeps response times low, CSAT high, and escalations handled before they become problems.',
     intro: "Nora runs the support queue like a great support lead would — triaging tickets by priority, drafting accurate responses, routing complex cases to the right people, and keeping the knowledge base updated so the same question never gets answered twice.",
     agentCount: 132,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Ticket triage & classification', 'Response drafting & quality', 'Escalation management', 'CSAT & SLA tracking', 'Knowledge base management', 'Support workflow design', 'Root cause analysis', 'Self-service optimization', 'Multi-channel support ops', 'Team performance reporting'],
     capabilities: [
       { area: 'Triage & Response', icon: '⚡', blurb: 'Every ticket routed and responded to correctly, every time.', scenarios: ['Classify and prioritize incoming tickets', 'Draft accurate first responses for common issues', 'Route complex tickets to the right specialists', 'Send proactive updates to waiting customers', 'Handle multi-channel tickets: email, chat, social'] },
@@ -1161,7 +1161,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Fills the top of the funnel with qualified pipeline — paid, organic, and everything in between.',
     intro: "Leo runs demand generation like a performance marketer with the strategic instincts of a CMO. He manages paid channels, optimizes landing pages, runs experiments, and reports on pipeline sourced and influenced — not just MQLs.",
     agentCount: 88,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Paid search & social (Google, Meta, LinkedIn)', 'Landing page optimization & CRO', 'Marketing attribution & pipeline reporting', 'Lead scoring & funnel analysis', 'Content syndication & sponsorships', 'ABM campaigns & target account lists', 'Webinar & event demand gen', 'Marketing automation & nurture', 'Budget management & CAC optimization'],
     capabilities: [
       { area: 'Paid Media', icon: '💰', blurb: 'Paid campaigns that generate pipeline, not just clicks.', scenarios: ['Launch and manage Google Ads campaigns', 'Run LinkedIn Ads for B2B demand gen', 'Build Meta retargeting campaigns', 'A/B test ad creative and copy', 'Optimize bidding strategy by conversion stage', 'Track CPL, CAC, and pipeline ROI by channel'] },
@@ -1353,7 +1353,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Keeps the business compliant, audit-ready, and protected — without slowing it down.',
     intro: "Clara manages compliance the way a great compliance officer would — proactively. She monitors for gaps, collects evidence continuously, drafts policies, and ensures the business is always audit-ready rather than scrambling when one is announced.",
     agentCount: 176,
-    pricing: { monthly: 299, label: '$299/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['SOC 2 Type I & II', 'ISO 27001', 'GDPR & CCPA data privacy', 'HIPAA (where applicable)', 'Vendor risk management', 'Policy lifecycle management', 'Security questionnaire responses', 'Audit evidence collection', 'Access review & control testing', 'Incident reporting & regulatory notification'],
     capabilities: [
       { area: 'Evidence Collection', icon: '📂', blurb: 'Continuous, automated evidence so audits are never a fire drill.', scenarios: ['Collect SOC 2 evidence continuously from connected systems', 'Document access reviews with timestamps', 'Gather change management records automatically', 'Archive security training completion records', 'Pull infrastructure configuration snapshots for audit'] },
@@ -1545,7 +1545,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Manages vendors, contracts, renewals, and approvals so nothing slips through the cracks.',
     intro: "Owen runs procurement the way a great ops person would — with a clear vendor registry, tight renewal tracking, and an approval workflow that doesn't create bottlenecks. He makes sure you never miss a renewal, never overpay, and always have the right vendor agreements in place.",
     agentCount: 104,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Vendor onboarding & management', 'Contract review & renewal tracking', 'Purchase approval workflows', 'SLA monitoring & vendor performance', 'Spend analysis & optimization', 'RFP & vendor evaluation', 'Software license management', 'Procurement policy compliance', 'Vendor risk assessment'],
     capabilities: [
       { area: 'Vendor Onboarding', icon: '🤝', blurb: 'New vendors set up correctly from day one.', scenarios: ['Collect and verify vendor compliance documents', 'Route new vendor approvals through the right stakeholders', 'Set up payment terms and banking details securely', 'Create vendor record in procurement system', 'Send onboarding confirmation and next steps'] },
@@ -1738,7 +1738,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Handles scheduling, briefings, communications, and coordination so you stay in flow.',
     intro: "Maya is the EA every executive wants and rarely gets. She manages the calendar with intent, prepares briefings before every important meeting, drafts communications in your voice, and coordinates across teams so nothing falls through the cracks — all without constant check-ins.",
     agentCount: 76,
-    pricing: { monthly: 149, label: '$149/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Calendar management & scheduling', 'Meeting preparation & briefings', 'Travel coordination', 'Email drafting & inbox triage', 'Cross-functional coordination', 'Executive communications', 'Document preparation', 'Follow-up tracking', 'Stakeholder management', 'Expense reporting'],
     capabilities: [
       { area: 'Calendar & Scheduling', icon: '📅', blurb: 'A calendar that reflects priorities, not just availability.', scenarios: ['Schedule and manage all executive meetings', 'Prioritize meeting requests by stakeholder importance', 'Block deep work time and protect it', 'Coordinate multi-timezone scheduling for global teams', 'Send meeting prep reminders 24 hours in advance'] },
@@ -1930,7 +1930,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Turns raw data into decisions — dashboards, anomaly alerts, and board-ready reports.',
     intro: "Raj turns messy data into clear decisions. He builds dashboards, spots anomalies before they become crises, runs cohort analyses, and delivers the weekly report that actually changes what leadership does on Monday morning.",
     agentCount: 96,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Business intelligence & dashboards', 'SQL & data querying', 'Cohort analysis & retention modeling', 'Funnel & conversion analysis', 'Anomaly detection', 'A/B test analysis & statistical significance', 'KPI design & tracking', 'Data pipeline monitoring', 'Executive reporting & storytelling', 'Forecasting & trend analysis'],
     capabilities: [
       { area: 'Dashboards & Reporting', icon: '📊', blurb: 'Dashboards leaders actually use to make decisions.', scenarios: ['Build the weekly business performance dashboard', 'Create department-level KPI scorecards', 'Design a board-ready metrics package', 'Build revenue, retention, and growth dashboards', 'Automate daily/weekly report delivery to leadership'] },
@@ -2086,7 +2086,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Runs onboarding, offboarding, compliance, and people ops so your team can focus on work.',
     intro: "Zara runs people operations with the precision of a great HR leader — structured onboarding that gets new hires productive fast, clean offboarding that protects the business, and the compliance documentation that keeps the company on the right side of employment law.",
     agentCount: 88,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Employee onboarding & offboarding', 'HRIS management', 'Benefits administration', 'Compliance documentation', 'Performance review cycles', 'Employee handbook & policy management', 'Recruiting coordination', 'Employment law compliance', 'People analytics & reporting', 'Contractor management'],
     capabilities: [
       { area: 'Onboarding', icon: '🎉', blurb: 'New hires productive from day one.', scenarios: ['Create personalized onboarding plans by role', 'Send pre-hire paperwork and IT access requests', 'Schedule first-week meetings and introductions', 'Track onboarding checklist completion', 'Run 30-60-90 day check-in sequences', 'Collect first-week feedback automatically'] },
@@ -2239,7 +2239,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Keeps systems running, access managed, and incidents resolved before they become outages.',
     intro: "Eli manages IT operations the way a great IT leader would — proactive monitoring, clean access control, fast incident response, and a help desk that actually helps. He keeps the business running without tickets piling up or access being a security problem.",
     agentCount: 112,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['IT help desk & ticket management', 'Access provisioning & deprovisioning', 'Device & endpoint management', 'Network monitoring', 'Incident response', 'Software license management', 'Security patching', 'IT asset tracking', 'Vendor management for IT contracts', 'IT compliance & audit support'],
     capabilities: [
       { area: 'Help Desk & Tickets', icon: '🎫', blurb: 'Fast, accurate resolution of IT issues.', scenarios: ['Triage and route IT support tickets', 'Draft solutions for common IT issues', 'Escalate complex or security-related tickets', 'Track ticket SLA and resolution time', 'Build self-service knowledge base for common issues'] },
@@ -2392,7 +2392,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Manages contracts, NDAs, renewals, and legal intake so legal spends time on what matters.',
     intro: "Iris runs legal operations the way in-house counsel wishes it worked — clean contract intake, tracked renewals, templated NDAs that don't require a lawyer for every signature, and a legal queue that never becomes a bottleneck.",
     agentCount: 122,
-    pricing: { monthly: 299, label: '$299/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Contract lifecycle management', 'NDA & standard agreement processing', 'Legal intake & triage', 'Contract renewal tracking', 'Entity management', 'Outside counsel management', 'Legal spend tracking', 'IP & trademark tracking', 'Regulatory tracking', 'Legal operations metrics'],
     capabilities: [
       { area: 'Contract Management', icon: '📄', blurb: 'Every contract tracked, every renewal flagged.', scenarios: ['Maintain central contract repository with metadata', 'Track all contract expiration and renewal dates', 'Alert on contracts approaching renewal 90/60/30 days out', 'Summarize key terms before renewal negotiations', 'Track contract status from draft to fully executed'] },
@@ -2545,7 +2545,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Runs full-cycle deals — discovery, demos, proposals, and close — with precision.',
     intro: "Knox runs deals the way a great enterprise AE would — thorough discovery, tailored demos, multi-threaded stakeholder management, and negotiations that close at the right price. He keeps the pipeline moving and the forecast honest.",
     agentCount: 86,
-    pricing: { monthly: 249, label: '$249/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Full-cycle sales execution', 'Discovery & needs analysis', 'Demo & presentation preparation', 'Proposal & SOW creation', 'Multi-stakeholder management', 'Negotiation & objection handling', 'Pipeline management & forecasting', 'Contract review & redlining', 'Competitive positioning', 'Sales methodology (MEDDIC, Challenger, SPIN)'],
     capabilities: [
       { area: 'Discovery & Qualification', icon: '🔍', blurb: 'Know exactly what a prospect needs before building a solution.', scenarios: ['Run structured discovery calls with MEDDIC framework', 'Identify economic buyer and decision-making process', 'Map pain, impact, and critical event', 'Research prospect company before every call', 'Score deal quality and flag low-probability opportunities early'] },
@@ -2701,7 +2701,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Keeps launches clean, feedback loops tight, and product metrics visible.',
     intro: "Vera runs product operations the way a great product ops leader would — coordinating launches across teams, synthesizing user feedback into actionable insights, tracking product metrics, and keeping the product development process moving without chaos.",
     agentCount: 94,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Product launch coordination', 'Feature flag & rollout management', 'User feedback synthesis', 'Product analytics & metrics', 'Roadmap communication', 'Beta program management', 'Bug triage & escalation', 'Cross-functional launch coordination', 'Product documentation', 'OKR tracking for product'],
     capabilities: [
       { area: 'Launch Coordination', icon: '🚀', blurb: 'Launches that ship on time with every team aligned.', scenarios: ['Build launch checklist and coordinate all stakeholders', 'Track launch readiness across eng, design, marketing, and CS', 'Manage feature flag rollout and monitoring', 'Send internal launch announcements', 'Coordinate go-to-market with sales and marketing', 'Run post-launch retrospective'] },
@@ -2854,7 +2854,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Monitors threats, manages risk, and keeps the organization secure without slowing it down.',
     intro: "Sage manages security and risk the way a great CISO-lite would — proactively monitoring for threats, managing the vulnerability backlog, running access reviews, and keeping the board informed about risk posture without crying wolf on every low-severity alert.",
     agentCount: 148,
-    pricing: { monthly: 299, label: '$299/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Security monitoring & alerting', 'Vulnerability management', 'Access review & least privilege', 'GRC (governance, risk, compliance)', 'Incident response planning', 'Penetration testing coordination', 'Security awareness training', 'Vendor security assessment', 'SIEM & log analysis', 'Cloud security posture'],
     capabilities: [
       { area: 'Threat Monitoring', icon: '👁️', blurb: 'Eyes on every surface, 24/7.', scenarios: ['Monitor SIEM for security events and alerts', 'Classify alerts by severity and business impact', 'Investigate suspicious activity across systems', 'Correlate events across multiple sources', 'Alert security team on critical events immediately'] },
@@ -3007,7 +3007,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Financial planning, cash flow, scenario modeling, and board reporting for growth-stage companies.',
     intro: "Cole brings CFO-level financial intelligence to companies that don't yet have a full-time CFO. He owns the financial model, tracks cash flow and burn, builds the board deck financials, models growth scenarios, and makes sure leadership always knows the runway and the constraints.",
     agentCount: 164,
-    pricing: { monthly: 349, label: '$349/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Financial modeling & forecasting', 'Cash flow management & runway tracking', 'Board reporting & investor relations', 'Scenario planning', 'Budget vs actuals analysis', 'Fundraising financial preparation', 'Unit economics & SaaS metrics', 'FP&A (financial planning & analysis)', 'Cap table basics & equity management', 'M&A financial diligence support'],
     capabilities: [
       { area: 'Financial Planning', icon: '📐', blurb: 'A financial model that actually reflects how the business works.', scenarios: ['Build a 3-year bottom-up financial model', 'Model multiple growth scenarios (base, bull, bear)', 'Run sensitivity analysis on key assumptions', 'Update the model monthly with actuals', 'Build department-level budget with headcount plan'] },
@@ -3160,7 +3160,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'Runs the operating system of the business — processes, OKRs, and cross-functional coordination.',
     intro: "Luna is the operations backbone of the business. She designs and maintains business processes, tracks OKRs across teams, coordinates cross-functional projects, and makes sure the company runs efficiently as it scales — without creating bureaucracy.",
     agentCount: 116,
-    pricing: { monthly: 199, label: '$199/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Business process design & improvement', 'OKR setting & tracking', 'Cross-functional project coordination', 'Operational metrics & KPIs', 'Vendor & tool stack management', 'Meeting cadence & operating rhythm design', 'Organizational efficiency analysis', 'Change management', 'Documentation & knowledge management', 'Strategic planning support'],
     capabilities: [
       { area: 'Process Design & Improvement', icon: '🔄', blurb: 'Processes that scale, documented and enforced.', scenarios: ['Map and document core business processes', 'Identify bottlenecks and redesign for efficiency', 'Implement process changes with change management', 'Build process playbooks for key operations', 'Track process compliance and identify where it breaks down'] },
@@ -3313,7 +3313,7 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
     tagline: 'The CEO\'s strategic right hand — briefings, decisions, cross-functional intelligence, and strategy.',
     intro: "Atlas is the intelligence layer that makes CEOs and leadership teams more effective. He synthesizes information from across the business, prepares for high-stakes decisions, monitors strategy execution, and surfaces the risks and opportunities that might otherwise go unnoticed until it's too late.",
     agentCount: 240,
-    pricing: { monthly: 349, label: '$349/mo' },
+    pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Strategic planning & execution', 'Board & investor relations', 'Competitive intelligence', 'Cross-functional business synthesis', 'Decision support & scenario analysis', 'Executive communications', 'Organizational health monitoring', 'Crisis management & communication', 'Fundraising & M&A support', 'Leadership alignment & OKR oversight'],
     capabilities: [
       { area: 'Daily & Weekly Briefings', icon: '📋', blurb: 'Start every day knowing what matters.', scenarios: ['Deliver a daily CEO briefing: top priorities, risks, and decisions needed', 'Synthesize revenue, product, and people updates into a weekly executive summary', 'Flag anything that needs the CEO\'s attention today vs. this week', 'Prepare pre-meeting briefings for every important call', 'Deliver a weekly competitive intelligence digest'] },
@@ -3544,3 +3544,4 @@ export function groupByDept(employees: EmployeeProfile[]) {
   }
   return groups
 }
+
