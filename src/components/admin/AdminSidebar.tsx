@@ -32,6 +32,11 @@ const NAV_ITEMS = [
     icon: "🤝",
   },
   {
+    label: "Subscriptions",
+    href: "/admin/subscriptions",
+    icon: "💳",
+  },
+  {
     label: "Agent Catalog",
     href: "/admin/agents",
     icon: "🤖",
