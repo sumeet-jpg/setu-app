@@ -48,10 +48,16 @@ export default function MyEmployeesPage() {
     ev.preventDefault()
     if (!email) return
     setSubmitting(true)
-    // Stub: in prod, email the userId + manage URLs to the given address
-    await new Promise(r => setTimeout(r, 800))
-    setEmailSent(true)
-    setSubmitting(false)
+    try {
+      await fetch('/api/manage/recover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      setEmailSent(true)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const hasEmployees = !loading && subs.length > 0

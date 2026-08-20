@@ -160,9 +160,12 @@ export async function POST(req: NextRequest) {
               `).join('')}
             </div>
 
-            <div style="margin-bottom:24px">
+            <div style="margin-bottom:24px;display:flex;gap:10px;flex-wrap:wrap">
+              <a href="https://setuagents.com/manage/${employee_slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700">
+                Manage ${employee_name} →
+              </a>
               <a href="https://setuagents.com/employees/${employee_slug}/interview" style="display:inline-block;padding:12px 24px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#a1a1aa;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600">
-                Interview ${employee_name} while you wait →
+                Chat while you wait →
               </a>
             </div>
 
