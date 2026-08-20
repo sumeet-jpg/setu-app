@@ -130,9 +130,20 @@ export default function ManageClient({
 
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: '"IBM Plex Sans", system-ui, sans-serif' }}>
+      <style>{`
+        @media (max-width: 600px) {
+          .manage-nav-grid { grid-template-columns: 1fr !important; }
+          .manage-stats-grid { grid-template-columns: 1fr 1fr !important; }
+          .manage-content { padding: 20px 16px !important; }
+          .manage-price-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .manage-header { padding: 0 16px !important; }
+          .manage-banner { padding: 20px 18px !important; }
+          .manage-subscription-row { flex-direction: column !important; align-items: flex-start !important; }
+        }
+      `}</style>
 
       {/* Header */}
-      <div style={{ borderBottom: `1px solid ${C.border}`, background: C.surface, padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
+      <div className="manage-header" style={{ borderBottom: `1px solid ${C.border}`, background: C.surface, padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <Link href="/my-employees" style={{ fontSize: 12, color: C.muted, textDecoration: 'none', padding: '5px 10px', borderRadius: 7, border: `1px solid ${C.border}` }}>
             ← My Employees
@@ -176,7 +187,7 @@ export default function ManageClient({
         )}
       </div>
 
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '36px 24px' }}>
+      <div className="manage-content" style={{ maxWidth: 960, margin: '0 auto', padding: '36px 24px' }}>
 
         {/* Trial progress banner */}
         {!loading && isTrial && (
@@ -258,7 +269,7 @@ export default function ManageClient({
         )}
 
         {/* Quick nav */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
+        <div className="manage-nav-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
           {navLinks.map(link => (
             <Link key={link.href} href={link.href} style={{ textDecoration: 'none' }}>
               <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '20px 22px', cursor: 'pointer', transition: 'border-color 0.2s' }}>
@@ -271,7 +282,7 @@ export default function ManageClient({
         </div>
 
         {/* Stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 32 }}>
+        <div className="manage-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 32 }}>
           {[
             { label: 'Agent fleet', value: agentCount.toLocaleString(), color: employeeColor },
             { label: 'Beliefs learned', value: loading ? '—' : (stats?.total_beliefs ?? 0), color: C.accent },
@@ -337,7 +348,7 @@ export default function ManageClient({
 
         {/* Pricing lock reminder + escalation */}
         {!loading && sub && (
-          <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, padding: 24, display: 'grid', gridTemplateColumns: '1fr auto', gap: 20, alignItems: 'center' }}>
+          <div className="manage-price-grid" style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, padding: 24, display: 'grid', gridTemplateColumns: '1fr auto', gap: 20, alignItems: 'center' }}>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 6 }}>Your price is locked</div>
               <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.65, maxWidth: 440 }}>
@@ -359,7 +370,7 @@ export default function ManageClient({
 
         {/* Cancel / manage subscription */}
         {!loading && !isCancelled && (isTrial || isActive || isPaused) && (
-          <div style={{ marginTop: 12, padding: '20px 24px', background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div className="manage-subscription-row" style={{ marginTop: 12, padding: '20px 24px', background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <div>
               <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 3 }}>Subscription settings</div>
               <div style={{ fontSize: 12, color: C.muted }}>
