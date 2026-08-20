@@ -56,37 +56,37 @@ const Qs = [
 
 type Rec = { slug: string; name: string; title: string; emoji: string; color: string; price: string; match: string[] }
 const RECS: Record<string, Rec> = {
-  whatsapp_budget: { slug: 'whatsapp-lead-qualifier', name: 'Nisha', title: 'WhatsApp Lead Qualifier', emoji: '🎯', color: '#075E54', price: '$199/mo', match: ['Qualifies every WhatsApp lead automatically', 'Replies in < 3 seconds, 24/7', 'Appointment booking built in', 'Frees you from the WhatsApp grind'] },
-  whatsapp_mid: { slug: 'whatsapp-commerce-agent', name: 'Zara', title: 'WhatsApp Commerce Agent', emoji: '💬', color: '#25D366', price: '$299/mo', match: ['Full sales channel on WhatsApp', 'Product catalogue, orders, cart recovery', 'Payment link automation', 'Runs 44 commerce agents'] },
-  marketing_budget: { slug: 'demand-gen-manager', name: 'Your Demand Gen Manager', title: 'Demand Gen Manager', emoji: '🚀', color: '#8B5CF6', price: '$999/mo', match: ['Full-funnel demand generation', 'Ad copy, landing pages, A/B tests', 'Lead scoring and attribution', 'Weekly pipeline reports'] },
-  marketing_high: { slug: 'marketing-manager', name: 'Your Marketing Manager', title: 'Marketing Manager', emoji: '📊', color: '#6366F1', price: '$1,999/mo', match: ['Plans and executes full strategy', 'Manages 208 specialist agents', 'Covers every channel simultaneously', 'Weekly board-ready reports'] },
-  finance_budget: { slug: 'finance-controller', name: 'Your Finance Controller', title: 'Finance Controller', emoji: '💰', color: '#F59E0B', price: '$1,099/mo', match: ['Month-close in 2 days not 2 weeks', 'Cash flow visibility always-on', 'AP/AR automation', 'Board reporting on demand'] },
-  finance_high: { slug: 'cfo-intelligence', name: 'Your AI CFO', title: 'CFO-level Intelligence', emoji: '🏦', color: '#D97706', price: '$1,999/mo', match: ['Board and investor reporting', 'Cash flow and runway forecasting', 'Financial strategy and modeling', 'Fundraising intelligence'] },
-  ops_budget: { slug: 'operations-manager', name: 'Your Operations Manager', title: 'Operations Manager', emoji: '⚙️', color: '#0369A1', price: '$999/mo', match: ['Systematizes chaotic operations', 'Vendor and supply chain management', 'Process documentation', 'OKR tracking'] },
-  ops_high: { slug: 'coo-intelligence', name: 'Your AI COO', title: 'COO-level Intelligence', emoji: '🏢', color: '#0284C7', price: '$2,499/mo', match: ['End-to-end operations oversight', '300+ agents across all functions', 'Cross-team coordination', 'Board-level operational reporting'] },
-  enterprise: { slug: 'cmo-intelligence', name: 'Your AI CMO', title: 'CMO-level Intelligence', emoji: '🎯', color: '#EC4899', price: '$2,999/mo', match: ['Full marketing org in AI form', 'Strategy, brand, campaigns, analytics', 'Board-level reporting', 'Commands 234 specialist agents'] },
+  whatsapp_budget: { slug: 'whatsapp-lead-qualifier', name: 'Nisha', title: 'WhatsApp Lead Qualifier', emoji: '🎯', color: '#075E54', price: '$49/mo', match: ['Qualifies every WhatsApp lead automatically', 'Replies in < 3 seconds, 24/7', 'Appointment booking built in', '14-day free trial — no card needed'] },
+  whatsapp_mid: { slug: 'whatsapp-commerce-agent', name: 'Zara', title: 'WhatsApp Commerce Agent', emoji: '💬', color: '#25D366', price: '$49/mo', match: ['Full sales channel on WhatsApp', 'Product catalogue, orders, cart recovery', 'Payment link automation', 'Runs 44 commerce agents'] },
+  marketing_budget: { slug: 'demand-gen-manager', name: 'Your Demand Gen Manager', title: 'Demand Gen Manager', emoji: '🚀', color: '#8B5CF6', price: '$49/mo', match: ['Full-funnel demand generation', 'Ad copy, landing pages, A/B tests', 'Lead scoring and attribution', 'Weekly pipeline reports'] },
+  marketing_high: { slug: 'marketing-manager', name: 'Your Marketing Manager', title: 'Marketing Manager', emoji: '📊', color: '#6366F1', price: '$49/mo', match: ['Plans and executes full strategy', 'Manages 208 specialist agents', 'Covers every channel simultaneously', 'Weekly board-ready reports'] },
+  finance_budget: { slug: 'finance-controller', name: 'Your Finance Controller', title: 'Finance Controller', emoji: '💰', color: '#F59E0B', price: '$49/mo', match: ['Month-close in 2 days not 2 weeks', 'Cash flow visibility always-on', 'AP/AR automation', 'Board reporting on demand'] },
+  finance_high: { slug: 'cfo-intelligence', name: 'Your AI CFO', title: 'CFO-level Intelligence', emoji: '🏦', color: '#D97706', price: '$49/mo', match: ['Board and investor reporting', 'Cash flow and runway forecasting', 'Financial strategy and modeling', 'Fundraising intelligence'] },
+  ops_budget: { slug: 'operations-manager', name: 'Your Operations Manager', title: 'Operations Manager', emoji: '⚙️', color: '#0369A1', price: '$49/mo', match: ['Systematizes chaotic operations', 'Vendor and supply chain management', 'Process documentation', 'OKR tracking'] },
+  ops_high: { slug: 'coo-intelligence', name: 'Your AI COO', title: 'COO-level Intelligence', emoji: '🏢', color: '#0284C7', price: '$49/mo', match: ['End-to-end operations oversight', '300+ agents across all functions', 'Cross-team coordination', 'Board-level operational reporting'] },
+  enterprise: { slug: 'cmo-intelligence', name: 'Your AI CMO', title: 'CMO-level Intelligence', emoji: '🎯', color: '#EC4899', price: '$49/mo', match: ['Full marketing org in AI form', 'Strategy, brand, campaigns, analytics', 'Board-level reporting', 'Commands 234 specialist agents'] },
 }
 
 const ALSO: Record<string, { slug: string; emoji: string; name: string; price: string; sub: string }[]> = {
   whatsapp: [
-    { slug: 'whatsapp-support-agent', emoji: '🤝', name: 'Aarav', price: '$249/mo', sub: 'WhatsApp Support' },
-    { slug: 'whatsapp-commerce-agent', emoji: '💬', name: 'Zara', price: '$299/mo', sub: 'WhatsApp Commerce' },
-    { slug: 'demand-gen-manager', emoji: '🚀', name: 'Growth Manager', price: '$999/mo', sub: 'Lead gen' },
+    { slug: 'whatsapp-support-agent', emoji: '🤝', name: 'Aarav', price: '$49/mo', sub: 'WhatsApp Support' },
+    { slug: 'whatsapp-commerce-agent', emoji: '💬', name: 'Zara', price: '$49/mo', sub: 'WhatsApp Commerce' },
+    { slug: 'demand-gen-manager', emoji: '🚀', name: 'Growth Manager', price: '$49/mo', sub: 'Lead gen' },
   ],
   marketing: [
-    { slug: 'demand-gen-manager', emoji: '🚀', name: 'Demand Gen', price: '$999/mo', sub: 'Top of funnel' },
-    { slug: 'plg-growth-agent', emoji: '🌱', name: 'PLG Agent', price: '$499/mo', sub: 'Product-led growth' },
-    { slug: 'cmo-intelligence', emoji: '🎯', name: 'AI CMO', price: '$2,999/mo', sub: 'C-Suite marketing' },
+    { slug: 'demand-gen-manager', emoji: '🚀', name: 'Demand Gen', price: '$49/mo', sub: 'Top of funnel' },
+    { slug: 'plg-growth-agent', emoji: '🌱', name: 'PLG Agent', price: '$49/mo', sub: 'Product-led growth' },
+    { slug: 'cmo-intelligence', emoji: '🎯', name: 'AI CMO', price: '$49/mo', sub: 'C-Suite marketing' },
   ],
   finance: [
-    { slug: 'accounts-payable', emoji: '📤', name: 'AP Manager', price: '$499/mo', sub: 'Accounts payable' },
-    { slug: 'financial-planning', emoji: '📈', name: 'FP&A', price: '$1,499/mo', sub: 'Financial planning' },
-    { slug: 'cfo-intelligence', emoji: '🏦', name: 'AI CFO', price: '$1,999/mo', sub: 'CFO intelligence' },
+    { slug: 'accounts-payable', emoji: '📤', name: 'AP Manager', price: '$49/mo', sub: 'Accounts payable' },
+    { slug: 'financial-planning', emoji: '📈', name: 'FP&A', price: '$49/mo', sub: 'Financial planning' },
+    { slug: 'cfo-intelligence', emoji: '🏦', name: 'AI CFO', price: '$49/mo', sub: 'CFO intelligence' },
   ],
   ops: [
-    { slug: 'project-manager-agent', emoji: '📋', name: 'Project Manager', price: '$499/mo', sub: 'Project ops' },
-    { slug: 'vendor-manager', emoji: '🤝', name: 'Vendor Manager', price: '$699/mo', sub: 'Vendor coordination' },
-    { slug: 'coo-intelligence', emoji: '🏢', name: 'AI COO', price: '$2,499/mo', sub: 'C-Suite ops' },
+    { slug: 'project-manager-agent', emoji: '📋', name: 'Project Manager', price: '$49/mo', sub: 'Project ops' },
+    { slug: 'vendor-manager', emoji: '🤝', name: 'Vendor Manager', price: '$49/mo', sub: 'Vendor coordination' },
+    { slug: 'coo-intelligence', emoji: '🏢', name: 'AI COO', price: '$49/mo', sub: 'C-Suite ops' },
   ],
 }
 
