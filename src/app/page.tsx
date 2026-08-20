@@ -274,7 +274,7 @@ export default function HomePage() {
             {[
               { tier: '14-day trial', price: 'Free', desc: 'Start immediately. No credit card. Interview first, hire when ready — all employees included.', accent: GREEN_M },
               { tier: 'Today', price: '$49/month', desc: 'Sign up now and this is your rate forever — any employee, all memory systems, full calibration.', accent: '#1A5C8A' },
-              { tier: 'Next month', price: '$59/month', desc: 'New signups from September pay $10 more. Your early rate stays locked as long as you subscribe.', accent: '#8B5A1A' },
+              { tier: 'October onward', price: '$59/month', desc: 'New signups from October pay $10 more. Sign up before then and your rate is locked forever.', accent: '#8B5A1A' },
               { tier: 'Multiple employees', price: 'Per employee', desc: 'Each employee is a separate subscription. Each locks in the rate at their individual trial start.', accent: MUTED },
             ].map(t => (
               <div key={t.tier} style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 16, padding: '26px 22px', position: 'relative', overflow: 'hidden' }}>
