@@ -30,17 +30,9 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error
 
-    // Return stub if not found (pre-migration or not yet hired)
+    // Not found — user hasn't hired this employee
     if (!data) {
-      return NextResponse.json({
-        user_id: userId,
-        employee_slug: slug,
-        status: 'trial',
-        trial_ends_at: new Date(Date.now() + 14 * 86400000).toISOString(),
-        monthly_price_cents: 4900,
-        billing_months: 0,
-        activated_at: null,
-      })
+      return NextResponse.json({ status: null, _not_hired: true })
     }
 
     return NextResponse.json(data)

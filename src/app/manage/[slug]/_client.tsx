@@ -107,6 +107,7 @@ export default function ManageClient({
     }
   }
 
+  const notHired = !loading && (!sub || sub._not_hired === true || sub.status === null)
   const trialDays = sub?.trial_ends_at ? daysRemaining(sub.trial_ends_at) : null
   const isTrial = sub?.status === 'trial'
   const isActive = sub?.status === 'active'
@@ -187,7 +188,39 @@ export default function ManageClient({
         )}
       </div>
 
-      <div className="manage-content" style={{ maxWidth: 960, margin: '0 auto', padding: '36px 24px' }}>
+      {/* Not-hired state */}
+      {notHired && (
+        <div style={{ maxWidth: 560, margin: '80px auto', padding: '0 24px', textAlign: 'center' }}>
+          <div style={{
+            background: C.surface, border: `1px solid ${C.border}`,
+            borderRadius: 20, padding: '48px 40px',
+          }}>
+            <div style={{ fontSize: 48, marginBottom: 20 }}>{employeeEmoji}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 10 }}>
+              You haven't hired {employeeName} yet
+            </div>
+            <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.7, marginBottom: 32 }}>
+              Start a 14-day free trial. No payment needed upfront — activate before it ends to lock in your rate.
+            </div>
+            <Link
+              href={`/employees/${slug}/hire`}
+              style={{
+                display: 'inline-block', padding: '13px 28px',
+                background: C.accent, color: '#fff',
+                borderRadius: 11, textDecoration: 'none',
+                fontSize: 15, fontWeight: 800, letterSpacing: '-0.01em',
+              }}
+            >
+              Hire {employeeName} — free 14-day trial →
+            </Link>
+            <div style={{ marginTop: 16, fontSize: 12, color: C.muted }}>
+              $49/month after trial · locked forever · cancel anytime
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="manage-content" style={{ maxWidth: 960, margin: '0 auto', padding: '36px 24px', display: notHired ? 'none' : undefined }}>
 
         {/* Trial progress banner */}
         {!loading && isTrial && (
