@@ -130,51 +130,65 @@ export async function POST(req: NextRequest) {
     }).catch(err => console.error('[Setu hire admin email]', err))
 
     // Prospect confirmation
+    const trialEndDate = new Date(Date.now() + 14 * 86400000).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
     await resend.emails.send({
       from: fromEmail,
       to: email,
-      subject: `${employee_name} is ready to get to work — Setu`,
+      subject: `${employee_name} is live — your 14-day trial starts now`,
       html: `
-        <div style="font-family:Inter,sans-serif;max-width:580px;margin:0 auto;background:#09090b;color:#fafafa;border-radius:16px;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:32px 32px 24px">
-            <div style="font-size:28px;font-weight:900;letter-spacing:-0.03em">Setu</div>
-            <div style="font-size:13px;opacity:0.7;margin-top:4px">AI Employees Platform</div>
+        <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:0">
+          <div style="background:#0B0D14;border-radius:16px 16px 0 0;padding:32px 32px 24px">
+            <div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.04em">SETU</div>
           </div>
-          <div style="padding:32px">
-            <div style="font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px">Hi ${name} 👋</div>
-            <div style="font-size:15px;color:#a1a1aa;margin-bottom:24px;line-height:1.65">
-              Your request to hire <strong style="color:#a78bfa">${employee_name}</strong> as your ${employee_title} has been received. Sumeet will reach out within <strong style="color:#fff">24 hours</strong> to kick off onboarding.
+          <div style="background:#141620;padding:32px;border-left:1px solid rgba(99,102,241,0.2);border-right:1px solid rgba(99,102,241,0.2)">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.03em;margin-bottom:6px">
+              ${name.split(' ')[0]}, ${employee_name} is live right now.
+            </div>
+            <p style="font-size:14px;color:#94a3b8;line-height:1.7;margin:0 0 24px">
+              Your 14-day free trial started the moment you hit submit. No waiting — open the management hub and start chatting.
+            </p>
+
+            <a href="https://setuagents.com/manage/${employee_slug}" style="display:block;text-align:center;padding:14px 24px;background:#6366f1;color:#fff;border-radius:12px;text-decoration:none;font-size:15px;font-weight:800;letter-spacing:-0.01em;margin-bottom:20px">
+              Open ${employee_name}'s management hub →
+            </a>
+
+            <div style="background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:12px;padding:20px;margin-bottom:24px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06)">
+                <span style="color:#64748b">Your locked rate</span>
+                <strong style="color:#fff">$49/month</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06)">
+                <span style="color:#64748b">Trial ends</span>
+                <strong style="color:#fff">${trialEndDate}</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:#64748b">Cancel anytime</span>
+                <strong style="color:#22c55e">Yes</strong>
+              </div>
             </div>
 
-            <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:24px;margin-bottom:24px">
-              <div style="font-size:12px;font-weight:700;color:#818cf8;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px">What happens next</div>
-              ${[
-                ['Within 24 hours', 'Sumeet reaches out to confirm your requirements and schedule onboarding'],
-                ['Day 2–3', `${employee_name}'s agent fleet is configured for your specific tech stack and workflows`],
-                ['Day 4–5', 'Onboarding call — first agents go live, first results delivered'],
-              ].map(([label, detail]) => `
-                <div style="display:flex;gap:14px;margin-bottom:14px">
-                  <div style="font-size:11px;font-weight:700;color:#6366f1;min-width:80px;padding-top:2px">${label}</div>
-                  <div style="font-size:13px;color:#a1a1aa;line-height:1.55">${detail}</div>
+            <div style="font-size:12px;font-weight:700;color:#6366f1;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px">Get started in 3 steps</div>
+            ${[
+              ['Chat first', `Ask ${employee_name} something real — a strategy question, a task, a review. See how they think.`],
+              ['Upload context', 'Add your SOPs, product docs, or brand voice to the Vault so they have real context.'],
+              ['Activate before trial ends', `Your $49/month rate is locked in forever if you activate by ${trialEndDate}.`],
+            ].map(([step, detail], i) => `
+              <div style="display:flex;gap:14px;margin-bottom:14px;align-items:flex-start">
+                <div style="width:24px;height:24px;border-radius:7px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#818cf8;flex-shrink:0">${i + 1}</div>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:#e2e8f0;margin-bottom:3px">${step}</div>
+                  <div style="font-size:12px;color:#64748b;line-height:1.6">${detail}</div>
                 </div>
-              `).join('')}
-            </div>
+              </div>
+            `).join('')}
 
-            <div style="margin-bottom:24px;display:flex;gap:10px;flex-wrap:wrap">
-              <a href="https://setuagents.com/manage/${employee_slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700">
-                Manage ${employee_name} →
-              </a>
-              <a href="https://setuagents.com/employees/${employee_slug}/interview" style="display:inline-block;padding:12px 24px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#a1a1aa;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600">
-                Chat while you wait →
-              </a>
-            </div>
-
-            <div style="font-size:13px;color:#52525b;line-height:1.65">
-              Questions? Reply to this email or reach Sumeet directly at <a href="mailto:sumeet@setuagents.com" style="color:#818cf8">sumeet@setuagents.com</a>
-            </div>
+            <p style="font-size:12px;color:#475569;margin:20px 0 0;line-height:1.6">
+              Questions? Reply to this email. Sumeet reads every one.<br>
+              Setu · setuagents.com
+            </p>
           </div>
-          <div style="padding:20px 32px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:#3f3f46">
-            Setu · SignalPulse Technologies LLC · Wyoming, USA · <a href="https://setuagents.com" style="color:#3f3f46">setuagents.com</a>
+          <div style="background:#0B0D14;border-radius:0 0 16px 16px;padding:14px 32px">
+            <p style="font-size:11px;color:#334155;margin:0">Setu · SignalPulse Technologies LLC · Wyoming, USA</p>
           </div>
         </div>
       `,

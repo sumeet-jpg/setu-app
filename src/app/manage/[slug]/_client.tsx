@@ -113,9 +113,14 @@ export default function ManageClient({
   const isPaused = sub?.status === 'paused'
   const isCancelled = cancelled || sub?.status === 'cancelled'
   const monthlyPrice = sub?.monthly_price_cents ? (sub.monthly_price_cents / 100).toFixed(0) : '49'
-
-  // Urgency: next month's price
   const nextMonthPrice = parseInt(monthlyPrice) + 10
+
+  // Trial day calculation
+  const trialDayNumber = sub?.trial_started_at
+    ? Math.min(14, Math.max(1, Math.round((Date.now() - new Date(sub.trial_started_at).getTime()) / 86400000) + 1))
+    : null
+  const trialPct = trialDayNumber ? Math.min(100, (trialDayNumber / 14) * 100) : 0
+  const trialUrgent = trialDays !== null && trialDays <= 4
 
   const navLinks = [
     { href: `/employees/${slug}/interview`, label: 'Chat', icon: '💬', desc: 'Start a session' },
@@ -173,32 +178,82 @@ export default function ManageClient({
 
       <div style={{ maxWidth: 960, margin: '0 auto', padding: '36px 24px' }}>
 
-        {/* Welcome banner — first visit */}
+        {/* Trial progress banner */}
         {!loading && isTrial && (
           <div style={{
-            background: `linear-gradient(135deg, ${employeeColor}18, ${C.accent}12)`,
-            border: `1px solid ${employeeColor}30`,
-            borderRadius: 16, padding: '28px 32px', marginBottom: 32,
-            display: 'grid', gridTemplateColumns: '1fr auto', gap: 24, alignItems: 'center',
+            background: trialUrgent
+              ? `linear-gradient(135deg, rgba(245,158,11,0.10), rgba(239,68,68,0.06))`
+              : `linear-gradient(135deg, ${employeeColor}14, ${C.accent}08)`,
+            border: `1px solid ${trialUrgent ? 'rgba(245,158,11,0.30)' : employeeColor + '28'}`,
+            borderRadius: 18, padding: '26px 28px', marginBottom: 28,
           }}>
-            <div>
-              <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 8 }}>
-                {employeeEmoji} {employeeName} is ready — 14 days free
+            {/* Top row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 5 }}>
+                  {employeeEmoji} {employeeName} · 14-day free trial
+                </div>
+                <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.65, maxWidth: 480 }}>
+                  {trialUrgent
+                    ? `Your trial ends in ${trialDays} day${trialDays !== 1 ? 's' : ''}. Activate now to keep your $${monthlyPrice}/mo rate locked forever.`
+                    : `Every session teaches ${employeeName} your preferences and builds memory. By day 10, the difference from day 1 is clear.`
+                  }
+                </div>
               </div>
-              <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.7, maxWidth: 520 }}>
-                Your employee is live. Start by chatting — every session teaches {employeeName} your preferences and builds the memory that makes them more useful over time.
-                {trialDays !== null && trialDays <= 7 && (
-                  <span style={{ color: C.amber, marginLeft: 6, fontWeight: 600 }}>
-                    {trialDays} days left in your trial.
-                  </span>
-                )}
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <div style={{ fontSize: 10, color: C.muted, marginBottom: 4, fontFamily: 'monospace', letterSpacing: '0.08em' }}>LOCKED RATE</div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: C.text, letterSpacing: '-0.04em', lineHeight: 1 }}>
+                  ${monthlyPrice}<span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>/mo</span>
+                </div>
+                <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>New signups after Oct: ${nextMonthPrice}/mo</div>
               </div>
             </div>
-            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 6, fontFamily: 'monospace' }}>YOUR LOCKED PRICE</div>
-              <div style={{ fontSize: 32, fontWeight: 800, color: C.text, letterSpacing: '-0.04em' }}>${monthlyPrice}<span style={{ fontSize: 14, fontWeight: 400, color: C.muted }}>/mo</span></div>
-              <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Next month: ${nextMonthPrice}/mo for new signups</div>
+
+            {/* Progress bar */}
+            <div style={{ marginBottom: trialUrgent ? 16 : 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span style={{ fontSize: 11, color: C.muted, fontFamily: 'monospace' }}>
+                  DAY {trialDayNumber} OF 14
+                </span>
+                <span style={{
+                  fontSize: 11, fontWeight: 700,
+                  color: trialUrgent ? C.amber : C.muted,
+                  fontFamily: 'monospace',
+                }}>
+                  {trialDays} DAYS LEFT
+                </span>
+              </div>
+              <div style={{ height: 6, background: 'rgba(148,163,184,0.12)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{
+                  height: '100%',
+                  width: `${trialPct}%`,
+                  borderRadius: 3,
+                  background: trialUrgent
+                    ? `linear-gradient(90deg, ${C.amber}, ${C.red})`
+                    : `linear-gradient(90deg, ${employeeColor}, ${C.accent})`,
+                  transition: 'width 0.6s ease',
+                }} />
+              </div>
             </div>
+
+            {/* Urgent CTA row */}
+            {trialUrgent && (
+              <div style={{ display: 'flex', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => setShowActivate(true)}
+                  style={{ padding: '9px 20px', borderRadius: 9, background: C.amber, color: '#fff', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', letterSpacing: '-0.01em' }}
+                >
+                  Activate now — ${monthlyPrice}/mo locked →
+                </button>
+                <a
+                  href={`https://wa.me/918951066630?text=${encodeURIComponent(`Hi, I want to activate ${employeeName} before my trial ends. Slug: ${slug}`)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  style={{ padding: '9px 18px', borderRadius: 9, background: 'rgba(37,211,102,0.12)', border: '1px solid rgba(37,211,102,0.30)', color: '#22c55e', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}
+                >
+                  WhatsApp to activate →
+                </a>
+              </div>
+            )}
           </div>
         )}
 
