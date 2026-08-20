@@ -606,11 +606,14 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: e.color }} />
             <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, letterSpacing: '0.08em',
               textTransform: 'uppercase', marginBottom: 6 }}>Pricing</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: INK, letterSpacing: '-0.05em', marginBottom: 4 }}>
-              {e.pricing.label}
+            <div style={{ fontSize: 32, fontWeight: 800, color: INK, letterSpacing: '-0.05em', marginBottom: 2 }}>
+              $49<span style={{ fontSize: 16, fontWeight: 400, color: MUTED }}>/month</span>
             </div>
-            <div style={{ fontSize: 13, color: MUTED, marginBottom: 24, lineHeight: 1.6 }}>
-              BYOK — use your own API keys. Setu charges for orchestration only.
+            <div style={{ fontSize: 12, color: '#0E5C34', fontWeight: 700, marginBottom: 4 }}>
+              Price locked at hire — rises $10/month for new signups
+            </div>
+            <div style={{ fontSize: 13, color: MUTED, marginBottom: 20, lineHeight: 1.6 }}>
+              14-day free trial · No credit card needed
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <button onClick={scrollToInterview}
@@ -623,11 +626,11 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
                 style={{ display: 'block', textAlign: 'center', background: e.color + '10',
                   color: e.color, border: `1.5px solid ${e.color}30`, borderRadius: 10,
                   padding: '12px 0', fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-                Hire {e.name}
+                Start free trial →
               </Link>
             </div>
             <div style={{ fontSize: 11, color: DIM, marginTop: 14, textAlign: 'center' }}>
-              Interview is free · No account needed · Cancel anytime
+              Interview is free · No card needed · Cancel anytime
             </div>
           </div>
         </div>

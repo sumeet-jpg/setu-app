@@ -55,6 +55,7 @@ export default function EmployeesClient() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Link href="/quiz" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Find my role</Link>
           <Link href="/pricing" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Pricing</Link>
+          <Link href="/my-employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>My Team</Link>
           <Link href="/signin" style={{ fontSize: 13, color: WHITE, textDecoration: 'none', padding: '8px 18px', borderRadius: 8, letterSpacing: '-0.01em', background: INK, fontWeight: 700 }}>Sign in</Link>
         </div>
       </nav>

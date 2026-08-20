@@ -102,6 +102,7 @@ export default function PricingPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8 }}>Employees</Link>
           <Link href="/quiz" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8 }}>Which role?</Link>
+          <Link href="/my-employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8 }}>My Team</Link>
           <Link href="/signin" style={{ fontSize: 13, color: WHITE, textDecoration: 'none', padding: '8px 18px', borderRadius: 8, background: INK, fontWeight: 700 }}>Sign in</Link>
         </div>
       </nav>
