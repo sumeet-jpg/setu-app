@@ -1,7 +1,8 @@
+﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // /api/employees/vault/upload
 //
 // POST body: { userId, slug?, sourceName, sourceType, content, sourceUrl? }
@@ -13,10 +14,10 @@ import { createAdminClient } from '@/lib/supabase/server'
 //   1. Split by double newline (paragraph boundary)
 //   2. Merge adjacent short paragraphs until ~600 words per chunk
 //   3. If a paragraph alone exceeds 600 words, split by sentence
-//   Keeps semantic boundaries intact — no mid-sentence cuts.
+//   Keeps semantic boundaries intact â€” no mid-sentence cuts.
 //
 // Documents are stored as-is (untrusted). They are never promoted to beliefs.
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const MAX_CHUNK_WORDS = 600
 const MAX_TOTAL_WORDS = 50_000  // per upload

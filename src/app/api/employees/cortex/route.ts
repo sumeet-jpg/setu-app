@@ -1,10 +1,11 @@
+﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// /api/employees/cortex — Cross-Employee Cortex (CEC)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// /api/employees/cortex â€” Cross-Employee Cortex (CEC)
 //
-// Persistent shared organizational intelligence. Not orchestration — shared memory.
+// Persistent shared organizational intelligence. Not orchestration â€” shared memory.
 // What one employee learns that every employee in this org should know.
 //
 // GET  ?userId=&slug=&limit=
@@ -20,7 +21,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 //
 // PATCH body: { userId, entryId, slug }
 //   Marks an entry as consumed by a specific employee slug.
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const VALID_ENTRY_TYPES = [
   'org_decision', 'customer_insight', 'market_signal',

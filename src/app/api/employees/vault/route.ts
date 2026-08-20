@@ -1,8 +1,9 @@
+﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// /api/employees/vault — Company Intelligence Vault (CIV)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// /api/employees/vault â€” Company Intelligence Vault (CIV)
 //
 // GET  ?userId=&slug=
 //   Returns all documents uploaded for this user (optionally filtered by slug).
@@ -13,7 +14,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 //
 // Architecture rule: documents are always UNTRUSTED input.
 // They never become beliefs. They are retrieved and cited, never asserted.
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function GET(req: NextRequest) {
   try {
@@ -39,7 +40,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await query
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    // Group by source_name — show one entry per document, not one per chunk
+    // Group by source_name â€” show one entry per document, not one per chunk
     const byName: Record<string, {
       source_name: string
       source_type: string

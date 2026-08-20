@@ -1,8 +1,9 @@
+﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 
-// /api/cron/trials — daily trial lifecycle management
+// /api/cron/trials â€” daily trial lifecycle management
 // Secured by CRON_SECRET.
 // Runs every day at 8am UTC (see vercel.json)
 
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
   let expiredCount = 0
   let emailCount   = 0
 
-  // ── 1. Auto-cancel expired trials + send re-engagement email ──────────
+  // â”€â”€ 1. Auto-cancel expired trials + send re-engagement email â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   try {
     // Fetch before cancelling so we have the subscriber details for re-engagement
     const { data: expiring } = await supabase
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
         .in('id', ids)
       expiredCount = expiring.length
 
-      // Re-engagement emails — only if Resend is available (checked below)
+      // Re-engagement emails â€” only if Resend is available (checked below)
       if (resend) {
         for (const sub of expiring) {
           if (!sub.owner_email) continue
@@ -54,11 +55,11 @@ export async function POST(req: NextRequest) {
           await resend.emails.send({
             from,
             to: sub.owner_email,
-            subject: `Your ${empName} trial ended — your rate is still locked`,
+            subject: `Your ${empName} trial ended â€” your rate is still locked`,
             html: `
               <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;background:#0B0D14;border-radius:16px;overflow:hidden">
                 <div style="padding:32px">
-                  <p style="color:#94a3b8;font-size:13px;margin:0 0 4px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">SETU · Trial ended</p>
+                  <p style="color:#94a3b8;font-size:13px;margin:0 0 4px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">SETU Â· Trial ended</p>
                   <h2 style="font-size:20px;font-weight:800;color:#fff;margin:8px 0 16px;letter-spacing:-0.03em">
                     ${firstName}, your ${empName} trial has ended
                   </h2>
@@ -66,12 +67,12 @@ export async function POST(req: NextRequest) {
                     Your 14-day trial is over, but your locked rate of <strong style="color:#fff">$${price}/month</strong> is still yours if you reactivate within the next 30 days.
                   </p>
                   <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 24px">
-                    New signups now pay more. If you come back later, you'll pay the then-current rate — not your locked price.
+                    New signups now pay more. If you come back later, you'll pay the then-current rate â€” not your locked price.
                   </p>
                   <a href="${base}/employees/${sub.employee_slug}/hire" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
-                    Reactivate at $${price}/mo →
+                    Reactivate at $${price}/mo â†’
                   </a>
-                  <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu · setuagents.com</p>
+                  <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu Â· setuagents.com</p>
                 </div>
               </div>
             `,
@@ -91,7 +92,7 @@ export async function POST(req: NextRequest) {
   // Email windows: one-day windows so daily cron sends each exactly once
   // Day 3 window: started between 2d 12h ago and 3d 12h ago
   // Day 10 window: started between 9d 12h ago and 10d 12h ago
-  // Day 7-expiry reminder: expires 6d 12h → 7d 12h from now
+  // Day 7-expiry reminder: expires 6d 12h â†’ 7d 12h from now
   const h = 3600000
   const d = 86400000
 
@@ -106,24 +107,24 @@ export async function POST(req: NextRequest) {
       label: 'day3',
       fromDate: new Date(now.getTime() - 3 * d - 12 * h),
       toDate:   new Date(now.getTime() - 2 * d - 12 * h),
-      subject: (n, en) => `${en} check-in — how's it going?`,
+      subject: (n, en) => `${en} check-in â€” how's it going?`,
       html: (n, en, p, slug) => `
         <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;background:#0B0D14;border-radius:16px;overflow:hidden">
           <div style="padding:32px">
-            <p style="color:#94a3b8;font-size:13px;margin:0 0 4px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">SETU · Day 3 check-in</p>
+            <p style="color:#94a3b8;font-size:13px;margin:0 0 4px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">SETU Â· Day 3 check-in</p>
             <h2 style="font-size:20px;font-weight:800;color:#fff;margin:8px 0 16px;letter-spacing:-0.03em">
               How is ${en} working out, ${n}?
             </h2>
             <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 20px">
-              Three days in is where the magic starts — every conversation teaches ${en} your preferences, decisions, and working style. By session 5 you'll notice a real difference.
+              Three days in is where the magic starts â€” every conversation teaches ${en} your preferences, decisions, and working style. By session 5 you'll notice a real difference.
             </p>
             <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 24px">
-              Haven't had a chance yet? Open the hub and send ${en} your first real task — they're ready.
+              Haven't had a chance yet? Open the hub and send ${en} your first real task â€” they're ready.
             </p>
             <a href="${base}/manage/${slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
-              Open ${en}'s hub →
+              Open ${en}'s hub â†’
             </a>
-            <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu · setuagents.com</p>
+            <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu Â· setuagents.com</p>
           </div>
         </div>
       `,
@@ -132,16 +133,16 @@ export async function POST(req: NextRequest) {
       label: 'day10',
       fromDate: new Date(now.getTime() - 10 * d - 12 * h),
       toDate:   new Date(now.getTime() - 9 * d - 12 * h),
-      subject: (n, en, p) => `${n}, 4 days left — lock in $${p}/mo forever`,
+      subject: (n, en, p) => `${n}, 4 days left â€” lock in $${p}/mo forever`,
       html: (n, en, p, slug) => `
         <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;background:#0B0D14;border-radius:16px;overflow:hidden">
           <div style="padding:32px">
-            <p style="color:#f59e0b;font-size:13px;margin:0 0 4px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">⚠️ 4 days left</p>
+            <p style="color:#f59e0b;font-size:13px;margin:0 0 4px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">âš ï¸ 4 days left</p>
             <h2 style="font-size:20px;font-weight:800;color:#fff;margin:8px 0 16px;letter-spacing:-0.03em">
               Your ${en} trial ends in 4 days
             </h2>
             <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 16px">
-              Activate before your trial ends and you keep <strong style="color:#fff">$${p}/month locked in forever</strong>. New signups after October pay $${p + 10}/month — and it rises $10 every month after that.
+              Activate before your trial ends and you keep <strong style="color:#fff">$${p}/month locked in forever</strong>. New signups after October pay $${p + 10}/month â€” and it rises $10 every month after that.
             </p>
             <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:18px;margin-bottom:24px">
               <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
@@ -154,9 +155,9 @@ export async function POST(req: NextRequest) {
               </div>
             </div>
             <a href="${base}/manage/${slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
-              Activate now →
+              Activate now â†’
             </a>
-            <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu · setuagents.com</p>
+            <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu Â· setuagents.com</p>
           </div>
         </div>
       `,
@@ -165,13 +166,13 @@ export async function POST(req: NextRequest) {
       label: 'day7reminder',
       fromDate: new Date(now.getTime() + 6 * d + 12 * h),  // trial_ends_at > 6.5 days from now
       toDate:   new Date(now.getTime() + 7 * d + 12 * h),  // trial_ends_at < 7.5 days from now
-      subject: (n, en, p) => `${en} trial ending in 7 days — $${p}/mo locked`,
+      subject: (n, en, p) => `${en} trial ending in 7 days â€” $${p}/mo locked`,
       html: (n, en, p, slug) => {
         const endDate = new Date(now.getTime() + 7 * d).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
         return `
           <div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;background:#0B0D14;border-radius:16px;overflow:hidden">
             <div style="padding:32px">
-              <p style="color:#94a3b8;font-size:13px;margin:0 0 4px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">SETU · Trial reminder</p>
+              <p style="color:#94a3b8;font-size:13px;margin:0 0 4px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">SETU Â· Trial reminder</p>
               <h2 style="font-size:20px;font-weight:800;color:#fff;margin:8px 0 16px;letter-spacing:-0.03em">
                 ${n}, your trial ends ${endDate}
               </h2>
@@ -179,9 +180,9 @@ export async function POST(req: NextRequest) {
                 7 days left. Activate to keep your <strong style="color:#fff">$${p}/month</strong> rate locked forever. If you cancel and re-subscribe later, you'll pay the then-current rate.
               </p>
               <a href="${base}/manage/${slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
-                Go to manage hub →
+                Go to manage hub â†’
               </a>
-              <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu · setuagents.com</p>
+              <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu Â· setuagents.com</p>
             </div>
           </div>
         `

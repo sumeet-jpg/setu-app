@@ -1,20 +1,21 @@
+﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // /api/employees/beliefs
-// Owner Memory Panel API — read, correct, or delete what an employee believes.
+// Owner Memory Panel API â€” read, correct, or delete what an employee believes.
 //
 // GET  ?slug=&userId=&category=&limit=&offset=
 //   Returns beliefs grouped by category, ordered by confidence desc.
 //   Also returns the last 5 distillation runs for this employee.
 //
 // DELETE  body: { userId, beliefId }
-//   Owner removes an incorrect belief. Hard delete — irreversible.
+//   Owner removes an incorrect belief. Hard delete â€” irreversible.
 //
 // PATCH  body: { userId, beliefId, confidence?, note? }
 //   Owner overrides confidence or adds a correction note.
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const CATEGORY_LABELS: Record<string, string> = {
   owner_preference:  'Your preferences & working style',

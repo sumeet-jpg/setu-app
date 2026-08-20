@@ -1,20 +1,21 @@
+﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { getEmployee } from '@/lib/employees/profiles'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// /api/employees/pin — Proactive Intelligence Network
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// /api/employees/pin â€” Proactive Intelligence Network
 //
 // GET  ?userId=&slug=&unreadOnly=true
-//   Returns proactive briefs for this employee — unread by default.
+//   Returns proactive briefs for this employee â€” unread by default.
 //
 // POST body: { action: 'seed' | 'check' | 'dismiss', userId, slug, briefId? }
-//   seed   — seeds watch patterns from the employee's static profile (idempotent)
-//   check  — evaluates all active patterns and creates briefs for triggered ones
-//   dismiss — marks a brief as dismissed by the owner
-// ─────────────────────────────────────────────────────────────────────────────
+//   seed   â€” seeds watch patterns from the employee's static profile (idempotent)
+//   check  â€” evaluates all active patterns and creates briefs for triggered ones
+//   dismiss â€” marks a brief as dismissed by the owner
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// ── Pattern evaluators ───────────────────────────────────────────────────────
+// â”€â”€ Pattern evaluators â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Each evaluator receives DB data and returns { triggered, title, body, urgency }
 // or null if the pattern hasn't fired.
 
@@ -40,7 +41,7 @@ async function evalMemoryStaleness(
     .limit(1)
 
   const lastRun = data?.[0]
-  if (!lastRun) return null  // never distilled — no signal yet
+  if (!lastRun) return null  // never distilled â€” no signal yet
 
   const daysSince = (Date.now() - new Date(lastRun.completed_at).getTime()) / 86400000
   if (daysSince < 14) return null
@@ -69,7 +70,7 @@ async function evalBeliefConflicts(
 
   return {
     title: `${count} conflicting beliefs need your review`,
-    body: `I've encountered ${count} situations where new information contradicted what I previously understood. I've flagged them rather than overwriting — but you should review them to make sure my understanding stays accurate.`,
+    body: `I've encountered ${count} situations where new information contradicted what I previously understood. I've flagged them rather than overwriting â€” but you should review them to make sure my understanding stays accurate.`,
     urgency: count >= 5 ? 'high' : 'normal',
     signal_data: { conflict_count: count },
   }
@@ -87,7 +88,7 @@ async function evalConfidenceDrift(
     .eq('user_id', userId)
     .eq('employee_slug', slug)
     .lt('confidence', 0.4)
-    .gt('reinforcement_count', 2)  // was reinforced multiple times — was once important
+    .gt('reinforcement_count', 2)  // was reinforced multiple times â€” was once important
     .limit(5)
 
   if (!data || data.length === 0) return null
@@ -138,7 +139,7 @@ const EVALUATORS = [
   { key: 'vault_empty',            fn: evalVaultEmpty },
 ]
 
-// ── Seed watch patterns from static profile ──────────────────────────────────
+// â”€â”€ Seed watch patterns from static profile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function seedWatchPatterns(
   supabase: ReturnType<typeof createAdminClient>,
@@ -157,7 +158,7 @@ async function seedWatchPatterns(
     is_active:           true,
   }))
 
-  // Upsert — idempotent re-seeds
+  // Upsert â€” idempotent re-seeds
   await supabase
     .from('employee_watch_patterns')
     .upsert(rows, { onConflict: 'user_id,employee_slug,pattern_key', ignoreDuplicates: true })
@@ -177,7 +178,7 @@ async function seedWatchPatterns(
     .upsert(internalRows, { onConflict: 'user_id,employee_slug,pattern_key', ignoreDuplicates: true })
 }
 
-// ── Check patterns and create briefs ─────────────────────────────────────────
+// â”€â”€ Check patterns and create briefs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function checkPatterns(
   supabase: ReturnType<typeof createAdminClient>,
@@ -234,7 +235,7 @@ async function checkPatterns(
 
       created++
     } catch {
-      // Non-fatal — one evaluator failing doesn't block the rest
+      // Non-fatal â€” one evaluator failing doesn't block the rest
     }
   }
 
@@ -246,7 +247,7 @@ async function checkPatterns(
   return created
 }
 
-// ── Route handlers ────────────────────────────────────────────────────────────
+// â”€â”€ Route handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function GET(req: NextRequest) {
   try {

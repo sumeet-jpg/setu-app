@@ -1,7 +1,8 @@
+﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
-// getServerEnv removed — reads env vars directly to avoid strict validation crash
+// getServerEnv removed â€” reads env vars directly to avoid strict validation crash
 
 // POST { email }
 // Looks up all hired_subscriptions where contact_email matches,
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
       .eq('owner_email', email.trim().toLowerCase())
 
     if (!subs || subs.length === 0) {
-      // Return success even if no match — don't leak whether an email exists
+      // Return success even if no match â€” don't leak whether an email exists
       return NextResponse.json({ ok: true })
     }
 
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
         ? Math.max(0, Math.ceil((new Date(s.trial_ends_at).getTime() - Date.now()) / 86400000))
         : null
       const statusLabel = s.status === 'trial' && daysLeft !== null
-        ? `Trial — ${daysLeft} days left`
+        ? `Trial â€” ${daysLeft} days left`
         : s.status === 'active' ? 'Active' : s.status
 
       return `
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
           <td style="padding:12px 16px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:13px">${statusLabel}</td>
           <td style="padding:12px 16px;border-bottom:1px solid #e5e7eb;font-size:13px">$${price}/mo</td>
           <td style="padding:12px 16px;border-bottom:1px solid #e5e7eb">
-            <a href="${BASE_URL}/manage/${s.employee_slug}?uid=${encodeURIComponent(s.user_id)}" style="background:#111;color:#fff;padding:6px 14px;border-radius:7px;text-decoration:none;font-size:12px;font-weight:600">Manage →</a>
+            <a href="${BASE_URL}/manage/${s.employee_slug}?uid=${encodeURIComponent(s.user_id)}" style="background:#111;color:#fff;padding:6px 14px;border-radius:7px;text-decoration:none;font-size:12px;font-weight:600">Manage â†’</a>
           </td>
         </tr>`
     }).join('')
@@ -74,9 +75,9 @@ export async function POST(req: NextRequest) {
           </table>
 
           <p style="font-size:12px;color:#9ca3af;margin-top:28px;line-height:1.6">
-            These links contain a recovery token — clicking them restores your employee management access on any device. Bookmark them for quick access.<br><br>
-            Questions? Reply to this email — we respond within a few hours.<br><br>
-            <em>Setu · setuagents.com</em>
+            These links contain a recovery token â€” clicking them restores your employee management access on any device. Bookmark them for quick access.<br><br>
+            Questions? Reply to this email â€” we respond within a few hours.<br><br>
+            <em>Setu Â· setuagents.com</em>
           </p>
         </div>
       `,

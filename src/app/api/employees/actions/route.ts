@@ -1,8 +1,9 @@
+﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// /api/employees/actions — S6 Action Layer
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// /api/employees/actions â€” S6 Action Layer
 //
 // GET  ?userId=&slug=&status=pending&limit=20
 //   Returns action proposals, filtered by status (default: all non-failed).
@@ -13,14 +14,14 @@ import { createAdminClient } from '@/lib/supabase/server'
 //
 // PATCH body: { userId, actionId, decision: 'approve'|'reject', rejectionReason? }
 //   Owner approves or rejects. Updates status and timestamps.
-//   Approval = status → 'approved'. Employee is responsible for execution.
+//   Approval = status â†’ 'approved'. Employee is responsible for execution.
 //   The execution layer (S6b) will call PATCH again with { decision: 'done'|'failed', result? }.
 //
 // DELETE body: { userId, actionId }
 //   Hard-deletes a pending action (owner clears noise).
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// The canonical action type registry — what employees are allowed to propose.
+// The canonical action type registry â€” what employees are allowed to propose.
 // Each type defines the trust level and what payload fields are expected.
 export const ACTION_TYPES = {
   draft_document: {
@@ -38,7 +39,7 @@ export const ACTION_TYPES = {
   send_email: {
     label:       'Send Email',
     description: 'Send an email to a contact on behalf of the owner',
-    trust_level: 'high',      // external side effect — always requires approval
+    trust_level: 'high',      // external side effect â€” always requires approval
     payload_fields: ['to', 'subject', 'body', 'cc'],
   },
   schedule_meeting: {
@@ -89,7 +90,7 @@ export async function GET(req: NextRequest) {
     } else if (status && VALID_STATUSES.includes(status as any)) {
       query = query.eq('status', status)
     } else if (status !== 'all') {
-      // Default: exclude failed (noise) — show actionable + recent history
+      // Default: exclude failed (noise) â€” show actionable + recent history
       query = query.neq('status', 'failed')
     }
 

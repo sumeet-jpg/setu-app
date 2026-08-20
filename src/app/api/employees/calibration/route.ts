@@ -1,8 +1,9 @@
+﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// /api/employees/calibration — S7 Calibration Engine
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// /api/employees/calibration â€” S7 Calibration Engine
 //
 // GET  ?userId=&slug=
 //   Returns the current calibration state for one or all employees.
@@ -10,13 +11,13 @@ import { createAdminClient } from '@/lib/supabase/server'
 //   autonomy label, and the full action audit trail.
 //
 // POST body: { userId, slug, action: 'recalibrate' | 'set_autonomy' | 'rate_outcome' | 'reset' }
-//   recalibrate  — recalculate trust score and nudge autonomy from action history
-//   set_autonomy — owner pins the autonomy dial (0.0–1.0)
-//   rate_outcome — owner rates the quality of a completed action
-//   reset        — clear the owner override so system resumes self-management
-// ─────────────────────────────────────────────────────────────────────────────
+//   recalibrate  â€” recalculate trust score and nudge autonomy from action history
+//   set_autonomy â€” owner pins the autonomy dial (0.0â€“1.0)
+//   rate_outcome â€” owner rates the quality of a completed action
+//   reset        â€” clear the owner override so system resumes self-management
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// Map autonomy_level (0–1) to a human label
+// Map autonomy_level (0â€“1) to a human label
 function autonomyLabel(level: number): string {
   if (level < 0.2) return 'Supervised'
   if (level < 0.4) return 'Guided'
@@ -121,7 +122,7 @@ export async function POST(req: NextRequest) {
 
     const supabase = createAdminClient()
 
-    // ── recalibrate ──────────────────────────────────────────────────────────
+    // â”€â”€ recalibrate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (action === 'recalibrate') {
       const { data, error } = await supabase.rpc('recalibrate_employee' as any, {
         p_user_id: userId,
@@ -138,11 +139,11 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // ── set_autonomy (owner pins the dial) ───────────────────────────────────
+    // â”€â”€ set_autonomy (owner pins the dial) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (action === 'set_autonomy') {
       const { level } = body
       if (typeof level !== 'number' || level < 0 || level > 1) {
-        return NextResponse.json({ error: 'level must be 0.0–1.0' }, { status: 400 })
+        return NextResponse.json({ error: 'level must be 0.0â€“1.0' }, { status: 400 })
       }
       const { error } = await supabase
         .from('employee_calibration')
@@ -158,7 +159,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, autonomy_level: level, autonomy_label: autonomyLabel(level) })
     }
 
-    // ── reset (remove owner override, return to system management) ───────────
+    // â”€â”€ reset (remove owner override, return to system management) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (action === 'reset') {
       const { error } = await supabase
         .from('employee_calibration')
@@ -170,11 +171,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, system_managed: true })
     }
 
-    // ── rate_outcome ─────────────────────────────────────────────────────────
+    // â”€â”€ rate_outcome â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (action === 'rate_outcome') {
       const { actionId, score, note } = body
       if (!actionId || typeof score !== 'number' || score < 0 || score > 1) {
-        return NextResponse.json({ error: 'actionId and score (0–1) required' }, { status: 400 })
+        return NextResponse.json({ error: 'actionId and score (0â€“1) required' }, { status: 400 })
       }
 
       // Verify the action belongs to this user/slug

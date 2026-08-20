@@ -466,13 +466,13 @@ export default function MemoryClient({
         )}
 
         {/* Distillation runs (beliefs tab only) */}
-        {tab === 'beliefs' && showRuns && data?.recent_runs?.length > 0 && (
+        {tab === 'beliefs' && showRuns && (data?.recent_runs?.length ?? 0) > 0 && (
           <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: 20, marginBottom: 24 }}>
             <div style={{ fontSize: 11, fontFamily: 'monospace', color: C.muted, letterSpacing: '0.1em', marginBottom: 14 }}>
               RECENT DISTILLATION RUNS
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {data.recent_runs.map(run => (
+              {(data?.recent_runs ?? []).map(run => (
                 <div key={run.id} style={{ borderTop: `1px solid ${C.border}`, paddingTop: 10 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                     <div style={{ flex: 1 }}>
