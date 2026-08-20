@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { Resend } from 'resend'
 
 function getSupabase() {
   return createClient(
@@ -82,13 +83,47 @@ export async function PATCH(req: NextRequest) {
       if (reason) updates.cancel_reason = reason
     }
 
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from('hired_subscriptions')
       .update(updates)
       .eq('user_id', userId)
       .eq('employee_slug', slug)
+      .select('owner_name, owner_email, employee_name, monthly_price_cents')
+      .maybeSingle()
 
     if (error) throw error
+
+    // Notify admin when someone cancels so Sumeet can follow up
+    if (action === 'cancel' && process.env.RESEND_API_KEY) {
+      try {
+        const resend = new Resend(process.env.RESEND_API_KEY)
+        const adminEmail = process.env.ADMIN_ALERT_EMAIL ?? 'sumeet@setuagents.com'
+        const from      = process.env.FROM_EMAIL ?? 'hello@setuagents.com'
+        const price     = updated?.monthly_price_cents ? Math.round(updated.monthly_price_cents / 100) : 49
+
+        await resend.emails.send({
+          from,
+          to: adminEmail,
+          subject: `⚠️ Cancellation: ${updated?.owner_name ?? 'A user'} cancelled ${updated?.employee_name ?? slug}`,
+          html: `
+            <div style="font-family:system-ui,sans-serif;max-width:540px;margin:0 auto;padding:28px 20px">
+              <h2 style="font-size:18px;font-weight:800;color:#111;margin:0 0 6px">Subscription cancelled</h2>
+              <p style="color:#6b7280;font-size:14px;margin:0 0 20px">A user self-cancelled their subscription. This is worth a follow-up.</p>
+              <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+                ${[
+                  ['Name',      updated?.owner_name ?? '—'],
+                  ['Email',     updated?.owner_email ?? '—'],
+                  ['Employee',  updated?.employee_name ?? slug],
+                  ['Rate',      `$${price}/mo (locked)`],
+                  ['Reason',    reason || '(no reason given)'],
+                ].map(([k, v]) => `<tr><td style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;color:#6b7280;width:100px">${k}</td><td style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;color:#111">${v}</td></tr>`).join('')}
+              </table>
+              <a href="https://setuagents.com/admin/subscriptions" style="display:inline-block;padding:10px 20px;background:#111;color:#fff;border-radius:9px;text-decoration:none;font-size:13px;font-weight:700">View in Admin →</a>
+            </div>
+          `,
+        }).catch(() => {})
+      } catch { /* non-fatal */ }
+    }
 
     return NextResponse.json({ ok: true, status: newStatus })
   } catch (err) {
