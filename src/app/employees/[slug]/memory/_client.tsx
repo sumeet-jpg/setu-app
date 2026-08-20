@@ -111,6 +111,15 @@ export default function MemoryClient({
   const [autonomyDial, setAutonomyDial] = useState(0.3)
 
   const userId = typeof window !== 'undefined' ? getUserId() : ''
+  const [isHired, setIsHired] = useState(false)
+
+  useEffect(() => {
+    if (!userId || !slug) return
+    fetch(`/api/manage/subscription?userId=${userId}&slug=${slug}`)
+      .then(r => r.json())
+      .then(d => { if (d.status === 'trial' || d.status === 'active') setIsHired(true) })
+      .catch(() => {})
+  }, [userId, slug])
 
   const load = useCallback(async () => {
     if (!userId) return
@@ -352,7 +361,7 @@ export default function MemoryClient({
     return (
       <div style={panelStyle}>
         <div style={headerStyle}>
-          <Link href={`/employees/${slug}`} style={{ color: C.muted, textDecoration: 'none', fontSize: 13 }}>← Back</Link>
+          <Link href={isHired ? `/manage/${slug}` : `/employees/${slug}`} style={{ color: C.muted, textDecoration: 'none', fontSize: 13 }}>← {isHired ? 'Manage' : 'Back'}</Link>
           <span style={{ fontSize: 20 }}>{employeeEmoji}</span>
           <div>
             <div style={{ fontSize: 14, fontWeight: 600 }}>{employeeName}</div>
