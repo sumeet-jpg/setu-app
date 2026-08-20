@@ -7,6 +7,15 @@ const BILLING_EMAIL = 'hello@setuagents.com'
 
 function getOrCreateUserId(): string {
   if (typeof window === 'undefined') return ''
+  // If a recovery uid is present in the URL, restore it to localStorage
+  const params = new URLSearchParams(window.location.search)
+  const uidParam = params.get('uid')
+  if (uidParam) {
+    localStorage.setItem('setu_user_id', uidParam)
+    // Clean the uid from the URL without triggering a navigation
+    const clean = window.location.pathname
+    window.history.replaceState({}, '', clean)
+  }
   let id = localStorage.getItem('setu_user_id')
   if (!id) { id = crypto.randomUUID(); localStorage.setItem('setu_user_id', id) }
   return id

@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
     const { data: subs } = await supabase
       .from('hired_subscriptions')
-      .select('employee_slug, employee_name, employee_title, status, trial_ends_at, monthly_price_cents')
+      .select('user_id, employee_slug, employee_name, employee_title, status, trial_ends_at, monthly_price_cents')
       .eq('owner_email', email.trim().toLowerCase())
 
     if (!subs || subs.length === 0) {
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
           <td style="padding:12px 16px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:13px">${statusLabel}</td>
           <td style="padding:12px 16px;border-bottom:1px solid #e5e7eb;font-size:13px">$${price}/mo</td>
           <td style="padding:12px 16px;border-bottom:1px solid #e5e7eb">
-            <a href="${BASE_URL}/manage/${s.employee_slug}" style="background:#111;color:#fff;padding:6px 14px;border-radius:7px;text-decoration:none;font-size:12px;font-weight:600">Manage →</a>
+            <a href="${BASE_URL}/manage/${s.employee_slug}?uid=${encodeURIComponent(s.user_id)}" style="background:#111;color:#fff;padding:6px 14px;border-radius:7px;text-decoration:none;font-size:12px;font-weight:600">Manage →</a>
           </td>
         </tr>`
     }).join('')
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
           </table>
 
           <p style="font-size:12px;color:#9ca3af;margin-top:28px;line-height:1.6">
-            These links are tied to the device/browser where you originally hired the employee. Bookmark them for easy access.<br><br>
+            These links contain a recovery token — clicking them restores your employee management access on any device. Bookmark them for quick access.<br><br>
             Questions? Reply to this email — we respond within a few hours.<br><br>
             <em>Setu · setuagents.com</em>
           </p>
