@@ -110,24 +110,33 @@ export default function HomePage() {
         .ghost-btn:hover { background: ${GREEN_L} !important; }
         .nav-link { transition: color 0.12s; }
         .nav-link:hover { color: ${GREEN} !important; }
+        @media (max-width: 768px) {
+          .setu-hp-nav-links { display: none !important; }
+          .setu-hp-nav-hire { display: inline-block !important; }
+          .setu-hp-hero { grid-template-columns: 1fr !important; gap: 32px !important; padding: 48px 20px 40px !important; }
+          .setu-hp-hero-video { display: none; }
+          .setu-hp-stats { flex-wrap: wrap !important; gap: 20px !important; }
+          .setu-hp-pad { padding-left: 20px !important; padding-right: 20px !important; }
+          .setu-hp-section-pad { padding: 60px 20px !important; }
+        }
       `}</style>
 
       {/* ── NAV ── */}
-      <nav style={{ background: WHITE, borderBottom: `1px solid ${GRAY}`, padding: '0 32px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
+      <nav style={{ background: WHITE, borderBottom: `1px solid ${GRAY}`, padding: '0 20px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <SetuLogo size={30} color={GREEN} wordColor={INK} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div className="setu-hp-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           {[['All Employees', '/employees'], ['Enterprise', '/enterprise'], ['Compare', '/compare'], ['Pricing', '/pricing'], ['My Team', '/my-employees']].map(([label, href]) => (
             <Link key={href} href={href} className="nav-link" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }}>{label}</Link>
           ))}
           <Link href="/quiz" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }} className="nav-link">Which role?</Link>
-          <Link href="/employees" className="cta-btn" style={{ fontSize: 13, fontWeight: 700, color: WHITE, textDecoration: 'none', padding: '9px 20px', borderRadius: 100, background: INK, marginLeft: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.2)', letterSpacing: '-0.01em', display: 'inline-block' }}>
-            Hire an Employee →
-          </Link>
         </div>
+        <Link href="/employees" className="cta-btn setu-hp-nav-hire" style={{ fontSize: 13, fontWeight: 700, color: WHITE, textDecoration: 'none', padding: '9px 20px', borderRadius: 100, background: INK, marginLeft: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.2)', letterSpacing: '-0.01em', display: 'inline-block' }}>
+          Hire an Employee →
+        </Link>
       </nav>
 
       {/* ── HERO ── */}
-      <section style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 32px 72px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+      <section className="setu-hp-hero" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 32px 72px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.09em', textTransform: 'uppercase', padding: '5px 14px', borderRadius: 6, background: GREEN_L, marginBottom: 28 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: GREEN_M, display: 'inline-block' }} />
@@ -152,7 +161,7 @@ export default function HomePage() {
           </div>
 
           {/* Stats */}
-          <div style={{ display: 'flex', gap: 36, marginTop: 52, paddingTop: 36, borderTop: `1px solid ${GRAY}` }}>
+          <div className="setu-hp-stats" style={{ display: 'flex', gap: 36, marginTop: 52, paddingTop: 36, borderTop: `1px solid ${GRAY}` }}>
             {[
               { value: '100', label: 'AI Employees' },
               { value: '10,000+', label: 'Agents deployed' },
@@ -168,7 +177,7 @@ export default function HomePage() {
         </div>
 
         {/* Hero right: video */}
-        <div>
+        <div className="setu-hp-hero-video">
           <VideoHero />
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 12, color: MUTED }}>30-second overview · unmute for narration</span>

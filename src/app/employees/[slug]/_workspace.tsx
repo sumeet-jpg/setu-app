@@ -544,41 +544,56 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
 
   return (
     <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .setu-ws-nav-mid { display: none !important; }
+          .setu-ws-nav-mem { display: none !important; }
+          .setu-ws-hero { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .setu-ws-pricing-card { position: static !important; }
+          .setu-ws-caps { grid-template-columns: 1fr !important; }
+          .setu-ws-pad { padding: 28px 16px 0 !important; }
+          .setu-ws-sys-header { flex-direction: column !important; gap: 8px !important; }
+          .setu-ws-trust-grid { grid-template-columns: repeat(2,1fr) !important; }
+          .setu-ws-chat-layout { grid-template-columns: 1fr !important; height: auto !important; min-height: 600px !important; }
+          .setu-ws-chat-layout > aside { border-right: none !important; border-bottom: 1.5px solid #E3E1DA !important; max-height: 180px; overflow: auto; }
+          .setu-ws-chat-layout > aside:last-child { display: none; }
+        }
+      `}</style>
 
       {/* ── Nav ── */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 24px',
+      <nav style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px',
         height: 56, borderBottom: `1px solid ${GRAY}`, background: '#fff', position: 'sticky', top: 0, zIndex: 50 }}>
-        <Link href="/employees" style={{ color: MUTED, textDecoration: 'none', fontSize: 13 }}>← All Employees</Link>
-        <span style={{ color: GRAY }}>/</span>
-        <span style={{ color: INK, fontSize: 13, fontWeight: 600 }}>{e.name}</span>
-        <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
+        <Link href="/employees" style={{ color: MUTED, textDecoration: 'none', fontSize: 13, whiteSpace: 'nowrap' }}>← All Employees</Link>
+        <span className="setu-ws-nav-mid" style={{ color: GRAY }}>/</span>
+        <span className="setu-ws-nav-mid" style={{ color: INK, fontSize: 13, fontWeight: 600 }}>{e.name}</span>
+        <span className="setu-ws-nav-mid" style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
           background: e.color + '14', color: e.color, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
           {stuntTitle}
         </span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
-          <Link href={`/employees/${e.slug}/memory`}
+          <Link href={`/employees/${e.slug}/memory`} className="setu-ws-nav-mem"
             style={{ background: 'none', border: `1.5px solid ${GRAY}`, borderRadius: 8, padding: '6px 14px',
               fontWeight: 500, fontSize: 12, textDecoration: 'none', color: MUTED, display: 'flex', alignItems: 'center', gap: 5 }}>
             🧠 Memory
           </Link>
           <button onClick={scrollToInterview}
             style={{ background: 'none', border: `1.5px solid ${GRAY}`, borderRadius: 8, padding: '6px 16px',
-              fontWeight: 600, fontSize: 13, cursor: 'pointer', color: INK }}>
+              fontWeight: 600, fontSize: 13, cursor: 'pointer', color: INK, whiteSpace: 'nowrap' }}>
             Interview Free
           </button>
           <Link href={`/employees/${e.slug}/hire`}
             style={{ background: e.color, color: '#fff', border: 'none', borderRadius: 8,
-              padding: '7px 18px', fontWeight: 700, fontSize: 13, textDecoration: 'none', display: 'inline-block' }}>
-            Hire {e.name} →
+              padding: '7px 18px', fontWeight: 700, fontSize: 13, textDecoration: 'none', display: 'inline-block', whiteSpace: 'nowrap' }}>
+            Hire →
           </Link>
         </div>
       </nav>
 
       {/* ── PROSPECTUS ── */}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '56px 32px 0' }}>
+      <div className="setu-ws-pad" style={{ maxWidth: 1100, margin: '0 auto', padding: '56px 32px 0' }}>
 
         {/* Hero row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 48, alignItems: 'flex-start', marginBottom: 56 }}>
+        <div className="setu-ws-hero" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 48, alignItems: 'flex-start', marginBottom: 56 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
               <div style={{ width: 72, height: 72, borderRadius: 20, background: e.color + '14',
@@ -671,7 +686,7 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
           <div style={{ marginBottom: 48 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
               textTransform: 'uppercase', marginBottom: 16 }}>What {e.name} Can Do</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            <div className="setu-ws-caps" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
               {e.capabilities.map((cap, i) => (
                 <div key={i} style={{ background: '#fff', border: `1.5px solid ${GRAY}`, borderRadius: 14,
                   padding: '20px', cursor: 'pointer' }} onClick={scrollToInterview}>
@@ -1335,7 +1350,7 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
         </div>
 
       {/* ── Body: 3 panels ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr 260px', height: '80vh', maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
+      <div className="setu-ws-chat-layout" style={{ display: 'grid', gridTemplateColumns: '260px 1fr 260px', height: '80vh', maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
 
         {/* ── LEFT: Tool connections ── */}
         <aside style={{ borderRight: '1.5px solid #E3E1DA', overflow: 'auto',
