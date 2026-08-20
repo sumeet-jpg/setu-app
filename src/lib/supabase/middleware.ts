@@ -38,34 +38,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
-  const isAuthRoute = request.nextUrl.pathname.startsWith("/auth");
-  const isSigninRoute = request.nextUrl.pathname === "/signin";
-  const isApiAdminRoute = request.nextUrl.pathname.startsWith("/api/admin");
-  const isDashboardRoute = request.nextUrl.pathname.startsWith("/dashboard");
-  const isApiCustomerRoute = request.nextUrl.pathname.startsWith("/api/customer");
 
-  // Redirect unauthenticated users away from admin routes
-  if ((isAdminRoute || isApiAdminRoute) && !user && !isAuthRoute) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/auth/login";
-    redirectUrl.searchParams.set("redirect", request.nextUrl.pathname);
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  // Redirect unauthenticated users away from customer routes
-  if ((isDashboardRoute || isApiCustomerRoute) && !user) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/signin";
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  // Redirect already-authenticated users away from signin
-  if (isSigninRoute && user) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/dashboard";
-    return NextResponse.redirect(redirectUrl);
-  }
+  // Admin routes: requireAdmin() in each route handles auth via ADMIN_SECRET header.
+  // Dashboard/customer routes: not used in Setu's anonymous model — skip redirect.
 
   return supabaseResponse;
 }
