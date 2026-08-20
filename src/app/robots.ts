@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/admin/'],
+        disallow: ['/api/', '/admin/', '/manage/', '/my-employees/', '/dashboard/', '/auth/', '/blueprints/'],
       },
     ],
     sitemap: 'https://setuagents.com/sitemap.xml',
