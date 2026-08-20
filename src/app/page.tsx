@@ -116,7 +116,7 @@ export default function HomePage() {
       <nav style={{ background: WHITE, borderBottom: `1px solid ${GRAY}`, padding: '0 32px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <SetuLogo size={30} color={GREEN} wordColor={INK} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {[['All Employees', '/employees'], ['Enterprise', '/enterprise'], ['Compare', '/compare'], ['Pricing', '/pricing']].map(([label, href]) => (
+          {[['All Employees', '/employees'], ['Enterprise', '/enterprise'], ['Compare', '/compare'], ['Pricing', '/pricing'], ['My Team', '/my-employees']].map(([label, href]) => (
             <Link key={href} href={href} className="nav-link" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }}>{label}</Link>
           ))}
           <Link href="/quiz" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }} className="nav-link">Which role?</Link>
@@ -265,17 +265,17 @@ export default function HomePage() {
             <div>
               <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Pricing</span>
               <h2 style={{ fontSize: 'clamp(26px,3.5vw,40px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '10px 0 0', color: INK }}>
-                Pay per employee, not per seat
+                One price. $49/month. Lock it in now.
               </h2>
             </div>
-            <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>Interview any employee free. Hire when ready.</p>
+            <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>Price rises $10 every month we ship. Early signups keep their rate forever.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
             {[
-              { tier: 'Starter', price: '$29–99/mo', desc: 'Executive Assistant, Support Manager, SDR Manager, Data Analyst', accent: GREEN_M },
-              { tier: 'Growth', price: '$99–249/mo', desc: 'Marketing Manager, RevOps Lead, Finance Controller, Customer Success', accent: '#1A5C8A' },
-              { tier: 'Enterprise', price: '$299–349/mo', desc: 'CFO Intelligence, AI CMO, AI COO, CTO Intelligence, Chief of Staff', accent: '#8B5A1A' },
-              { tier: 'Custom', price: 'Your workflow', desc: 'Build any role on our Canvas — no code, no engineers, any complexity', accent: MUTED },
+              { tier: '14-day trial', price: 'Free', desc: 'Start immediately. No credit card. Interview first, hire when ready — all employees included.', accent: GREEN_M },
+              { tier: 'Today', price: '$49/month', desc: 'Sign up now and this is your rate forever — any employee, all memory systems, full calibration.', accent: '#1A5C8A' },
+              { tier: 'Next month', price: '$59/month', desc: 'New signups from September pay $10 more. Your early rate stays locked as long as you subscribe.', accent: '#8B5A1A' },
+              { tier: 'Multiple employees', price: 'Per employee', desc: 'Each employee is a separate subscription. Each locks in the rate at their individual trial start.', accent: MUTED },
             ].map(t => (
               <div key={t.tier} style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 16, padding: '26px 22px', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: t.accent }} />
