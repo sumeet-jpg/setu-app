@@ -29,14 +29,14 @@ export async function POST(req: NextRequest) {
     req.headers.forEach((v, k) => { headers[k] = v })
 
     const webhookSecret = process.env.DODO_WEBHOOK_SECRET
-    let event: any
-
-    if (webhookSecret) {
-      event = dodo.webhooks.unwrap(rawBody, { headers, key: webhookSecret })
-    } else {
-      // No secret configured — accept without verification (dev/testing only)
-      event = dodo.webhooks.unsafeUnwrap(rawBody)
+    if (!webhookSecret) {
+      // Fail closed: without a secret there's no way to verify this POST actually
+      // came from Dodo, and unsafeUnwrap() would flip any subscription to 'active'
+      // for whoever sent the request. Set DODO_WEBHOOK_SECRET before going live.
+      console.error('[webhooks/dodo] DODO_WEBHOOK_SECRET is not set — refusing to process webhook')
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 })
     }
+    const event: any = dodo.webhooks.unwrap(rawBody, { headers, key: webhookSecret })
 
     const type = event?.type as string | undefined
 

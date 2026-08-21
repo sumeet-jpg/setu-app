@@ -18,23 +18,26 @@ export interface AdminUser {
 }
 
 export async function requireAdmin(request: NextRequest): Promise<{ user: AdminUser } | NextResponse> {
-  // Phase 1: secret-header check — set ADMIN_SECRET on Vercel to lock down admin routes.
-  // If ADMIN_SECRET is not set, allows all access (single-admin model, URL is the gate).
+  // Path 1: secret-header check — set ADMIN_SECRET on Vercel to allow scripted/cron access.
   const adminSecret = process.env.ADMIN_SECRET
   if (adminSecret) {
     const provided =
       request.headers.get('x-admin-secret') ??
       request.cookies.get('admin_secret')?.value
-    if (provided !== adminSecret) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (provided === adminSecret) {
+      return { user: { id: 'admin', email: process.env.ADMIN_ALERT_EMAIL ?? 'admin@setuagents.com' } }
     }
   }
 
-  const adminUser: AdminUser = {
-    id: 'admin',
-    email: process.env.ADMIN_ALERT_EMAIL ?? 'admin@setuagents.com',
-  }
-  return { user: adminUser }
+  // Path 2: real Supabase Auth session — this is what /admin/subscriptions itself
+  // already gates on, so a signed-in admin's browser session works here too.
+  // Previously, if ADMIN_SECRET was unset, this function allowed ALL requests —
+  // meaning anyone who found an admin API route URL could call it directly,
+  // no login required, regardless of the UI's own auth gate.
+  const admin = await getAdminUserOrNull()
+  if (admin) return { user: admin }
+
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 }
 
 export async function getAdminUserOrNull(): Promise<AdminUser | null> {

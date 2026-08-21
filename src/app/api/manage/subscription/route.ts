@@ -66,13 +66,23 @@ export async function PATCH(req: NextRequest) {
     } else if (action === 'pause') {
       newStatus = 'paused'
     } else {
-      // resume: use trial if trial_ends_at is still in the future, else active
+      // resume only un-pauses an already-paid subscription — it must never be
+      // the path that grants 'active' for free. A cancelled or trial-expired
+      // subscription has to go through real Dodo checkout (/api/checkout/dodo)
+      // to become active again.
       const { data: current } = await supabase
         .from('hired_subscriptions')
-        .select('trial_ends_at, activated_at')
+        .select('status, trial_ends_at')
         .eq('user_id', userId)
         .eq('employee_slug', slug)
         .maybeSingle()
+
+      if (current?.status !== 'paused') {
+        return NextResponse.json(
+          { error: 'Only a paused subscription can be resumed. Activate via checkout instead.' },
+          { status: 400 }
+        )
+      }
       const trialStillValid = current?.trial_ends_at && new Date(current.trial_ends_at) > new Date()
       newStatus = trialStillValid ? 'trial' : 'active'
     }
