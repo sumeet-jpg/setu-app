@@ -143,26 +143,26 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
       <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-jakarta)', color: INK }}>
         <div style={{ textAlign: 'center', maxWidth: 500, padding: '0 24px' }}>
           <div style={{ width: 88, height: 88, borderRadius: 28, background: 'rgba(14,92,52,0.10)', border: '2px solid rgba(14,92,52,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, margin: '0 auto 28px' }}>✅</div>
-          <h1 style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.05em', margin: '0 0 14px', color: INK }}>{e.name} is on their way!</h1>
+          <h1 style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.05em', margin: '0 0 14px', color: INK }}>{e.name} is live right now.</h1>
           <p style={{ fontSize: 15, color: MUTED, lineHeight: 1.7, marginBottom: 36 }}>
-            Your request to hire <strong style={{ color: INK }}>{e.name}</strong> as your {e.title} has been received. Sumeet from Setu will reach out within 24 hours.
+            Your 14-day free trial of <strong style={{ color: INK }}>{e.name}</strong> as your {e.title} started the moment you submitted. Open the management hub to start chatting — no waiting on a call.
           </p>
           <div style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 18, padding: 24, marginBottom: 32, textAlign: 'left' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>What happens next</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 16, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Get started in 3 steps</div>
             {[
-              { step: '24 hours', detail: 'Sumeet reaches out to confirm your requirements' },
-              { step: 'Day 2-3', detail: `${e.name}'s ${e.agentCount} agents are configured for your stack` },
-              { step: 'Day 4-5', detail: 'Onboarding call — go live, first workflow runs' },
+              { step: '1', detail: `Chat first — ask ${e.name} something real and see how they think` },
+              { step: '2', detail: 'Upload context — SOPs, docs, or brand voice, so they know your business' },
+              { step: '3', detail: `Activate before your trial ends to lock in $${currentPrice}/mo forever` },
             ].map(s => (
               <div key={s.step} style={{ display: 'flex', gap: 14, marginBottom: 12 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: e.color, minWidth: 60 }}>{s.step}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: e.color, minWidth: 20 }}>{s.step}</span>
                 <span style={{ fontSize: 13, color: MUTED, lineHeight: 1.5 }}>{s.detail}</span>
               </div>
             ))}
           </div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
             <Link href="/employees" style={{ padding: '11px 22px', borderRadius: 10, background: WHITE, border: `1.5px solid ${GRAY}`, color: MUTED, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Browse more employees</Link>
-            <Link href={`/employees/${e.slug}/interview`} style={{ padding: '11px 22px', borderRadius: 10, background: GREEN, color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 16px rgba(14,92,52,0.28)' }}>Chat with {e.name}</Link>
+            <Link href={`/manage/${e.slug}`} style={{ padding: '11px 22px', borderRadius: 10, background: GREEN, color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 16px rgba(14,92,52,0.28)' }}>Open management hub →</Link>
           </div>
         </div>
       </div>
@@ -187,7 +187,7 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
           <div style={{ marginBottom: 36 }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: e.color, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>Hire Request</div>
             <h1 style={{ fontSize: 'clamp(26px,4vw,36px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '0 0 10px', color: INK, lineHeight: 1.1 }}>Hire {e.name} as your {e.title}</h1>
-            <p style={{ fontSize: 15, color: MUTED, margin: 0, lineHeight: 1.65 }}>Fill out this form and Sumeet will reach out within 24 hours. No credit card needed to start.</p>
+            <p style={{ fontSize: 15, color: MUTED, margin: 0, lineHeight: 1.65 }}>Your 14-day trial starts the moment you submit — no waiting on a call. No credit card needed to start.</p>
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -233,6 +233,9 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
               {status === 'loading' ? 'Submitting…' : `Start 14-day free trial →`}
             </button>
             <p style={{ fontSize: 11, color: DIM, textAlign: 'center', margin: 0 }}>No credit card required · 14 days free · ${currentPrice}/mo after, locked at this price</p>
+            <p style={{ fontSize: 11, color: DIM, textAlign: 'center', margin: 0 }}>
+              By starting a trial you agree to Setu's <Link href="/terms" style={{ color: MUTED, textDecoration: 'underline' }}>Terms</Link> and <Link href="/privacy" style={{ color: MUTED, textDecoration: 'underline' }}>Privacy Policy</Link>.
+            </p>
           </form>
         </div>
 

@@ -4,7 +4,7 @@ import { SetuLogo } from '@/components/SetuLogo'
 
 export const metadata: Metadata = {
   title: 'AI Employees vs Human Hires — Real Cost Comparison',
-  description: 'Compare the real cost of AI Employees vs human hires. Salary, PF, recruitment, downtime — the numbers tell the whole story. Setu AI Employees from $199/mo.',
+  description: 'Compare the real cost of AI Employees vs human hires. Salary, PF, recruitment, downtime — the numbers tell the whole story. Every Setu AI Employee is $49/mo, locked at signup.',
   openGraph: {
     title: 'AI Employees vs Human Hires — Setu',
     description: 'The real math on AI Employees vs human hires. Spoiler: it\'s not close.',
@@ -14,34 +14,38 @@ export const metadata: Metadata = {
   },
 }
 
+// Every AI Employee is the same flat rate — $49/mo (~₹4,100/mo), locked at
+// signup — see src/lib/employees/profiles.ts `pricing` field and the live
+// checkout flow. The "verdict" multipliers below are computed from that real
+// number against the human cost shown, not invented.
 const COMPARISONS = [
   {
     role: 'Marketing Manager',
     human: { cost: '₹10,00,000', breakdown: ['₹8L base salary', '₹96k PF (12%)', '₹1L+ recruitment', '90 day notice period', 'Leaves after 18 months avg'], risk: 'Quits → 6 months of lost momentum' },
-    ai: { cost: '₹1.99L/mo', breakdown: ['No PF or benefits', 'No recruitment cost', 'Starts in 48 hours', 'Never quits', '208 agents across all channels'], flex: '$1,999/mo' },
+    ai: { cost: '~₹4,100/mo', breakdown: ['No PF or benefits', 'No recruitment cost', 'Starts in 48 hours', 'Never quits', '208 agents across all channels'] },
     slug: 'marketing-manager',
-    verdict: '5× cheaper. Infinitely more capacity.'
+    verdict: '~20× cheaper per year. Infinitely more capacity.'
   },
   {
     role: 'WhatsApp Sales Rep',
     human: { cost: '₹3,00,000+', breakdown: ['₹2.4L base salary', '₹29k PF', 'Works 9am–6pm only', 'Misses leads after hours', 'Covers 1 channel only'], risk: 'Every unanswered lead = lost revenue' },
-    ai: { cost: '₹16k/mo', breakdown: ['24/7 — never sleeps', 'Replies in < 3 seconds', 'Handles 100s of chats simultaneously', 'Hindi, Tamil, Marathi + 9 languages', 'Reports daily'], flex: '$199/mo' },
+    ai: { cost: '~₹4,100/mo', breakdown: ['24/7 — never sleeps', 'Replies in < 3 seconds', 'Handles 100s of chats simultaneously', 'Hindi, Tamil, Marathi + 9 languages', 'Reports daily'] },
     slug: 'whatsapp-lead-qualifier',
-    verdict: '15× cheaper. Works while you sleep.'
+    verdict: '~6× cheaper per year. Works while you sleep.'
   },
   {
     role: 'CFO / Finance Head',
     human: { cost: '₹30,00,000+', breakdown: ['₹25L+ base salary', '₹3L PF', 'ESOPs expected', '120-day notice period', 'Manages limited scope'], risk: 'Hiring takes 6 months. Replacement takes another 6.' },
-    ai: { cost: '₹1.99L/mo', breakdown: ['Board-ready reporting on demand', 'Cash flow, forecasting, scenario models', 'No equity dilution', 'No notice period', 'Available 24/7 for investor queries'], flex: '$1,999/mo' },
+    ai: { cost: '~₹4,100/mo', breakdown: ['Board-ready reporting on demand', 'Cash flow, forecasting, scenario models', 'No equity dilution', 'No notice period', 'Available 24/7 for investor queries'] },
     slug: 'cfo-intelligence',
-    verdict: '10× cheaper. No equity dilution.'
+    verdict: '~60× cheaper per year. No equity dilution.'
   },
   {
     role: 'CMO',
     human: { cost: '₹40,00,000+', breakdown: ['₹35L+ base salary', 'ESOP/equity stake', 'Team budget needed on top', '6-month search + notice', 'Risk: wrong hire = wrong brand'], risk: 'Bad CMO = 18 months of damage + expensive exit' },
-    ai: { cost: '₹2.49L/mo', breakdown: ['Full marketing strategy on day 1', 'No equity given up', 'Commands 234 specialist agents', 'Interview free before committing', 'Weekly board-ready reports'], flex: '$2,999/mo' },
+    ai: { cost: '~₹4,100/mo', breakdown: ['Full marketing strategy on day 1', 'No equity given up', 'Commands 234 specialist agents', 'Interview free before committing', 'Weekly board-ready reports'] },
     slug: 'cmo-intelligence',
-    verdict: '12× cheaper. No ESOP. Interview first.'
+    verdict: '~80× cheaper per year. No ESOP. Interview first.'
   },
 ]
 
@@ -187,7 +191,7 @@ export default function ComparePage() {
             See pricing
           </Link>
         </div>
-        <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>Starting at $199/mo · No commitment · Cancel anytime</div>
+        <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>Every employee, $49/mo, locked at signup · No commitment · Cancel anytime</div>
       </section>
 
       <footer style={{ borderTop: `1px solid ${BORDER}`, padding: '20px 24px', textAlign: 'center', fontSize: 12, color: DIM }}>

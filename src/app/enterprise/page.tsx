@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'AI CMO, COO, CTO, and Chief of Staff — each commanding 240+ specialist agents. Enterprise-grade intelligence at a fraction of the exec hiring cost. Interview free.',
   openGraph: {
     title: 'Enterprise AI Employees — Setu',
-    description: 'Your C-Suite, powered by AI. CMO, COO, CTO, Chief of Staff. From $2,499/mo.',
+    description: 'Your C-Suite, powered by AI. CMO, COO, CTO, Chief of Staff. $49/mo, locked at signup.',
     url: 'https://setuagents.com/enterprise',
     siteName: 'Setu',
     type: 'website',
@@ -18,19 +18,13 @@ export const metadata: Metadata = {
 const CSUITE_SLUGS = ['cmo-intelligence', 'coo-intelligence', 'cto-intelligence', 'chief-of-staff']
 
 const ENTERPRISE_BENEFITS = [
-  { icon: '🔒', title: 'Enterprise security', desc: 'Your data stays yours. No training on your business data. SOC 2 aligned workflows.' },
+  { icon: '🔒', title: 'Enterprise security', desc: 'Your data stays yours. No training on your business data. Security questionnaire available on request.' },
   { icon: '🔗', title: 'Deep integrations', desc: 'Slack, Notion, Salesforce, HubSpot, Jira, Google Workspace — connects to your existing stack.' },
   { icon: '📊', title: 'Board-level reporting', desc: 'Weekly and monthly reports in the format your board expects. Investor-ready by default.' },
   { icon: '⚡', title: '240+ agents each', desc: 'Each C-Suite employee commands a fleet of specialist agents — no task too complex.' },
   { icon: '🎯', title: 'Custom playbooks', desc: 'Trained on your strategy, brand, values, and workflows. Acts like an insider, not a generalist.' },
   { icon: '🤝', title: 'White-glove onboarding', desc: 'Dedicated onboarding with Sumeet. Live in under 7 days. Ongoing support included.' },
 ]
-
-const TESTIMONIAL_PLACEHOLDER = {
-  quote: '"We needed a CMO-level thinker but couldn\'t justify the ₹40L salary. Setu\'s AI CMO gave us exactly that — the strategy, the oversight, and the board reporting — at a fraction of the cost."',
-  name: '[Founder Name]',
-  company: '[Company Name, City]',
-}
 
 export default function EnterprisePage() {
   const csuite = CSUITE_SLUGS.map(s => EMPLOYEE_BY_SLUG[s]).filter(Boolean)
@@ -60,7 +54,7 @@ export default function EnterprisePage() {
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.13) 0%, transparent 60%)', pointerEvents: 'none' }} />
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: '#a5b4fc', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '5px 14px', borderRadius: 24, background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', marginBottom: 28 }}>
-          C-Suite AI · $2,499–$2,999/mo
+          C-Suite AI · $49/mo
         </div>
 
         <h1 style={{ fontSize: 'clamp(34px,6vw,66px)', fontWeight: 900, letterSpacing: '-0.06em', color: '#fff', margin: '0 0 20px', lineHeight: 1.02 }}>
@@ -86,7 +80,7 @@ export default function EnterprisePage() {
           {[
             { num: '4', label: 'C-Suite AI Employees' },
             { num: '240+', label: 'Agents each' },
-            { num: '10×', label: 'Cheaper than human exec' },
+            { num: '~70×', label: 'Cheaper than human exec' },
             { num: '7 days', label: 'To go live' },
           ].map(s => (
             <div key={s.num} style={{ textAlign: 'center' }}>
@@ -152,14 +146,18 @@ export default function EnterprisePage() {
         </div>
       </section>
 
-      {/* TESTIMONIAL PLACEHOLDER */}
+      {/* WHY TRUST THIS WITHOUT A CASE STUDY YET */}
       <section style={{ maxWidth: 700, margin: '0 auto', padding: 'clamp(56px,7vw,88px) 24px', textAlign: 'center' }}>
         <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: 22, padding: 40 }}>
-          <div style={{ fontSize: 36, color: '#6366f1', marginBottom: 20, lineHeight: 1 }}>&ldquo;</div>
-          <p style={{ fontSize: 16, color: '#CBD5E1', lineHeight: 1.75, margin: '0 0 24px', fontStyle: 'italic' }}>
-            {TESTIMONIAL_PLACEHOLDER.quote}
+          <div style={{ fontSize: 32, marginBottom: 16 }}>🎙️</div>
+          <p style={{ fontSize: 16, color: '#CBD5E1', lineHeight: 1.75, margin: '0 0 8px', fontWeight: 700 }}>
+            Judge it yourself, not from a quote.
           </p>
-          <div style={{ fontSize: 13, color: MUTED }}>{TESTIMONIAL_PLACEHOLDER.name} · {TESTIMONIAL_PLACEHOLDER.company}</div>
+          <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.75, margin: 0, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto' }}>
+            We're early — we'd rather you interview the actual AI CMO or COO for 10 minutes and see the depth yourself
+            than take a stranger's word for it. If it's not good enough for a board-level decision, you'll know
+            immediately, and it costs you nothing to find out.
+          </p>
         </div>
       </section>
 
@@ -174,7 +172,7 @@ export default function EnterprisePage() {
         <Link href="/employees" style={{ display: 'inline-block', padding: '14px 32px', borderRadius: 14, background: 'linear-gradient(135deg,#6366f1,#7c3aed)', color: '#fff', fontSize: 15, fontWeight: 800, textDecoration: 'none', boxShadow: '0 8px 32px rgba(99,102,241,0.4)', letterSpacing: '-0.02em' }}>
           Meet the C-Suite →
         </Link>
-        <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>From $2,499/mo · 7-day live guarantee · Cancel anytime</div>
+        <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>$49/mo, locked at signup · 7-day live guarantee · Cancel anytime</div>
       </section>
 
       <footer style={{ borderTop: `1px solid ${BORDER}`, padding: '20px 24px', textAlign: 'center', fontSize: 12, color: DIM }}>

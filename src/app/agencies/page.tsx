@@ -23,17 +23,17 @@ const BENEFITS = [
   {
     icon: '🏷️',
     title: 'White-label option',
-    desc: 'Launch under your own brand. Your domain, your logo, your pricing. Clients see your agency, not Setu. Fully supported at no extra cost.',
+    desc: 'Launch under your own brand — available for Growth-tier partners and above. Tell us your setup on the application call and we\'ll scope it with you.',
   },
   {
     icon: '🤝',
-    title: 'Dedicated partner manager',
-    desc: 'A real person — not a ticketing system. Your partner manager handles onboarding, escalations, and custom deals. We win when your clients win.',
+    title: 'Direct line to the founder',
+    desc: 'You deal directly with Sumeet — not a ticketing system. Onboarding, escalations, and custom deals go straight to the person who can say yes.',
   },
   {
     icon: '📋',
-    title: 'Pre-built client decks',
-    desc: 'Sales decks, ROI calculators, onboarding guides, and case studies — ready to drop your logo on. No reinventing the wheel for every prospect.',
+    title: 'Sales materials on request',
+    desc: 'Need a one-pager, ROI numbers, or a case study for a specific prospect? Ask your partner contact and we\'ll put it together for that deal.',
   },
   {
     icon: '⚡',
@@ -42,8 +42,8 @@ const BENEFITS = [
   },
   {
     icon: '📊',
-    title: 'Agency dashboard',
-    desc: 'One view across all client accounts. Track usage, renewals, and revenue. Spot upsell opportunities before clients ask. Stay in control.',
+    title: 'Revenue reporting',
+    desc: 'Reported manually by your partner contact today — a self-serve dashboard is on the roadmap. You always know exactly what you\'re owed.',
   },
 ]
 
@@ -52,21 +52,21 @@ const USE_CASES = [
     type: 'Marketing Agency',
     headline: 'Sell AI CMOs to your clients',
     desc: 'Your retainer clients need marketing leadership they can\'t afford. You sell them Setu\'s AI CMO — they get strategy, reporting, and execution. You earn 30% recurring. Win-win-win.',
-    employees: ['AI CMO — $2,999/mo', 'Marketing Manager — $1,999/mo', 'Demand Gen Manager — $999/mo'],
+    employees: ['AI CMO', 'Marketing Manager', 'Demand Gen Manager'],
     color: '#6366F1',
   },
   {
     type: 'Business Consultant',
     headline: 'Bundle AI operations into your engagements',
     desc: 'When a client\'s ops are on fire, don\'t just recommend fixes — activate an AI COO or Operations Manager and make the fix immediate. Add a recurring revenue stream to every engagement.',
-    employees: ['AI COO — $2,499/mo', 'Operations Manager — $999/mo', 'Finance Controller — $1,099/mo'],
+    employees: ['AI COO', 'Operations Manager', 'Finance Controller'],
     color: '#0EA5E9',
   },
   {
     type: 'WhatsApp / CRM Agency',
     headline: 'Add AI Employees to every WhatsApp setup',
     desc: 'You\'re already configuring WhatsApp Business for clients. Activating a Lead Qualifier or Commerce Agent on top is a 30-minute upsell that generates recurring income on every account.',
-    employees: ['WhatsApp Lead Qualifier — $199/mo', 'WhatsApp Support Agent — $249/mo', 'WhatsApp Commerce — $299/mo'],
+    employees: ['WhatsApp Lead Qualifier', 'WhatsApp Support Agent', 'WhatsApp Commerce'],
     color: '#25D366',
   },
 ]
@@ -168,7 +168,7 @@ export default function AgenciesPage() {
                 <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.7 }}>{u.desc}</p>
               </div>
               <div style={{ flex: '0 1 220px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: DIM, marginBottom: 4 }}>Best employees to sell</div>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: DIM, marginBottom: 4 }}>Best employees to sell · $49/mo each</div>
                 {u.employees.map(e => (
                   <div key={e} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#CBD5E1', fontWeight: 600 }}>{e}</div>
                 ))}
@@ -197,7 +197,7 @@ export default function AgenciesPage() {
       {/* TIERS */}
       <section style={{ maxWidth: 900, margin: '0 auto', padding: 'clamp(56px,7vw,88px) 24px' }}>
         <h2 style={{ fontSize: 'clamp(22px,3vw,36px)', fontWeight: 900, letterSpacing: '-0.05em', color: '#fff', margin: '0 0 10px', textAlign: 'center' }}>Partner tiers</h2>
-        <p style={{ fontSize: 15, color: MUTED, textAlign: 'center', marginBottom: 40, lineHeight: 1.65 }}>Revenue share increases as your book grows. No applications for tier upgrades — it happens automatically.</p>
+        <p style={{ fontSize: 15, color: MUTED, textAlign: 'center', marginBottom: 40, lineHeight: 1.65 }}>Revenue share increases as your book grows — your partner contact moves you up as client count crosses each threshold.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
           {TIERS.map(t => (
             <div key={t.name} style={{ background: SURFACE, border: `1px solid ${t.color}20`, borderRadius: 22, padding: 28, boxShadow: `0 0 32px ${t.color}06` }}>

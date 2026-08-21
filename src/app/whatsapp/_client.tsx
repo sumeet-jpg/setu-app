@@ -12,7 +12,7 @@ const WA_EMPLOYEES = [
     emoji: '🎯',
     color: '#075E54',
     agents: 31,
-    price: '$199/mo',
+    price: '$49/mo',
     tagline: 'Qualifies every inbound WhatsApp lead so your sales team only talks to buyers',
     handles: ['Lead qualification', 'BANT scoring', 'Appointment booking', 'Follow-up sequences', 'CRM integration'],
   },
@@ -23,7 +23,7 @@ const WA_EMPLOYEES = [
     emoji: '🤝',
     color: '#128C7E',
     agents: 63,
-    price: '$249/mo',
+    price: '$49/mo',
     tagline: 'Resolves 80% of support tickets inside WhatsApp — before a human sees them',
     handles: ['Instant query resolution', 'Order and delivery queries', 'Return and refund handling', 'Smart escalation', 'CSAT measurement'],
   },
@@ -34,13 +34,11 @@ const WA_EMPLOYEES = [
     emoji: '💬',
     color: '#25D366',
     agents: 44,
-    price: '$299/mo',
+    price: '$49/mo',
     tagline: 'Turns WhatsApp into a full sales channel — catalogue, orders, follow-ups',
     handles: ['Product catalogue sends', 'Order confirmation flows', 'Cart abandonment recovery', 'Payment link automation', 'Broadcast campaigns'],
   },
 ]
-
-const LOGOS = ['Swiggy', 'Meesho', 'Razorpay', 'Zepto', 'Cars24', 'Urban Company']
 
 const FAQS = [
   {
@@ -108,7 +106,7 @@ export default function WhatsAppClient() {
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 700, color: C.greenLight, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '5px 14px', borderRadius: 24, background: C.greenDim, border: `1px solid ${C.greenBorder}`, marginBottom: 28 }}>
           <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.green, boxShadow: `0 0 8px ${C.green}` }} />
-          WhatsApp AI Employees — starts at $199/mo
+          WhatsApp AI Employees — $49/mo
         </div>
 
         <h1 style={{ fontSize: 'clamp(36px,7vw,72px)', fontWeight: 900, letterSpacing: '-0.06em', color: '#fff', margin: '0 0 20px', lineHeight: 1.02 }}>
@@ -162,7 +160,7 @@ export default function WhatsAppClient() {
             { stat: '< 3s', label: 'Average reply time' },
             { stat: '24/7', label: 'Always on — no sick days' },
             { stat: '12+', label: 'Languages supported' },
-            { stat: '$199', label: 'Starting monthly price' },
+            { stat: '$49', label: 'Monthly price, locked at signup' },
           ].map(s => (
             <div key={s.stat}>
               <div style={{ fontSize: 'clamp(24px,4vw,36px)', fontWeight: 900, letterSpacing: '-0.06em', color: C.green, lineHeight: 1 }}>{s.stat}</div>
@@ -298,7 +296,7 @@ export default function WhatsAppClient() {
         <Link href="/employees/whatsapp-lead-qualifier/interview" style={{ display: 'inline-block', padding: '16px 36px', borderRadius: 16, background: C.green, color: '#000', fontSize: 16, fontWeight: 900, textDecoration: 'none', letterSpacing: '-0.03em', boxShadow: `0 12px 40px rgba(37,211,102,0.4)` }}>
           Start free interview →
         </Link>
-        <div style={{ marginTop: 14, fontSize: 12, color: C.dim }}>Free to interview · $199/mo to hire · Cancel anytime</div>
+        <div style={{ marginTop: 14, fontSize: 12, color: C.dim }}>Free to interview · $49/mo to hire · Cancel anytime</div>
       </section>
 
       {/* FOOTER */}

@@ -44,7 +44,7 @@ const HOW_STEPS = [
   { n: '01', title: 'Browse 100 roles', body: 'From a RevOps Lead to an AI CMO — browse every function your business needs. Each employee is deeply specialized.' },
   { n: '02', title: 'Interview for free', body: 'Chat live with any employee. Ask real questions. See exactly how they think before you commit a rupee.' },
   { n: '03', title: 'Hire with one form', body: 'Fill out the hire form. We configure the employee, connect your tools, and have them working inside 48 hours.' },
-  { n: '04', title: 'Or build your own', body: 'Use the Canvas to wire up a custom AI Employee for any unique workflow — no code, no engineers.' },
+  { n: '04', title: 'Or build your own', body: 'Describe any unique workflow in the Blueprint Builder and Setu scopes a custom AI Employee for it — no code, no engineers.' },
 ]
 
 const homeJsonLd = {
@@ -249,20 +249,20 @@ export default function HomePage() {
           <DeptPicker departments={departments} />
         </section>
 
-        {/* ── CANVAS CTA ── */}
+        {/* ── BLUEPRINT BUILDER CTA ── */}
         <section style={{ marginBottom: 104, background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 24, padding: '52px 48px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 40, alignItems: 'center' }}>
           <div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Canvas Builder</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Blueprint Builder</span>
             <h2 style={{ fontSize: 'clamp(22px,3vw,34px)', fontWeight: 800, letterSpacing: '-0.04em', margin: '10px 0 14px', color: INK }}>
               Don't see the role you need?
             </h2>
             <p style={{ fontSize: 15, color: MUTED, lineHeight: 1.7, margin: 0, maxWidth: 440 }}>
-              Use the visual canvas to wire up any AI Employee for any workflow. Connect triggers, AI agents, tools, and approval rules — no code required.
+              Describe the workflow in plain English and Setu scopes a custom AI Employee for it — the agents, the tools it needs, the guardrails — no code required.
             </p>
           </div>
           <div style={{ flexShrink: 0, textAlign: 'center' }}>
-            <Link href="/employees" className="ghost-btn" style={{ display: 'inline-block', padding: '13px 30px', borderRadius: 11, background: GREEN_L, border: `1.5px solid ${GREEN}`, color: GREEN, fontSize: 14, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              Browse the team →
+            <Link href="/blueprints/new" className="ghost-btn" style={{ display: 'inline-block', padding: '13px 30px', borderRadius: 11, background: GREEN_L, border: `1.5px solid ${GREEN}`, color: GREEN, fontSize: 14, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+              Build a blueprint →
             </Link>
             <p style={{ fontSize: 12, color: DIM, marginTop: 10, textAlign: 'center' }}>Free to build</p>
           </div>

@@ -83,8 +83,8 @@ const spec = {
           pricing: {
             type: 'object',
             properties: {
-              monthly: { type: 'number', example: 1999 },
-              label: { type: 'string', example: '$1,999/mo' },
+              monthly: { type: 'number', example: 49 },
+              label: { type: 'string', example: '$49/mo' },
             },
           },
         },
