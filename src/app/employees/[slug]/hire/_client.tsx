@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { EMPLOYEE_BY_SLUG } from '@/lib/employees/profiles'
 import { SetuLogo } from '@/components/SetuLogo'
+import { setManageToken } from '@/lib/manage-token-client'
 
 import { useRouter } from 'next/navigation'
 
@@ -104,6 +105,7 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
       })
       const j = await res.json()
       if (!res.ok) throw new Error(j.error ?? 'Failed')
+      setManageToken(j.manage_token)
       if (typeof window !== 'undefined' && (window as any).fbq) {
         (window as any).fbq('track', 'Lead', { content_name: e.name, content_category: e.dept })
       }

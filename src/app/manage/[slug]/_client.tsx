@@ -2,17 +2,22 @@
 // @ts-nocheck
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { setManageToken, authFetch } from '@/lib/manage-token-client'
 
 const BILLING_EMAIL = 'hello@setuagents.com'
 
 function getOrCreateUserId(): string {
   if (typeof window === 'undefined') return ''
-  // If a recovery uid is present in the URL, restore it to localStorage
+  // A recovery link carries both the raw identity (uid, restores chat/interview
+  // continuity) and a signed, 48h-expiring session token (mt, required for
+  // subscription actions + the memory/vault/trust pages) — restore both.
   const params = new URLSearchParams(window.location.search)
   const uidParam = params.get('uid')
-  if (uidParam) {
-    localStorage.setItem('setu_user_id', uidParam)
-    // Clean the uid from the URL without triggering a navigation
+  const mtParam  = params.get('mt')
+  if (uidParam) localStorage.setItem('setu_user_id', uidParam)
+  if (mtParam) setManageToken(mtParam)
+  if (uidParam || mtParam) {
+    // Clean the params from the URL without triggering a navigation
     const clean = window.location.pathname
     window.history.replaceState({}, '', clean)
   }
@@ -115,14 +120,38 @@ export default function ManageClient({
     }
   }
 
+  // Shared PATCH helper for subscription actions — surfaces an error instead
+  // of silently no-op'ing (e.g. an expired manage-token, which now returns a
+  // real 401 instead of the request just quietly succeeding for the wrong
+  // reason, or failing with no explanation).
+  async function patchSub(action: 'cancel' | 'pause' | 'resume', reason?: string): Promise<boolean> {
+    try {
+      const res = await authFetch('/api/manage/subscription', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, action, reason }),
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        if (res.status === 401) {
+          alert('Your session link has expired. Go to setuagents.com/my-employees and use "Recover access" to email yourself a fresh link.')
+        } else {
+          alert(j.error ?? 'Something went wrong. Please try again.')
+        }
+        return false
+      }
+      return true
+    } catch {
+      alert('Something went wrong. Please try again.')
+      return false
+    }
+  }
+
   async function handleCancel() {
     setCancelling(true)
     try {
-      await fetch('/api/manage/subscription', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, slug, action: 'cancel', reason: cancelReason }),
-      })
+      const ok = await patchSub('cancel', cancelReason)
+      if (!ok) return
       setCancelled(true)
       setShowCancel(false)
     } finally {
@@ -437,12 +466,7 @@ export default function ManageClient({
               {isPaused ? (
                 <button
                   onClick={async () => {
-                    await fetch('/api/manage/subscription', {
-                      method: 'PATCH',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ userId, slug, action: 'resume' }),
-                    })
-                    loadAll()
+                    if (await patchSub('resume')) loadAll()
                   }}
                   style={{ padding: '7px 16px', borderRadius: 9, background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
                 >
@@ -452,12 +476,7 @@ export default function ManageClient({
                 <button
                   title="Pause keeps your locked rate — use when you need a break without losing your price"
                   onClick={async () => {
-                    await fetch('/api/manage/subscription', {
-                      method: 'PATCH',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ userId, slug, action: 'pause' }),
-                    })
-                    loadAll()
+                    if (await patchSub('pause')) loadAll()
                   }}
                   style={{ padding: '7px 16px', borderRadius: 9, background: 'rgba(148,163,184,0.08)', border: '1px solid rgba(148,163,184,0.2)', color: C.muted, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
                 >
@@ -596,11 +615,7 @@ export default function ManageClient({
               {isActive && (
                 <button
                   onClick={async () => {
-                    await fetch('/api/manage/subscription', {
-                      method: 'PATCH',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ userId, slug, action: 'pause' }),
-                    })
+                    if (!(await patchSub('pause'))) return
                     await loadAll()
                     setShowCancel(false)
                   }}

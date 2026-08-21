@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
+import { signManageToken } from '@/lib/manage-token'
 
 export const runtime = 'nodejs'
 
@@ -201,7 +202,9 @@ export async function POST(req: NextRequest) {
       `,
     }).catch(err => console.error('[Setu hire prospect email]', err))
 
-    return NextResponse.json({ success: true, id: hire?.id ?? null, db_saved: !dbErr, manage_url: `/manage/${employee_slug}` })
+    const manage_token = userId ? signManageToken(userId) : null
+
+    return NextResponse.json({ success: true, id: hire?.id ?? null, db_saved: !dbErr, manage_url: `/manage/${employee_slug}`, manage_token })
   } catch (err: any) {
     console.error('[Setu hire API]', err)
     return NextResponse.json({ error: err.message ?? 'Internal error' }, { status: 500 })

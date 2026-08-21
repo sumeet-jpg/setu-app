@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { authFetch } from '@/lib/manage-token-client'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -112,6 +113,18 @@ export default function MemoryClient({
 
   const userId = typeof window !== 'undefined' ? getUserId() : ''
   const [isHired, setIsHired] = useState(false)
+  // This whole page (beliefs, vault, calibration, cortex, alerts) requires a
+  // valid manage-token — it's reached from the manage hub post-hire, not the
+  // anonymous interview flow. If the token is missing or expired, every
+  // gated call below 401s; this flag drives a "go recover access" banner
+  // instead of a confusing wall of empty tabs.
+  const [needsRecovery, setNeedsRecovery] = useState(false)
+
+  const gatedFetch = useCallback(async (input: string, init?: RequestInit) => {
+    const res = await authFetch(input, init)
+    if (res.status === 401) setNeedsRecovery(true)
+    return res
+  }, [])
 
   useEffect(() => {
     if (!userId || !slug) return
@@ -125,18 +138,18 @@ export default function MemoryClient({
     if (!userId) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/employees/beliefs?slug=${slug}&userId=${userId}&limit=200`)
+      const res = await gatedFetch(`/api/employees/beliefs?slug=${slug}&limit=200`)
       if (res.ok) setData(await res.json())
     } finally {
       setLoading(false)
     }
-  }, [slug, userId])
+  }, [slug, userId, gatedFetch])
 
   const loadTimeline = useCallback(async () => {
     if (!userId || timelineLoading) return
     setTimelineLoading(true)
     try {
-      const res = await fetch(`/api/employees/beliefs/timeline?slug=${slug}&userId=${userId}&limit=40`)
+      const res = await gatedFetch(`/api/employees/beliefs/timeline?slug=${slug}&limit=40`)
       if (res.ok) {
         const d = await res.json()
         setTimeline(d.timeline ?? [])
@@ -144,31 +157,31 @@ export default function MemoryClient({
     } finally {
       setTimelineLoading(false)
     }
-  }, [slug, userId])
+  }, [slug, userId, gatedFetch])
 
   const loadBriefs = useCallback(async () => {
     if (!userId) return
     setBriefsLoading(true)
     try {
-      const res = await fetch(`/api/employees/pin?userId=${userId}&slug=${slug}&unreadOnly=false&limit=20`)
+      const res = await gatedFetch(`/api/employees/pin?slug=${slug}&unreadOnly=false&limit=20`)
       if (res.ok) { const d = await res.json(); setBriefs(d.briefs ?? []) }
     } finally { setBriefsLoading(false) }
-  }, [slug, userId])
+  }, [slug, userId, gatedFetch])
 
   const dismissBrief = useCallback(async (briefId: string) => {
-    await fetch('/api/employees/pin', {
+    await gatedFetch('/api/employees/pin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'dismiss', userId, slug, briefId }),
+      body: JSON.stringify({ action: 'dismiss', slug, briefId }),
     })
     setBriefs(prev => prev.filter(b => b.id !== briefId))
-  }, [userId, slug])
+  }, [slug, gatedFetch])
 
   const loadCalibration = useCallback(async () => {
     if (!userId) return
     setCalLoading(true)
     try {
-      const res = await fetch(`/api/employees/calibration?userId=${userId}&slug=${slug}&history=true`)
+      const res = await gatedFetch(`/api/employees/calibration?slug=${slug}&history=true`)
       if (res.ok) {
         const d = await res.json()
         setCalibration(d.calibration)
@@ -180,44 +193,44 @@ export default function MemoryClient({
     } finally {
       setCalLoading(false)
     }
-  }, [slug, userId])
+  }, [slug, userId, gatedFetch])
 
   const setAutonomy = useCallback(async (level: number) => {
     if (!userId) return
     setSavingAutonomy(true)
     try {
-      await fetch('/api/employees/calibration', {
+      await gatedFetch('/api/employees/calibration', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, slug, action: 'set_autonomy', level }),
+        body: JSON.stringify({ slug, action: 'set_autonomy', level }),
       })
       setAutonomyDial(level)
       await loadCalibration()
     } finally {
       setSavingAutonomy(false)
     }
-  }, [userId, slug, loadCalibration])
+  }, [userId, slug, loadCalibration, gatedFetch])
 
   const resetAutonomy = useCallback(async () => {
     if (!userId) return
     setSavingAutonomy(true)
     try {
-      await fetch('/api/employees/calibration', {
+      await gatedFetch('/api/employees/calibration', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, slug, action: 'reset' }),
+        body: JSON.stringify({ slug, action: 'reset' }),
       })
       await loadCalibration()
     } finally {
       setSavingAutonomy(false)
     }
-  }, [userId, slug, loadCalibration])
+  }, [userId, slug, loadCalibration, gatedFetch])
 
   const loadCortex = useCallback(async () => {
     if (!userId) return
     setCortexLoading(true)
     try {
-      const res = await fetch(`/api/employees/cortex?userId=${userId}&slug=${slug}&limit=30`)
+      const res = await gatedFetch(`/api/employees/cortex?slug=${slug}&limit=30`)
       if (res.ok) {
         const d = await res.json()
         setCortexEntries(d.entries ?? [])
@@ -225,13 +238,13 @@ export default function MemoryClient({
     } finally {
       setCortexLoading(false)
     }
-  }, [slug, userId])
+  }, [slug, userId, gatedFetch])
 
   const loadVault = useCallback(async () => {
     if (!userId) return
     setVaultLoading(true)
     try {
-      const res = await fetch(`/api/employees/vault?userId=${userId}&slug=${slug}`)
+      const res = await gatedFetch(`/api/employees/vault?slug=${slug}`)
       if (res.ok) {
         const d = await res.json()
         setVaultDocs(d.documents ?? [])
@@ -239,7 +252,7 @@ export default function MemoryClient({
     } finally {
       setVaultLoading(false)
     }
-  }, [slug, userId])
+  }, [slug, userId, gatedFetch])
 
   const uploadDoc = useCallback(async () => {
     if (!uploadName.trim() || !uploadContent.trim()) {
@@ -250,11 +263,10 @@ export default function MemoryClient({
     setUploadError('')
     setUploadSuccess('')
     try {
-      const res = await fetch('/api/employees/vault/upload', {
+      const res = await gatedFetch('/api/employees/vault/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId,
           slug,
           sourceName: uploadName.trim(),
           sourceType: uploadType,
@@ -270,17 +282,17 @@ export default function MemoryClient({
     } finally {
       setUploading(false)
     }
-  }, [userId, slug, uploadName, uploadType, uploadContent, loadVault])
+  }, [userId, slug, uploadName, uploadType, uploadContent, loadVault, gatedFetch])
 
   const deleteDoc = useCallback(async (sourceName: string) => {
     if (!confirm(`Remove "${sourceName}" from the vault?`)) return
-    await fetch('/api/employees/vault', {
+    await gatedFetch('/api/employees/vault', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, sourceName }),
+      body: JSON.stringify({ sourceName }),
     })
     await loadVault()
-  }, [userId, loadVault])
+  }, [loadVault, gatedFetch])
 
   useEffect(() => { load() }, [load])
 
@@ -296,10 +308,10 @@ export default function MemoryClient({
     if (!confirm('Remove this belief? This cannot be undone.')) return
     setDeleting(beliefId)
     try {
-      await fetch('/api/employees/beliefs', {
+      await gatedFetch('/api/employees/beliefs', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, beliefId }),
+        body: JSON.stringify({ beliefId }),
       })
       await load()
     } finally {
@@ -312,10 +324,10 @@ export default function MemoryClient({
     if (!input) return
     const val = parseInt(input)
     if (isNaN(val) || val < 0 || val > 100) { alert('Enter a number between 0 and 100'); return }
-    await fetch('/api/employees/beliefs', {
+    await gatedFetch('/api/employees/beliefs', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, beliefId, confidence: val / 100 }),
+      body: JSON.stringify({ beliefId, confidence: val / 100 }),
     })
     await load()
   }
@@ -434,6 +446,27 @@ export default function MemoryClient({
       </div>
 
       <div style={contentStyle}>
+
+        {needsRecovery && (
+          <div style={{
+            background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.25)',
+            borderRadius: 12, padding: '16px 20px', marginBottom: 24,
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap',
+          }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#ef4444', marginBottom: 3 }}>Your session has expired</div>
+              <div style={{ fontSize: 12, color: C.muted }}>
+                Memory, vault, and trust settings need a fresh access link — this page can't load private data with an expired session.
+              </div>
+            </div>
+            <Link href="/my-employees" style={{
+              padding: '8px 16px', borderRadius: 8, background: '#ef4444', color: '#fff',
+              fontSize: 12, fontWeight: 700, textDecoration: 'none', flexShrink: 0,
+            }}>
+              Recover access →
+            </Link>
+          </div>
+        )}
 
         {/* Stats bar */}
         {data && (

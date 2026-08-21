@@ -1,6 +1,7 @@
 ﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { withManageAuth, verifyManageToken, signManageToken } from '@/lib/manage-token'
 import { getEmployee } from '@/lib/employees/profiles'
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -250,15 +251,18 @@ async function checkPatterns(
 // â”€â”€ Route handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function GET(req: NextRequest) {
+  return withManageAuth(req, async (userId) => getPins(userId, req))
+}
+
+async function getPins(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url)
-    const userId    = searchParams.get('userId')
     const slug      = searchParams.get('slug')
     const unreadOnly = searchParams.get('unreadOnly') !== 'false'
     const limit     = Math.min(20, parseInt(searchParams.get('limit') ?? '10'))
 
-    if (!userId || !slug) {
-      return NextResponse.json({ error: 'userId and slug required' }, { status: 400 })
+    if (!slug) {
+      return NextResponse.json({ error: 'slug required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()
@@ -284,39 +288,55 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// 'seed' and 'check' are triggered server-to-server as a fire-and-forget side
+// effect of the anonymous interview flow (src/app/api/employees/interview/route.ts)
+// — no user is at the keyboard, so there's no token to send. They stay on the
+// bare userId the same way interview/distill do; worst case someone triggers
+// idempotent background computation for a UUID they know, which returns no
+// data and is already rate-limited (skips if a brief fired in the last 7
+// days). 'dismiss' and 'read' are real user actions from the memory page and
+// mutate a specific person's brief state, so those require a verified token —
+// and use the token's userId, not whatever the client sent.
 export async function POST(req: NextRequest) {
   try {
     const { action, userId, slug, briefId } = await req.json()
 
-    if (!userId || !slug) {
-      return NextResponse.json({ error: 'userId and slug required' }, { status: 400 })
+    if (!slug) {
+      return NextResponse.json({ error: 'slug required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()
 
     if (action === 'seed') {
+      if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
       await seedWatchPatterns(supabase, userId, slug)
       return NextResponse.json({ ok: true })
     }
 
     if (action === 'check') {
+      if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
       const count = await checkPatterns(supabase, userId, slug)
       return NextResponse.json({ ok: true, briefs_created: count })
     }
 
-    if (action === 'dismiss' && briefId) {
-      await supabase.from('employee_proactive_briefs').update({
-        dismissed_at: new Date().toISOString(),
-      }).eq('id', briefId).eq('user_id', userId)
-      return NextResponse.json({ ok: true })
-    }
+    if (action === 'dismiss' || action === 'read') {
+      if (!briefId) return NextResponse.json({ error: 'briefId required' }, { status: 400 })
+      const token = req.headers.get('x-manage-token') ?? new URL(req.url).searchParams.get('mt')
+      const authedUserId = verifyManageToken(token)
+      if (!authedUserId) {
+        return NextResponse.json({ error: 'Unauthorized — missing or expired session token' }, { status: 401 })
+      }
 
-    if (action === 'read' && briefId) {
-      await supabase.from('employee_proactive_briefs').update({
-        read_at:   new Date().toISOString(),
-        delivered: true,
-      }).eq('id', briefId).eq('user_id', userId)
-      return NextResponse.json({ ok: true })
+      const updates = action === 'dismiss'
+        ? { dismissed_at: new Date().toISOString() }
+        : { read_at: new Date().toISOString(), delivered: true }
+
+      await supabase.from('employee_proactive_briefs').update(updates)
+        .eq('id', briefId).eq('user_id', authedUserId)
+
+      const res = NextResponse.json({ ok: true })
+      res.headers.set('x-manage-token', signManageToken(authedUserId))
+      return res
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })

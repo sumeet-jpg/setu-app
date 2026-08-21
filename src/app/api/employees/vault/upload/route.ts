@@ -1,6 +1,7 @@
 ﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { withManageAuth } from '@/lib/manage-token'
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // /api/employees/vault/upload
@@ -76,11 +77,15 @@ function splitIntoChunks(content: string): string[] {
 const VALID_SOURCE_TYPES = ['text', 'sop', 'playbook', 'org_chart', 'product_catalog', 'website', 'pdf', 'notion'] as const
 
 export async function POST(req: NextRequest) {
-  try {
-    const { userId, slug, sourceName, sourceType, content, sourceUrl } = await req.json()
+  return withManageAuth(req, async (userId) => uploadVaultDoc(userId, req))
+}
 
-    if (!userId || !sourceName || !content) {
-      return NextResponse.json({ error: 'userId, sourceName, content required' }, { status: 400 })
+async function uploadVaultDoc(userId: string, req: NextRequest): Promise<NextResponse> {
+  try {
+    const { slug, sourceName, sourceType, content, sourceUrl } = await req.json()
+
+    if (!sourceName || !content) {
+      return NextResponse.json({ error: 'sourceName, content required' }, { status: 400 })
     }
 
     const type = VALID_SOURCE_TYPES.includes(sourceType) ? sourceType : 'text'

@@ -1,6 +1,7 @@
 ﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { withManageAuth } from '@/lib/manage-token'
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // /api/employees/cortex â€” Cross-Employee Cortex (CEC)
@@ -29,13 +30,14 @@ const VALID_ENTRY_TYPES = [
 ] as const
 
 export async function GET(req: NextRequest) {
+  return withManageAuth(req, async (userId) => getCortex(userId, req))
+}
+
+async function getCortex(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url)
-    const userId = searchParams.get('userId')
     const slug   = searchParams.get('slug') ?? undefined
     const limit  = Math.min(50, parseInt(searchParams.get('limit') ?? '30'))
-
-    if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
 
     const supabase = createAdminClient()
 
@@ -65,14 +67,18 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  return withManageAuth(req, async (userId) => postCortex(userId, req))
+}
+
+async function postCortex(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
     const {
-      userId, sourceSlug, entryType, title, body,
+      sourceSlug, entryType, title, body,
       relevantTo, confidence, sourceSessionId,
     } = await req.json()
 
-    if (!userId || !sourceSlug || !entryType || !title || !body) {
-      return NextResponse.json({ error: 'userId, sourceSlug, entryType, title, body required' }, { status: 400 })
+    if (!sourceSlug || !entryType || !title || !body) {
+      return NextResponse.json({ error: 'sourceSlug, entryType, title, body required' }, { status: 400 })
     }
 
     if (!VALID_ENTRY_TYPES.includes(entryType)) {
@@ -108,10 +114,14 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  return withManageAuth(req, async (userId) => deleteCortex(userId, req))
+}
+
+async function deleteCortex(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
-    const { userId, entryId } = await req.json()
-    if (!userId || !entryId) {
-      return NextResponse.json({ error: 'userId and entryId required' }, { status: 400 })
+    const { entryId } = await req.json()
+    if (!entryId) {
+      return NextResponse.json({ error: 'entryId required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()
@@ -131,10 +141,14 @@ export async function DELETE(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  return withManageAuth(req, async (userId) => patchCortex(userId, req))
+}
+
+async function patchCortex(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
-    const { userId, entryId, slug } = await req.json()
-    if (!userId || !entryId || !slug) {
-      return NextResponse.json({ error: 'userId, entryId, slug required' }, { status: 400 })
+    const { entryId, slug } = await req.json()
+    if (!entryId || !slug) {
+      return NextResponse.json({ error: 'entryId, slug required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()

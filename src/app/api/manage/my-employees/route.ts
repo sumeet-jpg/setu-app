@@ -3,6 +3,8 @@ import { createAdminClient } from '@/lib/supabase/server'
 
 // GET ?userId=
 // Returns all hired_subscriptions for this userId with employee metadata.
+// Scoped to non-PII columns only — this list renders on /my-employees for
+// whoever holds the bare userId, same tradeoff as manage/subscription GET.
 export async function GET(req: NextRequest) {
   try {
     const userId = new URL(req.url).searchParams.get('userId')
@@ -12,7 +14,7 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await supabase
       .from('hired_subscriptions')
-      .select('*')
+      .select('id, employee_slug, employee_name, employee_title, status, trial_ends_at, monthly_price_cents, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 

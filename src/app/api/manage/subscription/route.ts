@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
+import { withManageAuth } from '@/lib/manage-token'
 
 function getSupabase() {
   return createClient(
@@ -9,7 +10,13 @@ function getSupabase() {
   )
 }
 
-// GET — fetch subscription for a userId + slug
+// GET — fetch subscription status for a userId + slug.
+// Intentionally left open on a bare userId (no manage-token required): this
+// is called from the anonymous, pre-hire interview page just to render a
+// trial/status banner, so it must work before anyone has a token. To keep
+// that safe, the select below is scoped to non-PII status fields only —
+// name/email/company never leave this endpoint. Mutations (PATCH, below)
+// and anything that returns real PII require the token.
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -23,7 +30,7 @@ export async function GET(req: NextRequest) {
     const supabase = getSupabase()
     const { data, error } = await supabase
       .from('hired_subscriptions')
-      .select('*')
+      .select('id, status, trial_started_at, trial_ends_at, activated_at, cancelled_at, monthly_price_cents, employee_name, employee_title')
       .eq('user_id', userId)
       .eq('employee_slug', slug)
       .maybeSingle()
@@ -42,14 +49,21 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// PATCH — self-service cancel or pause
-// body: { userId, slug, action: 'cancel' | 'pause' | 'resume', reason? }
+// PATCH — self-service cancel or pause. Requires a valid manage-token
+// (x-manage-token header) — the authoritative userId comes from that token,
+// never from the request body, so this can no longer be called against
+// someone else's subscription just by knowing their UUID.
+// body: { slug, action: 'cancel' | 'pause' | 'resume', reason? }
 export async function PATCH(req: NextRequest) {
-  try {
-    const { userId, slug, action, reason } = await req.json()
+  return withManageAuth(req, async (userId) => patchSubscription(userId, req))
+}
 
-    if (!userId || !slug || !action) {
-      return NextResponse.json({ error: 'userId, slug, and action required' }, { status: 400 })
+async function patchSubscription(userId: string, req: NextRequest): Promise<NextResponse> {
+  try {
+    const { slug, action, reason } = await req.json()
+
+    if (!slug || !action) {
+      return NextResponse.json({ error: 'slug and action required' }, { status: 400 })
     }
 
     const VALID_ACTIONS = ['cancel', 'pause', 'resume']

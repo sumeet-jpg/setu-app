@@ -1,6 +1,7 @@
 ﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { withManageAuth } from '@/lib/manage-token'
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // /api/employees/beliefs
@@ -30,16 +31,19 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 export async function GET(req: NextRequest) {
+  return withManageAuth(req, async (userId) => getBeliefs(userId, req))
+}
+
+async function getBeliefs(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url)
     const slug   = searchParams.get('slug')
-    const userId = searchParams.get('userId')
     const category = searchParams.get('category') ?? undefined
     const limit  = Math.min(200, parseInt(searchParams.get('limit') ?? '100'))
     const offset = parseInt(searchParams.get('offset') ?? '0')
 
-    if (!slug || !userId) {
-      return NextResponse.json({ error: 'slug and userId required' }, { status: 400 })
+    if (!slug) {
+      return NextResponse.json({ error: 'slug required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()
@@ -109,10 +113,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  return withManageAuth(req, async (userId) => deleteBelief(userId, req))
+}
+
+async function deleteBelief(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
-    const { userId, beliefId } = await req.json()
-    if (!userId || !beliefId) {
-      return NextResponse.json({ error: 'userId and beliefId required' }, { status: 400 })
+    const { beliefId } = await req.json()
+    if (!beliefId) {
+      return NextResponse.json({ error: 'beliefId required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()
@@ -145,10 +153,14 @@ export async function DELETE(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  return withManageAuth(req, async (userId) => patchBelief(userId, req))
+}
+
+async function patchBelief(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
-    const { userId, beliefId, confidence, note } = await req.json()
-    if (!userId || !beliefId) {
-      return NextResponse.json({ error: 'userId and beliefId required' }, { status: 400 })
+    const { beliefId, confidence, note } = await req.json()
+    if (!beliefId) {
+      return NextResponse.json({ error: 'beliefId required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()

@@ -1,6 +1,7 @@
 ﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { withManageAuth } from '@/lib/manage-token'
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // /api/employees/vault â€” Company Intelligence Vault (CIV)
@@ -17,12 +18,13 @@ import { createAdminClient } from '@/lib/supabase/server'
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function GET(req: NextRequest) {
+  return withManageAuth(req, async (userId) => getVault(userId, req))
+}
+
+async function getVault(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url)
-    const userId = searchParams.get('userId')
     const slug   = searchParams.get('slug') ?? undefined
-
-    if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
 
     const supabase = createAdminClient()
 
@@ -77,10 +79,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  return withManageAuth(req, async (userId) => deleteVaultDoc(userId, req))
+}
+
+async function deleteVaultDoc(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
-    const { userId, sourceName } = await req.json()
-    if (!userId || !sourceName) {
-      return NextResponse.json({ error: 'userId and sourceName required' }, { status: 400 })
+    const { sourceName } = await req.json()
+    if (!sourceName) {
+      return NextResponse.json({ error: 'sourceName required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()

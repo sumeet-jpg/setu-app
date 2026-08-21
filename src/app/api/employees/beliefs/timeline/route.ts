@@ -1,6 +1,7 @@
 ﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { withManageAuth } from '@/lib/manage-token'
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // /api/employees/beliefs/timeline
@@ -13,14 +14,17 @@ import { createAdminClient } from '@/lib/supabase/server'
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function GET(req: NextRequest) {
+  return withManageAuth(req, async (userId) => getTimeline(userId, req))
+}
+
+async function getTimeline(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url)
     const slug   = searchParams.get('slug')
-    const userId = searchParams.get('userId')
     const limit  = Math.min(50, parseInt(searchParams.get('limit') ?? '30'))
 
-    if (!slug || !userId) {
-      return NextResponse.json({ error: 'slug and userId required' }, { status: 400 })
+    if (!slug) {
+      return NextResponse.json({ error: 'slug required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()

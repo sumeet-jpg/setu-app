@@ -1,6 +1,7 @@
 ﻿// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { withManageAuth } from '@/lib/manage-token'
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // /api/employees/calibration â€” S7 Calibration Engine
@@ -47,13 +48,14 @@ function autonomyPolicy(level: number) {
 }
 
 export async function GET(req: NextRequest) {
+  return withManageAuth(req, async (userId) => getCalibration(userId, req))
+}
+
+async function getCalibration(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url)
-    const userId = searchParams.get('userId')
     const slug   = searchParams.get('slug')
     const withHistory = searchParams.get('history') === 'true'
-
-    if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
 
     const supabase = createAdminClient()
 
@@ -112,12 +114,16 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  return withManageAuth(req, async (userId) => postCalibration(userId, req))
+}
+
+async function postCalibration(userId: string, req: NextRequest): Promise<NextResponse> {
   try {
     const body = await req.json()
-    const { userId, slug, action } = body
+    const { slug, action } = body
 
-    if (!userId || !slug || !action) {
-      return NextResponse.json({ error: 'userId, slug, action required' }, { status: 400 })
+    if (!slug || !action) {
+      return NextResponse.json({ error: 'slug, action required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()
