@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 import { signRecoveryToken } from '@/lib/manage-token'
+import { escapeHtml as esc } from '@/lib/email/escape-html'
 // getServerEnv removed â€” reads env vars directly to avoid strict validation crash
 
 // POST { email }
@@ -43,13 +44,13 @@ export async function POST(req: NextRequest) {
       return `
         <tr>
           <td style="padding:12px 16px;border-bottom:1px solid #e5e7eb">
-            <strong style="color:#111">${s.employee_name ?? s.employee_slug}</strong>
-            <div style="font-size:12px;color:#6b7280">${s.employee_title ?? ''}</div>
+            <strong style="color:#111">${esc(s.employee_name ?? s.employee_slug)}</strong>
+            <div style="font-size:12px;color:#6b7280">${esc(s.employee_title ?? '')}</div>
           </td>
           <td style="padding:12px 16px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:13px">${statusLabel}</td>
           <td style="padding:12px 16px;border-bottom:1px solid #e5e7eb;font-size:13px">$${price}/mo</td>
           <td style="padding:12px 16px;border-bottom:1px solid #e5e7eb">
-            <a href="${BASE_URL}/manage/${s.employee_slug}?uid=${encodeURIComponent(s.user_id)}&mt=${encodeURIComponent(signRecoveryToken(s.user_id))}" style="background:#111;color:#fff;padding:6px 14px;border-radius:7px;text-decoration:none;font-size:12px;font-weight:600">Manage â†’</a>
+            <a href="${BASE_URL}/manage/${encodeURIComponent(s.employee_slug)}?uid=${encodeURIComponent(s.user_id)}&mt=${encodeURIComponent(signRecoveryToken(s.user_id))}" style="background:#111;color:#fff;padding:6px 14px;border-radius:7px;text-decoration:none;font-size:12px;font-weight:600">Manage â†’</a>
           </td>
         </tr>`
     }).join('')

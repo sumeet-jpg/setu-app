@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 import { withManageAuth } from '@/lib/manage-token'
+import { escapeHtml as esc } from '@/lib/email/escape-html'
 
 function getSupabase() {
   return createClient(
@@ -133,7 +134,7 @@ async function patchSubscription(userId: string, req: NextRequest): Promise<Next
         await resend.emails.send({
           from,
           to: adminEmail,
-          subject: `⚠️ Cancellation: ${updated?.owner_name ?? 'A user'} cancelled ${updated?.employee_name ?? slug}`,
+          subject: `⚠️ Cancellation: ${esc(updated?.owner_name ?? 'A user')} cancelled ${esc(updated?.employee_name ?? slug)}`,
           html: `
             <div style="font-family:system-ui,sans-serif;max-width:540px;margin:0 auto;padding:28px 20px">
               <h2 style="font-size:18px;font-weight:800;color:#111;margin:0 0 6px">Subscription cancelled</h2>
@@ -145,7 +146,7 @@ async function patchSubscription(userId: string, req: NextRequest): Promise<Next
                   ['Employee',  updated?.employee_name ?? slug],
                   ['Rate',      `$${price}/mo (locked)`],
                   ['Reason',    reason || '(no reason given)'],
-                ].map(([k, v]) => `<tr><td style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;color:#6b7280;width:100px">${k}</td><td style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;color:#111">${v}</td></tr>`).join('')}
+                ].map(([k, v]) => `<tr><td style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;color:#6b7280;width:100px">${esc(k)}</td><td style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;color:#111">${esc(v)}</td></tr>`).join('')}
               </table>
               <a href="https://setuagents.com/admin/subscriptions" style="display:inline-block;padding:10px 20px;background:#111;color:#fff;border-radius:9px;text-decoration:none;font-size:13px;font-weight:700">View in Admin →</a>
             </div>
@@ -154,8 +155,8 @@ async function patchSubscription(userId: string, req: NextRequest): Promise<Next
 
         // Subscriber confirmation
         if (updated?.owner_email) {
-          const firstName = (updated.owner_name ?? '').split(' ')[0] || 'there'
-          const empName   = updated.employee_name ?? slug
+          const firstName = esc((updated.owner_name ?? '').split(' ')[0] || 'there')
+          const empName   = esc(updated.employee_name ?? slug)
           await resend.emails.send({
             from,
             to: updated.owner_email,
@@ -173,7 +174,7 @@ async function patchSubscription(userId: string, req: NextRequest): Promise<Next
                   <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 24px">
                     If you change your mind, your locked rate of <strong style="color:#fff">$${price}/month</strong> is still available if you reactivate within 30 days. After that, you'll pay the then-current rate.
                   </p>
-                  <a href="${base}/employees/${slug}/hire" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
+                  <a href="${base}/employees/${encodeURIComponent(slug)}/hire" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
                     Reactivate at $${price}/mo →
                   </a>
                   <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu · setuagents.com</p>
@@ -191,8 +192,8 @@ async function patchSubscription(userId: string, req: NextRequest): Promise<Next
         const resend    = new Resend(process.env.RESEND_API_KEY)
         const from      = process.env.FROM_EMAIL ?? 'hello@setuagents.com'
         const base      = process.env.NEXT_PUBLIC_APP_URL ?? 'https://setuagents.com'
-        const firstName = (updated.owner_name ?? '').split(' ')[0] || 'there'
-        const empName   = updated.employee_name ?? slug
+        const firstName = esc((updated.owner_name ?? '').split(' ')[0] || 'there')
+        const empName   = esc(updated.employee_name ?? slug)
         const price     = updated.monthly_price_cents ? Math.round(updated.monthly_price_cents / 100) : 49
 
         await resend.emails.send({
@@ -209,7 +210,7 @@ async function patchSubscription(userId: string, req: NextRequest): Promise<Next
                 <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 16px">
                   Your subscription is paused. You won't be billed while paused, and your locked rate of <strong style="color:#fff">$${price}/month</strong> is preserved — resume anytime and you pick up exactly where you left off.
                 </p>
-                <a href="${base}/manage/${slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
+                <a href="${base}/manage/${encodeURIComponent(slug)}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
                   Resume ${empName} →
                 </a>
                 <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu · setuagents.com</p>

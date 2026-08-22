@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/governance/admin-guard'
 import { createAdminClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
+import { escapeHtml as esc } from '@/lib/email/escape-html'
 
 // GET /api/admin/subscriptions?status=trial|active|paused|cancelled
 export async function GET(req: NextRequest) {
@@ -74,8 +75,8 @@ export async function PATCH(req: NextRequest) {
         const resend = new Resend(process.env.RESEND_API_KEY)
         const from = process.env.FROM_EMAIL ?? 'hello@setuagents.com'
         const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://setuagents.com'
-        const firstName = (updated.owner_name ?? '').split(' ')[0] || 'there'
-        const empName = updated.employee_name ?? updated.employee_slug
+        const firstName = esc((updated.owner_name ?? '').split(' ')[0] || 'there')
+        const empName = esc(updated.employee_name ?? updated.employee_slug)
         const price = updated.monthly_price_cents ? Math.round(updated.monthly_price_cents / 100) : 49
 
         await resend.emails.send({
@@ -95,7 +96,7 @@ export async function PATCH(req: NextRequest) {
                 <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 24px">
                   Head to the manage hub to upload context, adjust autonomy settings, and get your first task moving.
                 </p>
-                <a href="${base}/manage/${updated.employee_slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
+                <a href="${base}/manage/${encodeURIComponent(updated.employee_slug)}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
                   Open ${empName}'s hub →
                 </a>
                 <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu · setuagents.com</p>

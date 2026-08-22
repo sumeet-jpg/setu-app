@@ -2,14 +2,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
+import { verifyCronSecret } from '@/lib/cron-auth'
+import { escapeHtml as esc } from '@/lib/email/escape-html'
 
 // /api/cron/trials â€” daily trial lifecycle management
 // Secured by CRON_SECRET.
 // Runs every day at 8am UTC (see vercel.json)
 
 export async function POST(req: NextRequest) {
-  const secret = req.headers.get('x-cron-secret')
-  if (secret !== process.env.CRON_SECRET) {
+  if (!verifyCronSecret(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -48,9 +49,9 @@ export async function POST(req: NextRequest) {
       if (resend) {
         for (const sub of expiring) {
           if (!sub.owner_email) continue
-          const firstName = (sub.owner_name ?? '').split(' ')[0] || 'there'
+          const firstName = esc((sub.owner_name ?? '').split(' ')[0] || 'there')
           const price     = sub.monthly_price_cents ? Math.round(sub.monthly_price_cents / 100) : 49
-          const empName   = sub.employee_name ?? sub.employee_slug
+          const empName   = esc(sub.employee_name ?? sub.employee_slug)
 
           await resend.emails.send({
             from,
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
                   <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 24px">
                     New signups now pay more. If you come back later, you'll pay the then-current rate â€” not your locked price.
                   </p>
-                  <a href="${base}/employees/${sub.employee_slug}/hire" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
+                  <a href="${base}/employees/${encodeURIComponent(sub.employee_slug)}/hire" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
                     Reactivate at $${price}/mo â†’
                   </a>
                   <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu Â· setuagents.com</p>
@@ -121,7 +122,7 @@ export async function POST(req: NextRequest) {
             <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 24px">
               Haven't had a chance yet? Open the hub and send ${en} your first real task â€” they're ready.
             </p>
-            <a href="${base}/manage/${slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
+            <a href="${base}/manage/${encodeURIComponent(slug)}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
               Open ${en}'s hub â†’
             </a>
             <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu Â· setuagents.com</p>
@@ -154,7 +155,7 @@ export async function POST(req: NextRequest) {
                 <strong style="color:#f59e0b">$${p + 10}+/month</strong>
               </div>
             </div>
-            <a href="${base}/manage/${slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
+            <a href="${base}/manage/${encodeURIComponent(slug)}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
               Activate now â†’
             </a>
             <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu Â· setuagents.com</p>
@@ -179,7 +180,7 @@ export async function POST(req: NextRequest) {
               <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 24px">
                 7 days left. Activate to keep your <strong style="color:#fff">$${p}/month</strong> rate locked forever. If you cancel and re-subscribe later, you'll pay the then-current rate.
               </p>
-              <a href="${base}/manage/${slug}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
+              <a href="${base}/manage/${encodeURIComponent(slug)}" style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700">
                 Go to manage hub â†’
               </a>
               <p style="font-size:12px;color:#334155;margin:24px 0 0;line-height:1.6">Questions? Reply to this email.<br>Setu Â· setuagents.com</p>
@@ -209,9 +210,9 @@ export async function POST(req: NextRequest) {
 
       for (const sub of (targets ?? [])) {
         if (!sub.owner_email) continue
-        const firstName = (sub.owner_name ?? '').split(' ')[0] || 'there'
+        const firstName = esc((sub.owner_name ?? '').split(' ')[0] || 'there')
         const price = sub.monthly_price_cents ? Math.round(sub.monthly_price_cents / 100) : 49
-        const empName = sub.employee_name ?? sub.employee_slug
+        const empName = esc(sub.employee_name ?? sub.employee_slug)
 
         await resend.emails.send({
           from,

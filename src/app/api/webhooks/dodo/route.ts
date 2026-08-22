@@ -47,14 +47,28 @@ export async function POST(req: NextRequest) {
 
       if (user_id && employee_slug) {
         const supabase = getSupabase()
-        await supabase
+
+        // Idempotent: Dodo can and does redeliver webhooks. Skip if this
+        // subscription is already active so a redelivery doesn't stomp
+        // activated_at with a later timestamp or re-fire anything keyed off it.
+        const { data: current } = await supabase
           .from('hired_subscriptions')
-          .update({
-            status:     'active',
-            updated_at: new Date().toISOString(),
-          })
+          .select('status')
           .eq('user_id', user_id)
           .eq('employee_slug', employee_slug)
+          .maybeSingle()
+
+        if (current?.status !== 'active') {
+          await supabase
+            .from('hired_subscriptions')
+            .update({
+              status:       'active',
+              activated_at: new Date().toISOString(),
+              updated_at:   new Date().toISOString(),
+            })
+            .eq('user_id', user_id)
+            .eq('employee_slug', employee_slug)
+        }
       }
     }
 
