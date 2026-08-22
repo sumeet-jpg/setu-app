@@ -1,9 +1,17 @@
 // @ts-nocheck
 /**
  * SETU — Admin Route Guard
- * Verifies authentication and admin role.
- * Phase 1: any authenticated user = admin (single-admin model)
- * Phase 2+: checks profiles table for admin role
+ * Verifies authentication AND that the signed-in email is on the admin
+ * allowlist (ADMIN_EMAIL, comma-separated for more than one admin).
+ *
+ * Until this fix: /signin is a PUBLIC page offering Google/GitHub OAuth
+ * with no invite restriction — this app has no other use for Supabase
+ * Auth (real customers are anonymous-UUID only, per src/app/my-employees).
+ * getAdminUserOrNull() treated "successfully authenticated" as "is admin",
+ * so anyone who visited /signin and clicked "Sign in with Google" got full
+ * admin access — subscription management, lead data, blueprint
+ * approve/reject — with zero further check. Confirmed live: nothing in
+ * the signin flow restricts which Google account can complete it.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -40,12 +48,24 @@ export async function requireAdmin(request: NextRequest): Promise<{ user: AdminU
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 }
 
+function isAllowedAdminEmail(email: string): boolean {
+  const allowlist = (process.env.ADMIN_EMAIL ?? '')
+    .split(',')
+    .map(e => e.trim().toLowerCase())
+    .filter(Boolean)
+  // Fail closed: if ADMIN_EMAIL was never set, nobody is an admin — better
+  // than the previous behavior (everybody is).
+  if (allowlist.length === 0) return false
+  return allowlist.includes(email.toLowerCase())
+}
+
 export async function getAdminUserOrNull(): Promise<AdminUser | null> {
   try {
     const supabase = await createServerClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
-    return { id: user.id, email: user.email ?? "" };
+    if (!user || !user.email) return null;
+    if (!isAllowedAdminEmail(user.email)) return null;
+    return { id: user.id, email: user.email };
   } catch {
     return null;
   }

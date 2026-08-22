@@ -50,7 +50,12 @@ export type AuditEventType =
   | "internal_agent_run_completed"
   | "internal_agent_run_failed"
   | "lead_created"
-  | "conversation_started";
+  | "conversation_started"
+  | "subscription_created"
+  | "subscription_cancelled"
+  | "subscription_paused"
+  | "subscription_resumed"
+  | "subscription_admin_override";
 
 export type AuditSeverity = "info" | "warning" | "critical";
 

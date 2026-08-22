@@ -175,4 +175,65 @@ export const auditLog = {
       description: `Admin accessed route: ${route}`,
       metadata: { route },
     }),
+
+  subscriptionCreated: (userId: string, employeeSlug: string, priceCents: number) =>
+    writeAuditLog({
+      event_type: "subscription_created",
+      user_id: userId,
+      entity_type: "hired_subscription",
+      entity_id: `${userId}:${employeeSlug}`,
+      description: `Trial started for ${employeeSlug}`,
+      metadata: { employee_slug: employeeSlug, monthly_price_cents: priceCents },
+    }),
+
+  subscriptionCancelled: (userId: string, employeeSlug: string, reason?: string) =>
+    writeAuditLog({
+      event_type: "subscription_cancelled",
+      user_id: userId,
+      entity_type: "hired_subscription",
+      entity_id: `${userId}:${employeeSlug}`,
+      description: `Subscription cancelled for ${employeeSlug}`,
+      metadata: { employee_slug: employeeSlug, reason: reason ?? null },
+    }),
+
+  subscriptionPaused: (userId: string, employeeSlug: string) =>
+    writeAuditLog({
+      event_type: "subscription_paused",
+      user_id: userId,
+      entity_type: "hired_subscription",
+      entity_id: `${userId}:${employeeSlug}`,
+      description: `Subscription paused for ${employeeSlug}`,
+      metadata: { employee_slug: employeeSlug },
+    }),
+
+  subscriptionResumed: (userId: string, employeeSlug: string) =>
+    writeAuditLog({
+      event_type: "subscription_resumed",
+      user_id: userId,
+      entity_type: "hired_subscription",
+      entity_id: `${userId}:${employeeSlug}`,
+      description: `Subscription resumed for ${employeeSlug}`,
+      metadata: { employee_slug: employeeSlug },
+    }),
+
+  subscriptionAdminOverride: (adminEmail: string, subscriptionId: string, newStatus: string) =>
+    writeAuditLog({
+      event_type: "subscription_admin_override",
+      severity: "warning",
+      user_id: adminEmail,
+      entity_type: "hired_subscription",
+      entity_id: subscriptionId,
+      description: `Admin set subscription ${subscriptionId} to ${newStatus}`,
+      metadata: { new_status: newStatus },
+    }),
+
+  blueprintReviewed: (adminEmail: string, blueprintId: string, decision: string) =>
+    writeAuditLog({
+      event_type: decision === "approved" ? "approval_approved" : "approval_rejected",
+      user_id: adminEmail,
+      entity_type: "blueprint",
+      entity_id: blueprintId,
+      description: `Blueprint ${blueprintId} ${decision} by admin`,
+      metadata: { decision },
+    }),
 };

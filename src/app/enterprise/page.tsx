@@ -166,6 +166,9 @@ export default function EnterprisePage() {
           Meet the C-Suite →
         </Link>
         <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>$49/mo, locked at signup · 7-day live guarantee · Cancel anytime</div>
+        <div style={{ marginTop: 20, fontSize: 12, color: DIM }}>
+          Procurement need a DPA? <Link href="/legal/dpa" style={{ color: '#a5b4fc', textDecoration: 'underline' }}>Read Setu's standard Data Processing Agreement →</Link>
+        </div>
       </section>
 
       <Footer theme="dark" />

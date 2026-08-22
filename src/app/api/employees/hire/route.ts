@@ -5,6 +5,7 @@ import { Resend } from 'resend'
 import { signManageToken } from '@/lib/manage-token'
 import { escapeHtml as esc } from '@/lib/email/escape-html'
 import { RATE_LIMITS, getClientIp } from '@/lib/security/rate-limiter'
+import { auditLog } from '@/lib/governance/audit-logger'
 
 export const runtime = 'nodejs'
 
@@ -131,6 +132,8 @@ export async function POST(req: NextRequest) {
       console.error('[Setu hire subscription] FAILED TO SAVE:', subErr.message, { userId, employee_slug })
       return NextResponse.json({ error: 'Could not start your trial. Please try again.' }, { status: 500 })
     }
+
+    auditLog.subscriptionCreated(userId, employee_slug, priceCents).catch(() => {})
 
     const fromEmail = process.env.FROM_EMAIL ?? 'hello@setuagents.com'
     const adminEmail = process.env.ADMIN_ALERT_EMAIL ?? 'sumeet@setuagents.com'

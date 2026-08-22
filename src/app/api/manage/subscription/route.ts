@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 import { withManageAuth } from '@/lib/manage-token'
 import { escapeHtml as esc } from '@/lib/email/escape-html'
+import { auditLog } from '@/lib/governance/audit-logger'
 
 function getSupabase() {
   return createClient(
@@ -120,6 +121,10 @@ async function patchSubscription(userId: string, req: NextRequest): Promise<Next
       .maybeSingle()
 
     if (error) throw error
+
+    if (action === 'cancel') auditLog.subscriptionCancelled(userId, slug, reason).catch(() => {})
+    if (action === 'pause') auditLog.subscriptionPaused(userId, slug).catch(() => {})
+    if (action === 'resume') auditLog.subscriptionResumed(userId, slug).catch(() => {})
 
     // Send emails on cancel: admin alert + subscriber confirmation
     if (action === 'cancel' && process.env.RESEND_API_KEY) {

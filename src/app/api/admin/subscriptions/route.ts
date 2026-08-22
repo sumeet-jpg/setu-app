@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/governance/admin-guard'
 import { createAdminClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 import { escapeHtml as esc } from '@/lib/email/escape-html'
+import { auditLog } from '@/lib/governance/audit-logger'
 
 // GET /api/admin/subscriptions?status=trial|active|paused|cancelled
 export async function GET(req: NextRequest) {
@@ -68,6 +69,8 @@ export async function PATCH(req: NextRequest) {
       .maybeSingle()
 
     if (error) throw error
+
+    auditLog.subscriptionAdminOverride(auth.user.email, id, status).catch(() => {})
 
     // Send activation confirmation email when admin marks active
     if (status === 'active' && updated?.owner_email && process.env.RESEND_API_KEY) {
