@@ -110,7 +110,7 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
         (window as any).fbq('track', 'Lead', { content_name: e.name, content_category: e.dept })
       }
       // Redirect to self-service management hub
-      router.push(`/manage/${e.slug}`)
+      router.push(`/employees/${e.slug}/onboard`)
       setStatus('success')
     } catch (err: any) {
       setErrMsg(err.message ?? 'Something went wrong')
@@ -162,7 +162,7 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
           </div>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
             <Link href="/employees" style={{ padding: '11px 22px', borderRadius: 10, background: WHITE, border: `1.5px solid ${GRAY}`, color: MUTED, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Browse more employees</Link>
-            <Link href={`/manage/${e.slug}`} style={{ padding: '11px 22px', borderRadius: 10, background: GREEN, color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 16px rgba(14,92,52,0.28)' }}>Open management hub →</Link>
+            <Link href={`/employees/${e.slug}/onboard`} style={{ padding: '11px 22px', borderRadius: 10, background: GREEN, color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 16px rgba(14,92,52,0.28)' }}>Get set up →</Link>
           </div>
         </div>
       </div>

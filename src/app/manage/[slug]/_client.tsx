@@ -198,6 +198,7 @@ export default function ManageClient({
     { href: `/employees/${slug}/interview`, label: 'Chat', icon: '💬', desc: 'Start a session' },
     { href: `/employees/${slug}/memory`, label: 'Memory', icon: '🧠', desc: 'Beliefs, vault, alerts' },
     { href: `/employees/${slug}/memory#calibration`, label: 'Trust', icon: '⚙', desc: 'Autonomy dial' },
+    { href: `/employees/${slug}/onboard`, label: 'Setup', icon: '🚀', desc: 'Context, KPIs, tools' },
   ]
 
   return (
@@ -373,7 +374,7 @@ export default function ManageClient({
         )}
 
         {/* Quick nav */}
-        <div className="manage-nav-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
+        <div className="manage-nav-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 32 }}>
           {navLinks.map(link => (
             <Link key={link.href} href={link.href} style={{ textDecoration: 'none' }}>
               <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '20px 22px', cursor: 'pointer', transition: 'border-color 0.2s' }}>

@@ -86,6 +86,46 @@ export default function InterviewClient({ slug }: { slug: string }) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
+  // Soft, skippable email capture — shown once real engagement happens (2+
+  // messages sent), never as a pre-chat gate. "Free to interview, no account
+  // needed" is the actual product differentiator; this only asks after
+  // someone's already gotten value, and it's always dismissible.
+  const [showCapture, setShowCapture] = useState(false)
+  const [captureEmail, setCaptureEmail] = useState('')
+  const [capturing, setCapturing] = useState(false)
+  const [captured, setCaptured] = useState(false)
+
+  useEffect(() => {
+    const userMsgCount = msgs.filter(m => m.role === 'user').length
+    if (userMsgCount < 2 || isHired || captured) return
+    if (typeof window !== 'undefined' && localStorage.getItem('setu_email_capture_seen')) return
+    setShowCapture(true)
+  }, [msgs, isHired, captured])
+
+  function dismissCapture() {
+    setShowCapture(false)
+    if (typeof window !== 'undefined') localStorage.setItem('setu_email_capture_seen', '1')
+  }
+
+  async function submitCapture(ev: React.FormEvent) {
+    ev.preventDefault()
+    if (!captureEmail.trim() || capturing) return
+    setCapturing(true)
+    try {
+      await fetch('/api/employees/capture-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, slug: e.slug, email: captureEmail.trim() }),
+      })
+      setCaptured(true)
+      dismissCapture()
+    } catch {
+      dismissCapture()
+    } finally {
+      setCapturing(false)
+    }
+  }
+
   useEffect(() => {
     if (!userId || !slug) return
     fetch(`/api/manage/subscription?userId=${userId}&slug=${slug}`)
@@ -434,6 +474,38 @@ export default function InterviewClient({ slug }: { slug: string }) {
               })}
           </div>
         ))}
+
+        {showCapture && (
+          <div style={{
+            maxWidth: 640, margin: '8px auto 0', background: SURFACE, border: `1px solid ${BORDER}`,
+            borderRadius: 14, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+          }}>
+            <div style={{ flex: 1, minWidth: 220 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9', marginBottom: 2 }}>Keep this conversation</div>
+              <div style={{ fontSize: 12, color: MUTED }}>Drop your email and we'll send you a link back to it — {e.name} remembers, even if you close this tab.</div>
+            </div>
+            <form onSubmit={submitCapture} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input
+                type="email" value={captureEmail} onChange={ev => setCaptureEmail(ev.target.value)}
+                placeholder="you@company.com" required
+                style={{ padding: '8px 12px', borderRadius: 9, border: `1px solid ${BORDER}`, background: BG, color: '#F1F5F9', fontSize: 13, outline: 'none', fontFamily: 'inherit', width: 180 }}
+              />
+              <button type="submit" disabled={capturing} style={{
+                padding: '8px 16px', borderRadius: 9, background: '#6366f1', color: '#fff', border: 'none',
+                fontSize: 13, fontWeight: 700, cursor: capturing ? 'wait' : 'pointer', whiteSpace: 'nowrap',
+              }}>
+                {capturing ? '…' : 'Save'}
+              </button>
+              <button type="button" onClick={dismissCapture} style={{
+                padding: '8px 10px', background: 'transparent', border: 'none', color: MUTED,
+                fontSize: 12, cursor: 'pointer',
+              }}>
+                Skip
+              </button>
+            </form>
+          </div>
+        )}
+
         <div ref={bottomRef} />
       </div>
 

@@ -6,13 +6,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { getTool } from '@/lib/tools/registry'
 import { encrypt } from '@/lib/tools/crypto'
+import { withManageAuth } from '@/lib/manage-token'
 
+// Previously trusted a bare user_id from the request body — anyone who knew
+// or guessed another user's UUID could connect (or overwrite) a third-party
+// API key on their account, or read which tools they'd connected. Now
+// requires a verified manage-token, same as every other private-data route.
 export async function POST(req: NextRequest) {
-  try {
-    const { user_id, tool_slug, api_key, config } = await req.json()
+  return withManageAuth(req, async (user_id) => connectTool(user_id, req))
+}
 
-    if (!user_id || !tool_slug || !api_key) {
-      return NextResponse.json({ error: 'user_id, tool_slug, and api_key are required' }, { status: 400 })
+async function connectTool(user_id: string, req: NextRequest): Promise<NextResponse> {
+  try {
+    const { tool_slug, api_key, config } = await req.json()
+
+    if (!tool_slug || !api_key) {
+      return NextResponse.json({ error: 'tool_slug and api_key are required' }, { status: 400 })
     }
 
     const toolDef = getTool(tool_slug)
@@ -48,11 +57,15 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  try {
-    const { user_id, tool_slug } = await req.json()
+  return withManageAuth(req, async (user_id) => disconnectTool(user_id, req))
+}
 
-    if (!user_id || !tool_slug) {
-      return NextResponse.json({ error: 'user_id and tool_slug required' }, { status: 400 })
+async function disconnectTool(user_id: string, req: NextRequest): Promise<NextResponse> {
+  try {
+    const { tool_slug } = await req.json()
+
+    if (!tool_slug) {
+      return NextResponse.json({ error: 'tool_slug required' }, { status: 400 })
     }
 
     const supabase = createAdminClient()

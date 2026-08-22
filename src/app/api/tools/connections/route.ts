@@ -5,16 +5,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { getTool, toolLogoUrl } from '@/lib/tools/registry'
+import { withManageAuth } from '@/lib/manage-token'
 
 export async function GET(req: NextRequest) {
+  return withManageAuth(req, async (user_id) => listConnections(user_id))
+}
+
+async function listConnections(user_id: string): Promise<NextResponse> {
   try {
-    const { searchParams } = new URL(req.url)
-    const user_id = searchParams.get('user_id')
-
-    if (!user_id) {
-      return NextResponse.json({ error: 'user_id required' }, { status: 400 })
-    }
-
     const supabase = createAdminClient()
     const { data, error } = await supabase
       .from('tool_connections')

@@ -3,8 +3,9 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { getStuntTitle } from '@/lib/employees/profiles'
-import { TOOL_REGISTRY, toolLogoUrl } from '@/lib/tools/registry'
+import { TOOL_REGISTRY, toolLogoUrl, employeeToolSlugs } from '@/lib/tools/registry'
 import Link from 'next/link'
+import { authFetch } from '@/lib/manage-token-client'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -63,40 +64,6 @@ function getUserId(): string {
   return id
 }
 
-function employeeToolSlugs(toolGroups: any[]): string[] {
-  const nameMap: Record<string, string> = {
-    'HubSpot': 'hubspot', 'Salesforce': 'salesforce', 'Marketo': 'marketo',
-    'ActiveCampaign': 'activecampaign', 'Mailchimp': 'mailchimp', 'Klaviyo': 'klaviyo',
-    'Customer.io': 'customer-io', 'SendGrid': 'sendgrid', 'Google Ads': 'google-ads',
-    'Meta Ads': 'meta-ads', 'LinkedIn Ads': 'linkedin-ads', 'TikTok Ads': 'tiktok-ads',
-    'Semrush': 'semrush', 'SEMrush': 'semrush', 'Ahrefs': 'ahrefs',
-    'Search Console': 'search-console', 'GA4': 'ga4', 'Mixpanel': 'mixpanel',
-    'Amplitude': 'amplitude', 'Looker': 'looker', 'WhatsApp Business API': 'whatsapp-api',
-    'Twilio': 'twilio', 'Shopify': 'shopify', 'WooCommerce': 'woocommerce',
-    'Razorpay': 'razorpay', 'PayU': 'payu', 'CleverTap': 'clevertap',
-    'MoEngage': 'moengage', 'Slack': 'slack', 'Intercom': 'intercom',
-    'Zendesk': 'zendesk', 'Freshdesk': 'freshdesk', 'Jira': 'jira',
-    'GitHub': 'github', 'Sentry': 'sentry', 'DataDog': 'datadog', 'Datadog': 'datadog',
-    'Linear': 'linear', 'Notion': 'notion', 'Asana': 'asana', 'Figma': 'figma',
-    'BambooHR': 'bamboohr', 'Rippling': 'rippling', 'Darwinbox': 'darwinbox',
-    'Stripe': 'stripe', 'QuickBooks': 'quickbooks', 'Xero': 'xero',
-    'Chargebee': 'chargebee', 'Outreach': 'outreach', 'Salesloft': 'salesloft',
-    'Apollo': 'apollo', 'Pipedrive': 'pipedrive', 'Canva': 'canva',
-    'Buffer': 'buffer', 'Hootsuite': 'hootsuite', 'Monday.com': 'monday',
-    'Monday': 'monday', 'ClickUp': 'clickup', 'Airtable': 'airtable',
-    'Google Workspace': 'google-workspace', 'PostHog': 'posthog', 'Hotjar': 'hotjar',
-    'Tableau': 'tableau', 'Zoho CRM': 'zoho-crm',
-  }
-  const slugs = new Set<string>()
-  for (const group of toolGroups) {
-    for (const t of group.tools ?? []) {
-      const s = nameMap[t]
-      if (s) slugs.add(s)
-    }
-  }
-  return [...slugs]
-}
-
 // ── Logo component ────────────────────────────────────────────────────────────
 
 function ToolLogo({ slug, name, size = 20 }: { slug: string; name: string; size?: number }) {
@@ -148,10 +115,10 @@ function ConnectModal({ toolSlug, onClose, onConnected }: {
     if (!key.trim()) { setError('API key is required'); return }
     setLoading(true); setError('')
     try {
-      const res = await fetch('/api/tools/connect', {
+      const res = await authFetch('/api/tools/connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: getUserId(), tool_slug: toolSlug, api_key: key.trim(), config }),
+        body: JSON.stringify({ tool_slug: toolSlug, api_key: key.trim(), config }),
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? 'Failed to connect'); setLoading(false); return }
@@ -342,7 +309,7 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
   // Load connected tools on mount
   useEffect(() => {
     if (!userId) return
-    fetch(`/api/tools/connections?user_id=${userId}`)
+    authFetch(`/api/tools/connections?user_id=${userId}`)
       .then(r => r.json())
       .then(d => { setConnected(d.connections ?? []); setLoadingTools(false) })
       .catch(() => setLoadingTools(false))
@@ -520,10 +487,10 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
   // ── Disconnect tool ──────────────────────────────────────────────────────────
 
   const disconnectTool = async (slug: string) => {
-    await fetch('/api/tools/connect', {
+    await authFetch('/api/tools/connect', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, tool_slug: slug }),
+      body: JSON.stringify({ tool_slug: slug }),
     })
     setConnected(c => c.filter(t => t.slug !== slug))
   }

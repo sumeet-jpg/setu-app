@@ -870,6 +870,46 @@ export function getToolsByCategory(category: ToolCategory): ToolDef[] {
   return TOOL_REGISTRY.filter(t => t.category === category)
 }
 
+// Maps an employee's tool-fluency groups (EmployeeProfile.tools — display
+// names like "HubSpot", "Meta Ads") to real registry slugs, for anything that
+// needs to know which tools a specific employee actually cares about
+// (moved here from employees/[slug]/_workspace.tsx so the onboarding flow
+// can reuse the exact same mapping instead of guessing at a new one).
+const TOOL_NAME_TO_SLUG: Record<string, string> = {
+  'HubSpot': 'hubspot', 'Salesforce': 'salesforce', 'Marketo': 'marketo',
+  'ActiveCampaign': 'activecampaign', 'Mailchimp': 'mailchimp', 'Klaviyo': 'klaviyo',
+  'Customer.io': 'customer-io', 'SendGrid': 'sendgrid', 'Google Ads': 'google-ads',
+  'Meta Ads': 'meta-ads', 'LinkedIn Ads': 'linkedin-ads', 'TikTok Ads': 'tiktok-ads',
+  'Semrush': 'semrush', 'SEMrush': 'semrush', 'Ahrefs': 'ahrefs',
+  'Search Console': 'search-console', 'GA4': 'ga4', 'Mixpanel': 'mixpanel',
+  'Amplitude': 'amplitude', 'Looker': 'looker', 'WhatsApp Business API': 'whatsapp-api',
+  'Twilio': 'twilio', 'Shopify': 'shopify', 'WooCommerce': 'woocommerce',
+  'Razorpay': 'razorpay', 'PayU': 'payu', 'CleverTap': 'clevertap',
+  'MoEngage': 'moengage', 'Slack': 'slack', 'Intercom': 'intercom',
+  'Zendesk': 'zendesk', 'Freshdesk': 'freshdesk', 'Jira': 'jira',
+  'GitHub': 'github', 'Sentry': 'sentry', 'DataDog': 'datadog', 'Datadog': 'datadog',
+  'Linear': 'linear', 'Notion': 'notion', 'Asana': 'asana', 'Figma': 'figma',
+  'BambooHR': 'bamboohr', 'Rippling': 'rippling', 'Darwinbox': 'darwinbox',
+  'Stripe': 'stripe', 'QuickBooks': 'quickbooks', 'Xero': 'xero',
+  'Chargebee': 'chargebee', 'Outreach': 'outreach', 'Salesloft': 'salesloft',
+  'Apollo': 'apollo', 'Pipedrive': 'pipedrive', 'Canva': 'canva',
+  'Buffer': 'buffer', 'Hootsuite': 'hootsuite', 'Monday.com': 'monday',
+  'Monday': 'monday', 'ClickUp': 'clickup', 'Airtable': 'airtable',
+  'Google Workspace': 'google-workspace', 'PostHog': 'posthog', 'Hotjar': 'hotjar',
+  'Tableau': 'tableau', 'Zoho CRM': 'zoho-crm',
+}
+
+export function employeeToolSlugs(toolGroups: { tools?: string[] }[]): string[] {
+  const slugs = new Set<string>()
+  for (const group of toolGroups ?? []) {
+    for (const t of group.tools ?? []) {
+      const s = TOOL_NAME_TO_SLUG[t]
+      if (s) slugs.add(s)
+    }
+  }
+  return [...slugs]
+}
+
 // Clearbit logo URL for a tool slug
 export function toolLogoUrl(slug: string): string {
   const tool = REGISTRY_MAP.get(slug)
