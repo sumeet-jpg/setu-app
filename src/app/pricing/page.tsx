@@ -4,7 +4,8 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { EMPLOYEES } from '@/lib/employees/profiles'
-import { SetuLogo } from '@/components/SetuLogo'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
 
 /* ─── Design tokens ─── */
 const BG    = '#F6F5F1'
@@ -101,19 +102,7 @@ export default function PricingPage() {
       `}</style>
 
       {/* Nav */}
-      <nav style={{
-        borderBottom: `1px solid ${GRAY}`, padding: '0 24px', height: 60,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        position: 'sticky', top: 0, zIndex: 50, background: WHITE,
-      }}>
-        <SetuLogo size={30} color={GREEN} wordColor={INK} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8 }}>Employees</Link>
-          <Link href="/quiz" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8 }}>Which role?</Link>
-          <Link href="/my-employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8 }}>My Team</Link>
-          <Link href="/signin" style={{ fontSize: 13, color: WHITE, textDecoration: 'none', padding: '8px 18px', borderRadius: 8, background: INK, fontWeight: 700 }}>Sign in</Link>
-        </div>
-      </nav>
+      <Nav theme="light" />
 
       {/* Hero */}
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '80px 24px 0', textAlign: 'center' }}>
@@ -312,6 +301,7 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
+      <Footer theme="light" />
     </div>
   )
 }

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { EMPLOYEES, DEPT_ORDER, getStuntTitle } from '@/lib/employees/profiles'
-import { SetuLogo } from '@/components/SetuLogo'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
 
 function getStoredUserId(): string {
   if (typeof window === 'undefined') return ''
@@ -57,8 +58,6 @@ export default function EmployeesClient() {
         .setu-input:focus { border-color: rgba(14,92,56,0.45) !important; box-shadow: 0 0 0 3px rgba(14,92,52,0.08) !important; outline: none; }
         .setu-interview-btn:hover { background: rgba(14,92,52,0.06) !important; }
         @media (max-width: 768px) {
-          .setu-cat-nav-links { display: none !important; }
-          .setu-cat-nav { padding: 0 16px !important; }
           .setu-cat-pad { padding-left: 16px !important; padding-right: 16px !important; }
           .setu-cat-canvas-cta { grid-template-columns: 1fr !important; gap: 16px !important; }
           .setu-cat-canvas-cta > div:last-child { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -66,26 +65,7 @@ export default function EmployeesClient() {
       `}</style>
 
       {/* Nav */}
-      <nav className="setu-cat-nav" style={{
-        borderBottom: `1px solid ${GRAY}`,
-        padding: '0 32px',
-        height: 60,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        background: WHITE,
-      }}>
-        <SetuLogo size={30} color={GREEN} wordColor={INK} />
-        <div className="setu-cat-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Link href="/quiz" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Find my role</Link>
-          <Link href="/pricing" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>Pricing</Link>
-          <Link href="/my-employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 14px', borderRadius: 8, letterSpacing: '-0.01em' }}>My Team</Link>
-          <Link href="/signin" style={{ fontSize: 13, color: WHITE, textDecoration: 'none', padding: '8px 18px', borderRadius: 8, letterSpacing: '-0.01em', background: INK, fontWeight: 700 }}>Sign in</Link>
-        </div>
-      </nav>
+      <Nav theme="light" />
 
       {/* Header */}
       <div style={{ borderBottom: `1px solid ${GRAY}` }}>
@@ -226,6 +206,7 @@ export default function EmployeesClient() {
           </div>
         </div>
       </div>
+      <Footer theme="light" />
     </div>
   )
 }

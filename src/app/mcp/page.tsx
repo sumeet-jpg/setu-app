@@ -1,7 +1,8 @@
 // @ts-nocheck
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SetuLogo } from '@/components/SetuLogo'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
   title: 'MCP Server — Setu AI Employees',
@@ -72,15 +73,7 @@ export default function McpPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Nav */}
-      <nav style={{ borderBottom: `1px solid ${BORDER}`, padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50, background: 'rgba(9,9,11,0.9)', backdropFilter: 'blur(16px)' }}>
-        <SetuLogo size={28} color="#22c55e" wordColor="#fafafa" />
-        <div style={{ display: 'flex', gap: 10 }}>
-          <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '6px 12px' }}>AI Employees</Link>
-          <a href="https://setuagents.com/api/mcp" target="_blank" rel="noopener" style={{ padding: '7px 16px', borderRadius: 8, background: '#6366f1', color: '#fff', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
-            Connect MCP →
-          </a>
-        </div>
-      </nav>
+      <Nav theme="dark" />
 
       <div style={{ maxWidth: 960, margin: '0 auto', padding: '64px 24px' }}>
 
@@ -221,6 +214,7 @@ export default function McpPage() {
         </div>
 
       </div>
+      <Footer theme="dark" />
     </div>
   )
 }

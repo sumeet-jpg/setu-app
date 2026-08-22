@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { EMPLOYEE_BY_SLUG } from '@/lib/employees/profiles'
-import { SetuLogo } from '@/components/SetuLogo'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
   title: 'Enterprise AI Employees — C-Suite AI for Growing Businesses',
@@ -39,15 +40,7 @@ export default function EnterprisePage() {
   return (
     <div style={{ minHeight: '100vh', background: BG, color: '#F1F5F9', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', lineHeight: 1.6 }}>
 
-      {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(6,9,26,0.94)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${BORDER}`, padding: '0 24px', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <SetuLogo size={28} color="#22c55e" wordColor="#F1F5F9" />
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Link href="/compare" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '6px 12px' }}>Compare costs</Link>
-          <Link href="/pricing" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '6px 12px' }}>Pricing</Link>
-          <Link href="/employees" style={{ fontSize: 13, fontWeight: 700, color: '#a5b4fc', padding: '7px 16px', borderRadius: 20, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', textDecoration: 'none' }}>All employees →</Link>
-        </div>
-      </nav>
+      <Nav theme="dark" ctaLabel="Meet the C-Suite" />
 
       {/* HERO */}
       <section style={{ padding: 'clamp(60px,9vw,110px) 24px clamp(48px,7vw,80px)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
@@ -175,15 +168,7 @@ export default function EnterprisePage() {
         <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>$49/mo, locked at signup · 7-day live guarantee · Cancel anytime</div>
       </section>
 
-      <footer style={{ borderTop: `1px solid ${BORDER}`, padding: '20px 24px', textAlign: 'center', fontSize: 12, color: DIM }}>
-        <Link href="/" style={{ color: DIM, textDecoration: 'none' }}>Setu</Link>
-        {' · '}
-        <Link href="/employees" style={{ color: DIM, textDecoration: 'none' }}>All 100 Employees</Link>
-        {' · '}
-        <Link href="/compare" style={{ color: DIM, textDecoration: 'none' }}>Compare costs</Link>
-        {' · '}
-        <Link href="/pricing" style={{ color: DIM, textDecoration: 'none' }}>Pricing</Link>
-      </footer>
+      <Footer theme="dark" />
     </div>
   )
 }

@@ -2,10 +2,11 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { EMPLOYEES, EMPLOYEE_COUNT, DEPT_ORDER } from '@/lib/employees/profiles'
-import { SetuLogo } from '@/components/SetuLogo'
 import EmployeeMatchBox from '@/components/EmployeeMatchBox'
 import VideoHero from '@/components/VideoHero'
 import DeptPicker from '@/components/DeptPicker'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
 
 const BASE = 'https://setuagents.com'
 
@@ -108,11 +109,7 @@ export default function HomePage() {
         .cta-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.25) !important; }
         .ghost-btn { transition: background 0.15s ease, color 0.15s ease; }
         .ghost-btn:hover { background: ${GREEN_L} !important; }
-        .nav-link { transition: color 0.12s; }
-        .nav-link:hover { color: ${GREEN} !important; }
         @media (max-width: 768px) {
-          .setu-hp-nav-links { display: none !important; }
-          .setu-hp-nav-hire { display: inline-block !important; }
           .setu-hp-hero { grid-template-columns: 1fr !important; gap: 32px !important; padding: 48px 20px 40px !important; }
           .setu-hp-hero-video { display: none; }
           .setu-hp-stats { flex-wrap: wrap !important; gap: 20px !important; }
@@ -121,19 +118,7 @@ export default function HomePage() {
         }
       `}</style>
 
-      {/* ── NAV ── */}
-      <nav style={{ background: WHITE, borderBottom: `1px solid ${GRAY}`, padding: '0 20px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
-        <SetuLogo size={30} color={GREEN} wordColor={INK} />
-        <div className="setu-hp-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {[['All Employees', '/employees'], ['Enterprise', '/enterprise'], ['Compare', '/compare'], ['Pricing', '/pricing'], ['My Team', '/my-employees']].map(([label, href]) => (
-            <Link key={href} href={href} className="nav-link" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }}>{label}</Link>
-          ))}
-          <Link href="/quiz" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }} className="nav-link">Which role?</Link>
-        </div>
-        <Link href="/employees" className="cta-btn setu-hp-nav-hire" style={{ fontSize: 13, fontWeight: 700, color: WHITE, textDecoration: 'none', padding: '9px 20px', borderRadius: 100, background: INK, marginLeft: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.2)', letterSpacing: '-0.01em', display: 'inline-block' }}>
-          Hire an Employee →
-        </Link>
-      </nav>
+      <Nav theme="light" />
 
       {/* ── HERO ── */}
       <section className="setu-hp-hero" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 32px 72px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
@@ -406,21 +391,7 @@ export default function HomePage() {
         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 24 }}>100 roles available · BYOK — use your own API keys · Cancel anytime</p>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer style={{ background: WHITE, borderTop: `1px solid ${GRAY}`, padding: '24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 22, height: 22, borderRadius: 6, background: GREEN, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#fff' }}>S</span>
-          </div>
-          <span style={{ fontSize: 13, color: MUTED }}>Setu · SignalPulse Technologies LLC · Wyoming, USA</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          {[['sumeet@setuagents.com', 'mailto:sumeet@setuagents.com'], ['MCP', '/mcp'], ['Agencies', '/agencies'], ['Enterprise', '/enterprise']].map(([label, href]) => (
-            <a key={href} href={href} style={{ fontSize: 13, color: DIM, textDecoration: 'none' }}>{label}</a>
-          ))}
-          <span style={{ fontSize: 13, color: DIM }}>© 2026</span>
-        </div>
-      </footer>
+      <Footer theme="light" />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SetuLogo } from '@/components/SetuLogo'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
   title: 'Agency & Reseller Program — Setu AI Employees',
@@ -106,14 +107,7 @@ export default function AgenciesPage() {
   return (
     <div style={{ minHeight: '100vh', background: BG, color: '#F1F5F9', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', lineHeight: 1.6 }}>
 
-      {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(7,9,28,0.94)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${BORDER}`, padding: '0 24px', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <SetuLogo size={28} color="#22c55e" wordColor="#F1F5F9" />
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Link href="/pricing" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '6px 12px' }}>Pricing</Link>
-          <Link href="/employees" style={{ fontSize: 13, fontWeight: 700, color: '#a5b4fc', padding: '7px 16px', borderRadius: 20, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', textDecoration: 'none' }}>All employees →</Link>
-        </div>
-      </nav>
+      <Nav theme="dark" />
 
       {/* HERO */}
       <section style={{ padding: 'clamp(60px,9vw,110px) 24px clamp(48px,7vw,80px)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
@@ -231,15 +225,7 @@ export default function AgenciesPage() {
         <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>No setup fees · 30% from day one · Cancel anytime</div>
       </section>
 
-      <footer style={{ borderTop: `1px solid ${BORDER}`, padding: '20px 24px', textAlign: 'center', fontSize: 12, color: DIM }}>
-        <Link href="/" style={{ color: DIM, textDecoration: 'none' }}>Setu</Link>
-        {' · '}
-        <Link href="/employees" style={{ color: DIM, textDecoration: 'none' }}>All 100 Employees</Link>
-        {' · '}
-        <Link href="/pricing" style={{ color: DIM, textDecoration: 'none' }}>Pricing</Link>
-        {' · '}
-        <Link href="/enterprise" style={{ color: DIM, textDecoration: 'none' }}>Enterprise</Link>
-      </footer>
+      <Footer theme="dark" />
     </div>
   )
 }

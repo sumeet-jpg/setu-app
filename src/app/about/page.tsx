@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SetuLogo } from '@/components/SetuLogo'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
 
 const BASE = 'https://setuagents.com'
 
@@ -31,17 +32,7 @@ export default function AboutPage() {
   return (
     <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: F, lineHeight: 1.6 }}>
 
-      <nav style={{ background: WHITE, borderBottom: `1px solid ${GRAY}`, padding: '0 20px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
-        <Link href="/" style={{ textDecoration: 'none' }}><SetuLogo size={30} color={GREEN} wordColor={INK} /></Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {[['All Employees', '/employees'], ['Pricing', '/pricing'], ['Contact', '/contact']].map(([label, href]) => (
-            <Link key={href} href={href} style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }}>{label}</Link>
-          ))}
-        </div>
-        <Link href="/employees" style={{ fontSize: 13, fontWeight: 700, color: WHITE, textDecoration: 'none', padding: '9px 20px', borderRadius: 100, background: INK, letterSpacing: '-0.01em' }}>
-          Hire an Employee →
-        </Link>
-      </nav>
+      <Nav theme="light" />
 
       <section style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(56px,8vw,96px) 24px clamp(40px,6vw,64px)' }}>
         <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>About</span>
@@ -84,20 +75,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <footer style={{ background: WHITE, borderTop: `1px solid ${GRAY}`, padding: '24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 22, height: 22, borderRadius: 6, background: GREEN, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: 10, fontWeight: 800, color: '#fff' }}>S</span>
-          </div>
-          <span style={{ fontSize: 13, color: MUTED }}>Setu · SignalPulse Technologies LLC · Wyoming, USA</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          {[['Contact', '/contact'], ['Pricing', '/pricing'], ['Privacy', '/privacy'], ['Terms', '/terms']].map(([label, href]) => (
-            <Link key={href} href={href} style={{ fontSize: 13, color: DIM, textDecoration: 'none' }}>{label}</Link>
-          ))}
-          <span style={{ fontSize: 13, color: DIM }}>© 2026</span>
-        </div>
-      </footer>
+      <Footer theme="light" />
     </div>
   )
 }

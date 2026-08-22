@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SetuLogo } from '@/components/SetuLogo'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
   title: 'AI Employees vs Human Hires — Real Cost Comparison',
@@ -74,13 +75,7 @@ export default function ComparePage() {
     <div style={{ minHeight: '100vh', background: BG, color: '#F1F5F9', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', lineHeight: 1.6 }}>
 
       {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(8,12,28,0.92)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${BORDER}`, padding: '0 24px', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <SetuLogo size={28} color="#22c55e" wordColor="#F1F5F9" />
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '6px 12px' }}>All employees</Link>
-          <Link href="/pricing" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '6px 12px' }}>Pricing</Link>
-        </div>
-      </nav>
+      <Nav theme="dark" />
 
       {/* HERO */}
       <section style={{ padding: 'clamp(56px,8vw,96px) 24px clamp(40px,6vw,64px)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
@@ -194,15 +189,7 @@ export default function ComparePage() {
         <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>Every employee, $49/mo, locked at signup · No commitment · Cancel anytime</div>
       </section>
 
-      <footer style={{ borderTop: `1px solid ${BORDER}`, padding: '20px 24px', textAlign: 'center', fontSize: 12, color: DIM }}>
-        <Link href="/" style={{ color: DIM, textDecoration: 'none' }}>Setu</Link>
-        {' · '}
-        <Link href="/employees" style={{ color: DIM, textDecoration: 'none' }}>All 100 Employees</Link>
-        {' · '}
-        <Link href="/pricing" style={{ color: DIM, textDecoration: 'none' }}>Pricing</Link>
-        {' · '}
-        <Link href="/whatsapp" style={{ color: DIM, textDecoration: 'none' }}>WhatsApp</Link>
-      </footer>
+      <Footer theme="dark" />
     </div>
   )
 }

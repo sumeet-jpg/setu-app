@@ -2,7 +2,8 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
-import { SetuLogo } from '@/components/SetuLogo'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
 
 const WA_EMPLOYEES = [
   {
@@ -89,15 +90,7 @@ export default function WhatsAppClient() {
     <div style={{ background: C.bg, color: C.text, minHeight: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', lineHeight: 1.6 }}>
 
       {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(6,10,24,0.92)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${C.borderMid}`, padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <SetuLogo size={28} color={C.green} wordColor={C.text} />
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <Link href="/employees" style={{ fontSize: 13, color: C.muted, textDecoration: 'none', padding: '6px 12px' }}>All employees</Link>
-          <Link href="/employees/whatsapp-lead-qualifier/interview" style={{ fontSize: 13, fontWeight: 700, color: C.green, padding: '7px 16px', borderRadius: 20, background: C.greenDim, border: `1px solid ${C.greenBorder}`, textDecoration: 'none' }}>
-            Interview free →
-          </Link>
-        </div>
-      </nav>
+      <Nav theme="dark" ctaLabel="Interview free" ctaHref="/employees/whatsapp-lead-qualifier/interview" />
 
       {/* HERO */}
       <section style={{ padding: 'clamp(64px,10vw,120px) 24px clamp(48px,7vw,80px)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
@@ -300,15 +293,7 @@ export default function WhatsAppClient() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ borderTop: `1px solid ${C.borderMid}`, padding: '24px', textAlign: 'center', fontSize: 12, color: C.dim }}>
-        <Link href="/" style={{ color: C.dim, textDecoration: 'none' }}>Setu</Link>
-        {' · '}
-        <Link href="/employees" style={{ color: C.dim, textDecoration: 'none' }}>100 AI Employees</Link>
-        {' · '}
-        <Link href="/pricing" style={{ color: C.dim, textDecoration: 'none' }}>Pricing</Link>
-        {' · '}
-        <span>SignalPulse Technologies LLC · Wyoming, USA</span>
-      </footer>
+      <Footer theme="dark" />
     </div>
   )
 }

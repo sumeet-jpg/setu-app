@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { SetuLogo } from '@/components/SetuLogo'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
 
 const BASE = 'https://setuagents.com'
 
@@ -28,12 +28,7 @@ const SECTIONS: [string, string][] = [
 export default function PrivacyPage() {
   return (
     <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: F, lineHeight: 1.6 }}>
-      <nav style={{ background: WHITE, borderBottom: `1px solid ${GRAY}`, padding: '0 20px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
-        <Link href="/" style={{ textDecoration: 'none' }}><SetuLogo size={30} color={GREEN} wordColor={INK} /></Link>
-        <Link href="/employees" style={{ fontSize: 13, fontWeight: 700, color: WHITE, textDecoration: 'none', padding: '9px 20px', borderRadius: 100, background: INK }}>
-          Hire an Employee →
-        </Link>
-      </nav>
+      <Nav theme="light" />
       <div style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(48px,8vw,80px) clamp(16px,4vw,40px)' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>Legal</div>
         <h1 style={{ fontSize: 'clamp(32px,5vw,48px)', fontWeight: 800, letterSpacing: '-0.04em', margin: '0 0 8px' }}>Privacy Policy</h1>
@@ -45,9 +40,7 @@ export default function PrivacyPage() {
           </div>
         ))}
       </div>
-      <footer style={{ background: WHITE, borderTop: `1px solid ${GRAY}`, padding: '24px 32px', textAlign: 'center' }}>
-        <span style={{ fontSize: 13, color: MUTED }}>Setu · SignalPulse Technologies LLC · Wyoming, USA</span>
-      </footer>
+      <Footer theme="light" />
     </div>
   )
 }
