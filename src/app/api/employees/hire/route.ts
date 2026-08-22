@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 import { signManageToken } from '@/lib/manage-token'
 import { escapeHtml as esc } from '@/lib/email/escape-html'
+import { RATE_LIMITS, getClientIp } from '@/lib/security/rate-limiter'
 
 export const runtime = 'nodejs'
 
@@ -19,6 +20,12 @@ function getResend() {
 }
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req)
+  const rateCheck = RATE_LIMITS.leadCapture(ip)
+  if (!rateCheck.allowed) {
+    return NextResponse.json({ error: 'Too many requests. Please try again in a bit.' }, { status: 429 })
+  }
+
   try {
     const body = await req.json()
     const { name, email, company, role, size, use_case, timeline, employee_slug, employee_name, employee_title } = body

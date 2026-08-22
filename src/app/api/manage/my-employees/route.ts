@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await supabase
       .from('hired_subscriptions')
-      .select('id, employee_slug, employee_name, employee_title, status, trial_ends_at, monthly_price_cents, created_at')
+      .select('id, employee_slug, employee_name, employee_title, status, trial_ends_at, activated_at, monthly_price_cents, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 

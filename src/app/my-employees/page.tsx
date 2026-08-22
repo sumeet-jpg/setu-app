@@ -1,10 +1,26 @@
 // @ts-nocheck
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { EMPLOYEE_BY_SLUG } from '@/lib/employees/profiles'
-import { SetuLogo } from '@/components/SetuLogo'
+import { EMPLOYEES, EMPLOYEE_BY_SLUG } from '@/lib/employees/profiles'
+import { Nav } from '@/components/layout/Nav'
+import { Footer } from '@/components/layout/Footer'
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+// activated_at + 1 month, per subscription — an estimate, not read from Dodo's
+// own billing cycle (which this app doesn't currently fetch), so always
+// labeled "approx" wherever it's shown rather than stated as a fact.
+function approxNextRenewal(activatedAt: string): string {
+  const d = new Date(activatedAt)
+  const next = new Date(d)
+  next.setMonth(next.getMonth() + 1)
+  while (next.getTime() < Date.now()) next.setMonth(next.getMonth() + 1)
+  return formatDate(next.toISOString())
+}
 
 function getOrCreateUserId(): string {
   if (typeof window === 'undefined') return ''
@@ -62,27 +78,58 @@ export default function MyEmployeesPage() {
 
   const hasEmployees = !loading && subs.length > 0
 
+  const summary = useMemo(() => {
+    const active = subs.filter((s: any) => s.status === 'active')
+    const trial  = subs.filter((s: any) => s.status === 'trial')
+    const mrr = active.reduce((sum: number, s: any) => sum + (s.monthly_price_cents ? s.monthly_price_cents / 100 : 49), 0)
+    return { activeCount: active.length, trialCount: trial.length, mrr }
+  }, [subs])
+
+  // Suggest employees from departments the user hasn't hired into yet —
+  // one per missing department, up to 3.
+  const crossSell = useMemo(() => {
+    if (!hasEmployees) return []
+    const hiredDepts = new Set(subs.map((s: any) => EMPLOYEE_BY_SLUG[s.employee_slug]?.dept).filter(Boolean))
+    const hiredSlugs = new Set(subs.map((s: any) => s.employee_slug))
+    const seenDepts = new Set<string>()
+    const picks: typeof EMPLOYEES = []
+    for (const e of EMPLOYEES) {
+      if (hiredSlugs.has(e.slug) || hiredDepts.has(e.dept) || seenDepts.has(e.dept)) continue
+      seenDepts.add(e.dept)
+      picks.push(e)
+      if (picks.length === 3) break
+    }
+    return picks
+  }, [subs, hasEmployees])
+
   return (
     <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: 'var(--font-jakarta)' }}>
-      {/* Nav */}
-      <nav style={{
-        borderBottom: `1px solid ${GRAY}`, padding: '0 28px', height: 60,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: WHITE, position: 'sticky', top: 0, zIndex: 50,
-      }}>
-        <SetuLogo size={30} color={GREEN} wordColor={INK} />
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Link href="/employees" style={{ fontSize: 13, color: MUTED, textDecoration: 'none', padding: '7px 14px', borderRadius: 8, border: `1px solid ${GRAY}` }}>Browse employees</Link>
-        </div>
-      </nav>
+      <Nav theme="light" />
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '56px 24px 80px' }}>
         <h1 style={{ fontSize: 'clamp(26px,4vw,38px)', fontWeight: 900, letterSpacing: '-0.06em', margin: '0 0 6px', color: INK }}>
           Your AI Employees
         </h1>
-        <p style={{ fontSize: 15, color: MUTED, margin: '0 0 40px', lineHeight: 1.6 }}>
+        <p style={{ fontSize: 15, color: MUTED, margin: '0 0 24px', lineHeight: 1.6 }}>
           All your hired employees and their current status.
         </p>
+
+        {hasEmployees && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 32 }}>
+            <div style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 14, padding: '16px 18px' }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: INK, letterSpacing: '-0.03em' }}>${summary.mrr.toFixed(0)}<span style={{ fontSize: 12, fontWeight: 600, color: DIM }}>/mo</span></div>
+              <div style={{ fontSize: 11, color: MUTED, marginTop: 3 }}>Current spend</div>
+            </div>
+            <div style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 14, padding: '16px 18px' }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: '#166534', letterSpacing: '-0.03em' }}>{summary.activeCount}</div>
+              <div style={{ fontSize: 11, color: MUTED, marginTop: 3 }}>Active</div>
+            </div>
+            <div style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 14, padding: '16px 18px' }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: AMBER, letterSpacing: '-0.03em' }}>{summary.trialCount}</div>
+              <div style={{ fontSize: 11, color: MUTED, marginTop: 3 }}>On trial</div>
+            </div>
+          </div>
+        )}
 
         {loading && (
           <div style={{ textAlign: 'center', padding: '60px 0', color: MUTED, fontSize: 14 }}>Loading…</div>
@@ -138,6 +185,11 @@ export default function MyEmployeesPage() {
                           ${price}/mo{isTrial ? ' (locked)' : ''}
                         </span>
                       </div>
+                      {isActive && sub.activated_at && (
+                        <div style={{ fontSize: 11, color: DIM, marginTop: 6 }}>
+                          Activated {formatDate(sub.activated_at)} · next renewal ~{approxNextRenewal(sub.activated_at)}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
@@ -221,6 +273,33 @@ export default function MyEmployeesPage() {
           </div>
         )}
 
+        {/* Cross-sell: complementary roles from departments not yet hired */}
+        {crossSell.length > 0 && (
+          <div style={{ marginTop: 40 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 4 }}>Complete your team</div>
+            <p style={{ fontSize: 13, color: MUTED, margin: '0 0 16px' }}>A few roles that pair well with who you've already hired.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+              {crossSell.map(e => (
+                <Link key={e.slug} href={`/employees/${e.slug}/interview`} style={{
+                  background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 14, padding: '16px 18px',
+                  textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', gap: 6,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                      background: `${e.color}15`, border: `1.5px solid ${e.color}30`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17,
+                    }}>{e.emoji}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: INK }}>{e.name}</div>
+                  </div>
+                  <div style={{ fontSize: 11.5, color: MUTED, lineHeight: 1.5 }}>{e.title}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: GREEN, marginTop: 2 }}>Interview free →</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* CTA: hire another */}
         {hasEmployees && (
           <div style={{ marginTop: 28, textAlign: 'center' }}>
@@ -230,6 +309,7 @@ export default function MyEmployeesPage() {
           </div>
         )}
       </div>
+      <Footer theme="light" />
     </div>
   )
 }

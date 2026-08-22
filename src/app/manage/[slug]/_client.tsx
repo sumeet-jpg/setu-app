@@ -45,6 +45,8 @@ export default function ManageClient({
   const [stats, setStats] = useState<any>(null)
   const [calibration, setCalibration] = useState<any>(null)
   const [pendingActions, setPendingActions] = useState<any[]>([])
+  const [recentActivity, setRecentActivity] = useState<any[]>([])
+  const [ratedActions, setRatedActions] = useState<Record<string, 'up' | 'down'>>({})
   const [loading, setLoading] = useState(true)
   const [showActivate, setShowActivate] = useState(false)
   const [checkingOut, setCheckingOut]   = useState(false)
@@ -70,11 +72,13 @@ export default function ManageClient({
     if (!userId) return
     setLoading(true)
     try {
-      // Load in parallel
+      // Load in parallel. beliefs/calibration are manage-token-gated (P0
+      // hardening) — must go through authFetch or they 401 silently, since
+      // the callers below only check `.ok` and skip setting state on failure.
       const [subRes, beliefsRes, calRes, actionsRes] = await Promise.all([
         fetch(`/api/manage/subscription?userId=${userId}&slug=${slug}`),
-        fetch(`/api/employees/beliefs?slug=${slug}&userId=${userId}&limit=1`),
-        fetch(`/api/employees/calibration?userId=${userId}&slug=${slug}`),
+        authFetch(`/api/employees/beliefs?slug=${slug}&limit=1`),
+        authFetch(`/api/employees/calibration?slug=${slug}&history=true`),
         fetch(`/api/employees/actions?userId=${userId}&slug=${slug}&status=pending&limit=10`),
       ])
 
@@ -86,6 +90,7 @@ export default function ManageClient({
       if (calRes.ok) {
         const d = await calRes.json()
         setCalibration(d.calibration)
+        setRecentActivity((d.audit_trail ?? []).filter((a: any) => a.status === 'done' || a.status === 'failed').slice(0, 10))
       }
       if (actionsRes.ok) {
         const d = await actionsRes.json()
@@ -144,6 +149,20 @@ export default function ManageClient({
     } catch {
       alert('Something went wrong. Please try again.')
       return false
+    }
+  }
+
+  async function rateAction(actionId: string, thumbsUp: boolean) {
+    setRatedActions(prev => ({ ...prev, [actionId]: thumbsUp ? 'up' : 'down' }))
+    try {
+      await authFetch('/api/employees/calibration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, action: 'rate_outcome', actionId, score: thumbsUp ? 1 : 0 }),
+      })
+    } catch {
+      // Non-fatal — the rating just won't feed into calibration this time.
+      // Leave the optimistic UI state as-is rather than un-rating on the user.
     }
   }
 
@@ -405,6 +424,51 @@ export default function ManageClient({
                 +{pendingActions.length - 3} more — open chat to review them
               </div>
             )}
+          </div>
+        )}
+
+        {/* Recent activity — what the employee has actually done, not just proposed */}
+        {recentActivity.length > 0 && (
+          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: 22, marginBottom: 24 }}>
+            <div style={{ fontSize: 12, fontFamily: 'monospace', color: C.muted, letterSpacing: '0.08em', marginBottom: 14 }}>
+              RECENT ACTIVITY
+            </div>
+            {recentActivity.map((action: any) => {
+              const rated = ratedActions[action.id]
+              return (
+                <div key={action.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, borderTop: `1px solid ${C.border}`, paddingTop: 12, marginTop: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 3 }}>{action.title}</div>
+                    <div style={{ fontSize: 12, color: C.muted }}>{action.action_type?.replace(/_/g, ' ')}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                    {action.status === 'done' && (
+                      rated ? (
+                        <span style={{ fontSize: 11, color: C.muted }}>{rated === 'up' ? '👍 Thanks' : '👎 Noted'}</span>
+                      ) : (
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          <button onClick={() => rateAction(action.id, true)} title="This was good"
+                            style={{ background: 'transparent', border: `1px solid ${C.border}`, borderRadius: 6, padding: '3px 7px', cursor: 'pointer', fontSize: 12 }}>
+                            👍
+                          </button>
+                          <button onClick={() => rateAction(action.id, false)} title="This wasn't right"
+                            style={{ background: 'transparent', border: `1px solid ${C.border}`, borderRadius: 6, padding: '3px 7px', cursor: 'pointer', fontSize: 12 }}>
+                            👎
+                          </button>
+                        </div>
+                      )
+                    )}
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4, whiteSpace: 'nowrap',
+                      color: action.status === 'done' ? C.green : C.red,
+                      background: action.status === 'done' ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                    }}>
+                      {action.status === 'done' ? 'DONE' : 'FAILED'}
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         )}
 
