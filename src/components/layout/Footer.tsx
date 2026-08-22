@@ -6,6 +6,7 @@ const DARK  = { bg: 'transparent', border: 'rgba(148,163,184,0.08)', green: '#22
 
 const LINKS: [string, string][] = [
   ['About', '/about'],
+  ['Blog', '/blog'],
   ['Contact', '/contact'],
   ['Changelog', '/changelog'],
   ['Agencies', '/agencies'],
