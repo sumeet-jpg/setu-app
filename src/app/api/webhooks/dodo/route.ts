@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import DodoPayments from 'dodopayments'
 import { createClient } from '@supabase/supabase-js'
+import { trackServer } from '@/lib/posthog/server'
 
 export const runtime = 'nodejs'
 
@@ -68,6 +69,8 @@ export async function POST(req: NextRequest) {
             })
             .eq('user_id', user_id)
             .eq('employee_slug', employee_slug)
+
+          trackServer('subscription_activated', user_id, { employee_slug, via: 'dodo_webhook' }).catch(() => {})
         }
       }
     }

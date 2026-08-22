@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 import { verifyCronSecret } from '@/lib/cron-auth'
 import { escapeHtml as esc } from '@/lib/email/escape-html'
+import { trackServer } from '@/lib/posthog/server'
 
 // /api/cron/trials â€” daily trial lifecycle management
 // Secured by CRON_SECRET.
@@ -195,7 +196,7 @@ export async function POST(req: NextRequest) {
     try {
       let query = supabase
         .from('hired_subscriptions')
-        .select('owner_email, owner_name, employee_name, employee_slug, monthly_price_cents')
+        .select('user_id, owner_email, owner_name, employee_name, employee_slug, monthly_price_cents')
         .eq('status', 'trial')
 
       if (job.label === 'day7reminder') {
@@ -221,6 +222,13 @@ export async function POST(req: NextRequest) {
           html: job.html(firstName, empName, price, sub.employee_slug),
         }).catch(e => console.error(`[trials cron ${job.label}]`, sub.owner_email, e))
         emailCount++
+
+        // trial_day_7_active from SETU_MASTER_PLAN.md #20 — the day7reminder
+        // window is trials with ~7 days elapsed (trial_ends_at 6.5-7.5 days
+        // out on a 14-day trial), which is exactly the day-7 checkpoint.
+        if (job.label === 'day7reminder' && sub.user_id) {
+          trackServer('trial_day_7_active', sub.user_id, { employee_slug: sub.employee_slug }).catch(() => {})
+        }
       }
     } catch (e) {
       console.error(`[trials cron ${job.label}]`, e)

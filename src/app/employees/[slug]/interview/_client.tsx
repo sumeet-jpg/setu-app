@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { EMPLOYEE_BY_SLUG } from '@/lib/employees/profiles'
+import { track } from '@/lib/posthog/client'
 
 type Msg = { role: 'user' | 'assistant'; content: string; actionId?: string }
 
@@ -196,6 +197,8 @@ export default function InterviewClient({ slug }: { slug: string }) {
     if (!text || loading) return
     setInput('')
     setLoading(true)
+    if (!started) track('interview_started', userId, { employee_slug: e.slug })
+    track('interview_message_sent', userId, { employee_slug: e.slug })
     setStarted(true)
 
     const userMsg: Msg = { role: 'user', content: text }

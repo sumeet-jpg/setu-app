@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import PostHogInit from "@/components/PostHogInit";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -60,6 +61,7 @@ fbq('init','${META_PIXEL_ID}');fbq('track','PageView');
         )}
       </head>
       <body className={`${jakarta.variable} font-sans antialiased`}>
+        <PostHogInit />
         {children}
         {META_PIXEL_ID && (
           <noscript>

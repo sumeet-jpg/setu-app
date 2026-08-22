@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 import { escapeHtml as esc } from '@/lib/email/escape-html'
 import { auditLog } from '@/lib/governance/audit-logger'
+import { trackServer } from '@/lib/posthog/server'
 
 // GET /api/admin/subscriptions?status=trial|active|paused|cancelled
 export async function GET(req: NextRequest) {
@@ -65,12 +66,15 @@ export async function PATCH(req: NextRequest) {
       .from('hired_subscriptions')
       .update(updates)
       .eq('id', id)
-      .select('owner_email, owner_name, employee_name, employee_slug, monthly_price_cents')
+      .select('user_id, owner_email, owner_name, employee_name, employee_slug, monthly_price_cents')
       .maybeSingle()
 
     if (error) throw error
 
     auditLog.subscriptionAdminOverride(auth.user.email, id, status).catch(() => {})
+    if (status === 'active' && updated?.user_id) {
+      trackServer('subscription_activated', updated.user_id, { employee_slug: updated.employee_slug, via: 'admin_override' }).catch(() => {})
+    }
 
     // Send activation confirmation email when admin marks active
     if (status === 'active' && updated?.owner_email && process.env.RESEND_API_KEY) {
