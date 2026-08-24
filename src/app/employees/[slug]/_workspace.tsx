@@ -340,13 +340,13 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
     abortRef.current = new AbortController()
 
     try {
-      const body: any = { task: taskText, user_id: userId }
+      const body: any = { task: taskText }
       if (resumeTaskId) body.task_id = resumeTaskId
       if (pendingApproval) {
         body.approval_result = { approved: true, tool_use_id: pendingApproval.gate.tool_use_id }
       }
 
-      const res = await fetch(`/api/employees/${e.slug}/execute`, {
+      const res = await authFetch(`/api/employees/${e.slug}/execute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

@@ -14,11 +14,19 @@
  * the signin flow restricts which Google account can complete it.
  */
 
+import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
 import { buildErrorResponse, SETU_ERROR_CODES } from "@/lib/errors/setu-errors";
 import { auditLog } from "@/lib/governance/audit-logger";
 import { RATE_LIMITS } from "@/lib/security/rate-limiter";
+
+function safeEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 export interface AdminUser {
   id: string;
@@ -32,7 +40,7 @@ export async function requireAdmin(request: NextRequest): Promise<{ user: AdminU
     const provided =
       request.headers.get('x-admin-secret') ??
       request.cookies.get('admin_secret')?.value
-    if (provided === adminSecret) {
+    if (provided && safeEqual(provided, adminSecret)) {
       return { user: { id: 'admin', email: process.env.ADMIN_ALERT_EMAIL ?? 'admin@setuagents.com' } }
     }
   }

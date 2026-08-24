@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
+import DodoPayments from 'dodopayments'
 import { withManageAuth } from '@/lib/manage-token'
 import { escapeHtml as esc } from '@/lib/email/escape-html'
 import { auditLog } from '@/lib/governance/audit-logger'
+
+function getDodo() {
+  return new DodoPayments({
+    bearerToken: process.env.DODO_API_KEY!,
+    environment: (process.env.DODO_ENV ?? 'live_mode') as 'live_mode' | 'test_mode',
+  })
+}
 
 function getSupabase() {
   return createClient(
@@ -75,7 +83,17 @@ async function patchSubscription(userId: string, req: NextRequest): Promise<Next
 
     const supabase = getSupabase()
 
-    // For resume: determine correct target status from the subscription record
+    const { data: current } = await supabase
+      .from('hired_subscriptions')
+      .select('status, trial_ends_at, dodo_subscription_id')
+      .eq('user_id', userId)
+      .eq('employee_slug', slug)
+      .maybeSingle()
+
+    if (!current) {
+      return NextResponse.json({ error: 'Subscription not found' }, { status: 404 })
+    }
+
     let newStatus: string
     if (action === 'cancel') {
       newStatus = 'cancelled'
@@ -86,21 +104,57 @@ async function patchSubscription(userId: string, req: NextRequest): Promise<Next
       // the path that grants 'active' for free. A cancelled or trial-expired
       // subscription has to go through real Dodo checkout (/api/checkout/dodo)
       // to become active again.
-      const { data: current } = await supabase
-        .from('hired_subscriptions')
-        .select('status, trial_ends_at')
-        .eq('user_id', userId)
-        .eq('employee_slug', slug)
-        .maybeSingle()
-
-      if (current?.status !== 'paused') {
+      if (current.status !== 'paused') {
         return NextResponse.json(
           { error: 'Only a paused subscription can be resumed. Activate via checkout instead.' },
           { status: 400 }
         )
       }
-      const trialStillValid = current?.trial_ends_at && new Date(current.trial_ends_at) > new Date()
-      newStatus = trialStillValid ? 'trial' : 'active'
+      const trialStillValid = current.trial_ends_at && new Date(current.trial_ends_at) > new Date()
+      if (!trialStillValid) {
+        // Was paused after the trial had already ended, or has since expired
+        // while paused. Resuming here must never itself grant paid access —
+        // if they were previously billed (a dodo_subscription_id exists),
+        // unpause the real Dodo subscription too; otherwise there is nothing
+        // to resume into and they must go through checkout.
+        if (!current.dodo_subscription_id) {
+          return NextResponse.json(
+            { error: 'Your trial has ended. Reactivate via checkout to resume billing.', requires_checkout: true },
+            { status: 402 }
+          )
+        }
+        newStatus = 'active'
+      } else {
+        newStatus = 'trial'
+      }
+    }
+
+    // Reflect the action on the real Dodo subscription before touching our
+    // own status — cancel/pause/resume were previously DB-only, so a
+    // customer who "cancelled" in the app kept being billed by Dodo forever.
+    // Skip when there's no dodo_subscription_id (e.g. cancelling mid-trial,
+    // never activated) — nothing exists on Dodo's side to update yet.
+    if (current.dodo_subscription_id && (action === 'cancel' || action === 'pause' || (action === 'resume' && newStatus === 'active'))) {
+      try {
+        const dodo = getDodo()
+        if (action === 'cancel') {
+          await dodo.subscriptions.update(current.dodo_subscription_id, {
+            cancel_at_next_billing_date: true,
+            cancel_reason: 'cancelled_by_customer',
+            ...(reason ? { cancellation_comment: String(reason).slice(0, 500) } : {}),
+          })
+        } else if (action === 'pause') {
+          await dodo.subscriptions.update(current.dodo_subscription_id, { pause: true })
+        } else {
+          await dodo.subscriptions.update(current.dodo_subscription_id, { pause: false })
+        }
+      } catch (dodoErr: any) {
+        console.error('[manage/subscription] Dodo API call failed', dodoErr)
+        return NextResponse.json(
+          { error: 'Could not update billing with our payment provider. Please try again or contact support.' },
+          { status: 502 }
+        )
+      }
     }
 
     const updates: Record<string, unknown> = {

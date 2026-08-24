@@ -10,6 +10,7 @@ import { getEmployee } from '@/lib/employees/profiles'
 import { getTool, buildToolContext } from '@/lib/tools/registry'
 import { executeHttpRequest } from '@/lib/tools/executor'
 import { decrypt } from '@/lib/tools/crypto'
+import { withManageAuth } from '@/lib/manage-token'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -114,22 +115,33 @@ function sseEvent(type: string, payload: unknown): string {
 
 // ── Main route ───────────────────────────────────────────────────────────────
 
+// This loop decrypts and spends the owner's real connected-tool credentials
+// (Slack, HubSpot, Mailchimp, etc.) and can approve+execute high-trust
+// actions (send_email, external_api) with no further confirmation once
+// approval_result is set. Previously trusted a bare client-supplied user_id
+// — anyone who obtained another user's UUID could run tasks and approve
+// actions through that person's own connected tools. Now requires a
+// verified manage-token; the authoritative user_id comes from the token,
+// never from the request body.
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params
+  return withManageAuth(req, async (user_id) => runExecute(slug, user_id, req))
+}
 
+async function runExecute(slug: string, user_id: string, req: NextRequest): Promise<Response> {
   const employee = getEmployee(slug)
   if (!employee) {
     return NextResponse.json({ error: 'Employee not found' }, { status: 404 })
   }
 
   const body = await req.json()
-  const { task, user_id, task_id: existingTaskId } = body
+  const { task, task_id: existingTaskId } = body
 
-  if (!task || !user_id) {
-    return NextResponse.json({ error: 'task and user_id required' }, { status: 400 })
+  if (!task) {
+    return NextResponse.json({ error: 'task required' }, { status: 400 })
   }
 
   const supabase = createAdminClient()

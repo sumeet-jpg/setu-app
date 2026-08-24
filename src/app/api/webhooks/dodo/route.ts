@@ -40,12 +40,16 @@ export async function POST(req: NextRequest) {
     const event: any = dodo.webhooks.unwrap(rawBody, { headers, key: webhookSecret })
 
     const type = event?.type as string | undefined
+    const metadata = event?.data?.metadata ?? event?.data?.payment?.metadata ?? {}
+    const user_id       = metadata.user_id
+    const employee_slug = metadata.employee_slug
+    // Present on both Payment and Subscription webhook payloads — this is the
+    // only reference we get back to the Dodo-side subscription. Without
+    // storing it, cancel/pause actions in our own UI have no way to actually
+    // tell Dodo to stop billing (see manage/subscription route).
+    const dodoSubscriptionId = event?.data?.subscription_id as string | undefined
 
     if (type === 'payment.succeeded' || type === 'subscription.active') {
-      const metadata = event?.data?.metadata ?? event?.data?.payment?.metadata ?? {}
-      const user_id        = metadata.user_id
-      const employee_slug  = metadata.employee_slug
-
       if (user_id && employee_slug) {
         const supabase = getSupabase()
 
@@ -66,13 +70,50 @@ export async function POST(req: NextRequest) {
               status:       'active',
               activated_at: new Date().toISOString(),
               updated_at:   new Date().toISOString(),
+              ...(dodoSubscriptionId ? { dodo_subscription_id: dodoSubscriptionId } : {}),
             })
             .eq('user_id', user_id)
             .eq('employee_slug', employee_slug)
 
           trackServer('subscription_activated', user_id, { employee_slug, via: 'dodo_webhook' }).catch(() => {})
+        } else if (dodoSubscriptionId) {
+          // Already active (redelivery) — still backfill the subscription id
+          // if we somehow don't have it yet.
+          await supabase
+            .from('hired_subscriptions')
+            .update({ dodo_subscription_id: dodoSubscriptionId })
+            .eq('user_id', user_id)
+            .eq('employee_slug', employee_slug)
+            .is('dodo_subscription_id', null)
         }
       }
+    }
+
+    // Dodo-side loss of paid status — a failed renewal, a cancellation made
+    // directly in Dodo (dashboard, dunning exhaustion, dispute), or expiry.
+    // Previously nothing handled these: hired_subscriptions.status stayed
+    // 'active' forever even after Dodo stopped collecting.
+    if (
+      type === 'subscription.cancelled' ||
+      type === 'subscription.failed' ||
+      type === 'subscription.expired' ||
+      type === 'subscription.on_hold'
+    ) {
+      const supabase = getSupabase()
+      const newStatus = type === 'subscription.on_hold' ? 'paused' : 'cancelled'
+
+      let query = supabase.from('hired_subscriptions').update({
+        status:     newStatus,
+        cancelled_at: newStatus === 'cancelled' ? new Date().toISOString() : undefined,
+        cancel_reason: newStatus === 'cancelled' ? `dodo_${type.split('.')[1]}` : undefined,
+        updated_at: new Date().toISOString(),
+      })
+
+      query = dodoSubscriptionId
+        ? query.eq('dodo_subscription_id', dodoSubscriptionId)
+        : (user_id && employee_slug ? query.eq('user_id', user_id).eq('employee_slug', employee_slug) : null)
+
+      if (query) await query
     }
 
     return NextResponse.json({ received: true })

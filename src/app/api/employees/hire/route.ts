@@ -106,19 +106,49 @@ export async function POST(req: NextRequest) {
     } catch { /* migration not yet applied — use launch price */ }
 
     // Team bundle: building a team shouldn't get progressively more expensive
-    // per seat. If this user already has another employee hired, lock this one
-    // at their cheapest existing locked rate instead of today's (higher)
-    // published price.
+    // per seat. If this user already has another employee IN GOOD STANDING
+    // (trial/active/paused — not cancelled), lock this one at their cheapest
+    // existing locked rate instead of today's (higher) published price.
+    // Deliberately excludes cancelled subs: without this filter, hiring and
+    // immediately cancelling a cheap employee would permanently floor the
+    // price of every unrelated employee hired afterward.
     const { data: existingSubs } = await supabase
       .from('hired_subscriptions')
       .select('monthly_price_cents')
       .eq('user_id', userId)
       .neq('employee_slug', employee_slug)
+      .in('status', ['trial', 'active', 'paused'])
       .order('monthly_price_cents', { ascending: true })
       .limit(1)
 
     if (existingSubs && existingSubs.length > 0) {
       priceCents = existingSubs[0].monthly_price_cents
+    }
+
+    // Guard against downgrading an already-paying subscriber: this route is
+    // meant to start a NEW trial, not reset an existing active/paused one
+    // back to 'trial' with a fresh 14-day clock. Without this check, hitting
+    // this endpoint again for an employee the user already activated (a
+    // stale tab, a replayed request, or someone calling the API directly)
+    // would silently un-bill them and could later get them auto-cancelled
+    // by the trial-expiry cron for a subscription they're actually paying for.
+    const { data: existingForThisEmployee } = await supabase
+      .from('hired_subscriptions')
+      .select('status')
+      .eq('user_id', userId)
+      .eq('employee_slug', employee_slug)
+      .maybeSingle()
+
+    if (existingForThisEmployee && ['active', 'paused'].includes(existingForThisEmployee.status)) {
+      const manage_token = signManageToken(userId)
+      return NextResponse.json({
+        success: true,
+        id: hire?.id ?? null,
+        db_saved: !dbErr,
+        manage_url: `/manage/${employee_slug}`,
+        manage_token,
+        already_hired: true,
+      })
     }
 
     const trialEnd = new Date(Date.now() + 14 * 86400000).toISOString()

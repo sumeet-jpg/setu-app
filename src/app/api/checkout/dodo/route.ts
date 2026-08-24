@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import DodoPayments from 'dodopayments'
 import { createClient } from '@supabase/supabase-js'
+import { withManageAuth } from '@/lib/manage-token'
 
 export const runtime = 'nodejs'
 
@@ -12,12 +13,21 @@ function getSupabase() {
   )
 }
 
+// Previously trusted a bare client-supplied user_id — no harm from creating
+// a checkout session itself (someone still has to pay), but the 404-vs-409
+// response gave an unauthenticated oracle for guessing valid user_id +
+// employee_slug pairs and their activation status. Now requires a verified
+// manage-token, same as every other route touching a specific subscription.
 export async function POST(req: NextRequest) {
-  try {
-    const { user_id, employee_slug } = await req.json()
+  return withManageAuth(req, async (user_id) => createCheckout(user_id, req))
+}
 
-    if (!user_id || !employee_slug) {
-      return NextResponse.json({ error: 'user_id and employee_slug required' }, { status: 400 })
+async function createCheckout(user_id: string, req: NextRequest): Promise<NextResponse> {
+  try {
+    const { employee_slug } = await req.json()
+
+    if (!employee_slug) {
+      return NextResponse.json({ error: 'employee_slug required' }, { status: 400 })
     }
 
     const supabase = getSupabase()

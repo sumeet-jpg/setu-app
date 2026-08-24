@@ -107,10 +107,10 @@ export default function ManageClient({
     if (!userId || checkingOut) return
     setCheckingOut(true)
     try {
-      const res = await fetch('/api/checkout/dodo', {
+      const res = await authFetch('/api/checkout/dodo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, employee_slug: slug }),
+        body: JSON.stringify({ employee_slug: slug }),
       })
       const data = await res.json()
       if (data.checkout_url) {

@@ -4,12 +4,19 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 import { signRecoveryToken } from '@/lib/manage-token'
 import { escapeHtml as esc } from '@/lib/email/escape-html'
+import { RATE_LIMITS, getClientIp } from '@/lib/security/rate-limiter'
 // getServerEnv removed â€” reads env vars directly to avoid strict validation crash
 
 // POST { email }
 // Looks up all hired_subscriptions where contact_email matches,
 // then emails the user their manage links.
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req)
+  const rateCheck = RATE_LIMITS.recover(ip)
+  if (!rateCheck.allowed) {
+    return NextResponse.json({ error: 'Too many requests. Please try again in a bit.' }, { status: 429 })
+  }
+
   try {
     const { email } = await req.json()
     if (!email || typeof email !== 'string') {

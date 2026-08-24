@@ -81,6 +81,11 @@ export const RATE_LIMITS = {
     limit: 5,
     windowMs: 60 * 60 * 1000,
   }),
+  recover: (ip: string) => checkRateLimit({
+    key: `recover:${ip}`,
+    limit: 5,
+    windowMs: 60 * 60 * 1000,
+  }),
   adminRoute: (userId: string) => checkRateLimit({
     key: `admin:${userId}`,
     limit: 200,

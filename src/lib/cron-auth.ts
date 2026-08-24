@@ -1,4 +1,12 @@
+import crypto from 'crypto'
 import { NextRequest } from 'next/server'
+
+function safeEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a)
+  const bufB = Buffer.from(b)
+  if (bufA.length !== bufB.length) return false
+  return crypto.timingSafeEqual(bufA, bufB)
+}
 
 // Vercel's native Cron Jobs (see vercel.json `crons`) authenticate every
 // triggered request with `Authorization: Bearer ${CRON_SECRET}` — not a
@@ -12,5 +20,5 @@ export function verifyCronSecret(req: NextRequest): boolean {
   if (!cronSecret) return false
   const bearer = req.headers.get('authorization')
   const legacy = req.headers.get('x-cron-secret')
-  return bearer === `Bearer ${cronSecret}` || legacy === cronSecret
+  return (!!bearer && safeEqual(bearer, `Bearer ${cronSecret}`)) || (!!legacy && safeEqual(legacy, cronSecret))
 }

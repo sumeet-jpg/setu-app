@@ -159,6 +159,16 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// NOTE: intentionally left on a bare userId, matching the same pre-hire
+// anonymous-UUID pattern as /api/employees/interview and the GET above —
+// this table has no real executor behind it (confirmed: nothing outside
+// this file reads employee_actions.status to perform a real side effect;
+// the execute route's own request_approval flow uses a separate
+// task_approvals/employee_tasks table entirely). Approve/reject here only
+// updates a demo-visible status flag during the anonymous interview.
+// Requiring a manage-token would break that pre-hire flow for no real
+// security benefit. If a real executor is ever wired to this status field,
+// this must be revisited.
 export async function PATCH(req: NextRequest) {
   try {
     const { userId, actionId, decision, rejectionReason, result, error: execError } = await req.json()
