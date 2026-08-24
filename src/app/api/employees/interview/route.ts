@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { getEmployee } from '@/lib/employees/profiles'
 import { createAdminClient } from '@/lib/supabase/server'
+import { checkInterviewCap, logUsage } from '@/lib/usage/cap'
+import { TOOL_HONESTY_GUARDRAIL } from '@/lib/tools/registry'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -399,6 +401,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Employee not found' }, { status: 404 })
     }
 
+    // Free, no-signup interview has no cost cap of its own — a scripted
+    // abuser could otherwise run unlimited Claude calls against a single
+    // anonymous user_id for free. Real visitors doing an actual demo
+    // conversation won't come close to this in a day.
+    if (userId) {
+      const cap = await checkInterviewCap(userId)
+      if (!cap.allowed) {
+        return NextResponse.json(
+          { error: "You've reached today's free interview limit. Please try again tomorrow, or hire this employee to continue without limits." },
+          { status: 429 }
+        )
+      }
+    }
+
     // Build context: distilled CKG wisdom + vault docs + proactive briefs + recent exchanges
     let memoryContext = ''
     if (userId) {
@@ -422,7 +438,7 @@ export async function POST(req: NextRequest) {
         }).catch(() => {})
       }
     }
-    const systemPrompt = employee.systemPrompt + memoryContext
+    const systemPrompt = employee.systemPrompt + TOOL_HONESTY_GUARDRAIL + memoryContext
 
     const anthropicMessages = messages.map((m: { role: string; content: string }) => ({
       role: m.role as 'user' | 'assistant',
@@ -454,6 +470,20 @@ export async function POST(req: NextRequest) {
           }
           controller.enqueue(encoder.encode('data: [DONE]\n\n'))
           controller.close()
+
+          if (userId) {
+            try {
+              const finalMsg = await stream.finalMessage()
+              await logUsage({
+                userId,
+                employeeSlug: slug,
+                eventType: 'interview',
+                model,
+                inputTokens: finalMsg.usage?.input_tokens ?? 0,
+                outputTokens: finalMsg.usage?.output_tokens ?? 0,
+              })
+            } catch { /* non-fatal — logging must never break the response */ }
+          }
 
           // Persist both sides after the stream completes
           if (userId && sessionId) {

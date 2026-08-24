@@ -7,10 +7,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createAdminClient } from '@/lib/supabase/server'
 import { getEmployee } from '@/lib/employees/profiles'
-import { getTool, buildToolContext } from '@/lib/tools/registry'
+import { getTool, buildToolContext, TOOL_HONESTY_GUARDRAIL } from '@/lib/tools/registry'
 import { executeHttpRequest } from '@/lib/tools/executor'
 import { decrypt } from '@/lib/tools/crypto'
 import { withManageAuth } from '@/lib/manage-token'
+import { checkExecuteCap, logUsage } from '@/lib/usage/cap'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -144,6 +145,18 @@ async function runExecute(slug: string, user_id: string, req: NextRequest): Prom
     return NextResponse.json({ error: 'task required' }, { status: 400 })
   }
 
+  // This loop can run up to MAX_LOOPS full Claude calls per request, with no
+  // prior cap on how much of that a single customer could rack up — see
+  // migration 016. Scoped to this specific (user_id, employee_slug), i.e.
+  // the actual $49/mo subscription paying for it.
+  const cap = await checkExecuteCap(user_id, slug)
+  if (!cap.allowed) {
+    return NextResponse.json(
+      { error: `This employee has reached its usage limit for this billing period ($${cap.capUsd.toFixed(2)}). Contact support to raise it.` },
+      { status: 429 }
+    )
+  }
+
   const supabase = createAdminClient()
 
   // Load user's connected tools for this employee
@@ -183,7 +196,7 @@ async function runExecute(slug: string, user_id: string, req: NextRequest): Prom
 
   // Build system prompt with tool context
   const toolContext = buildToolContext(connectedSlugs)
-  const systemPrompt = `${employee.systemPrompt}
+  const systemPrompt = `${employee.systemPrompt}${TOOL_HONESTY_GUARDRAIL}
 
 EXECUTION MODE — you now have real tools connected and are executing a real task.
 
@@ -254,6 +267,15 @@ ${toolContext}`
 
           const finalMsg = await claudeStream.finalMessage()
           const stopReason = finalMsg.stop_reason
+
+          logUsage({
+            userId: user_id,
+            employeeSlug: slug,
+            eventType: 'execute',
+            model: finalMsg.model,
+            inputTokens: finalMsg.usage?.input_tokens ?? 0,
+            outputTokens: finalMsg.usage?.output_tokens ?? 0,
+          }).catch(() => {})
 
           // Collect tool_use blocks from final message
           for (const block of finalMsg.content) {
