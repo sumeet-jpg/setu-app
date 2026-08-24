@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: 'AI Employees ready to hire. Your CMO, CFO, COO — they do the work, you take the credit. Interview any of them free.',
   openGraph: {
     title: 'Browse AI Employees — Setu',
-    description: 'Interview your AI Employee free. Multiple roles, 31–312 agents each, starting from BYOK.',
+    description: 'Interview your AI Employee free. Multiple roles, 31–312 agents each, starting at $49/mo.',
     url: `${BASE}/employees`,
     type: 'website',
   },

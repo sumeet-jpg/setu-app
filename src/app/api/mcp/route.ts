@@ -20,27 +20,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { EMPLOYEES, getEmployee, groupByDept, DEPT_ORDER } from '@/lib/employees/profiles'
-import { TOOL_NAME_TO_SLUG } from '@/lib/tools/registry'
-
-// Splits an employee's claimed tool list into what the platform can actually
-// connect and automate today (registered in the tool registry, connectable
-// via /api/tools/connect and callable by the execute loop) versus tools the
-// employee can only advise on from training knowledge. Every employee's
-// system prompt claims broad tool fluency, but only ~60 tools are actually
-// registered — without this split, MCP responses (read by AI agents like
-// Claude/ChatGPT and often repeated verbatim to a prospect) overstate what's
-// automatable for most employees outside the flagship few.
-function splitToolsByConnectability(toolGroups: { category: string; tools: string[] }[]) {
-  const connectable: string[] = []
-  const advisoryOnly: string[] = []
-  for (const group of toolGroups ?? []) {
-    for (const t of group.tools ?? []) {
-      if (TOOL_NAME_TO_SLUG[t]) connectable.push(t)
-      else advisoryOnly.push(t)
-    }
-  }
-  return { connectable, advisoryOnly }
-}
+import { splitToolsByConnectability } from '@/lib/tools/registry'
 
 export const runtime = 'nodejs'
 

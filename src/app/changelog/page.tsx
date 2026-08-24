@@ -15,6 +15,18 @@ const GRAY = '#E3E1DA', MUTED = '#78746E', DIM = '#9E9891', F = 'var(--font-jaka
 
 const ENTRIES: { date: string; items: string[] }[] = [
   {
+    date: 'August 24, 2026',
+    items: [
+      'Closed the same session-token/RLS gap from Aug 21 on four more tables (conversation and interview data) that had been missed in that pass.',
+      'Cancelling or pausing a subscription now actually stops billing with our payment processor, not just in our own dashboard.',
+      'Price increases are now capped at $99/month — was previously unbounded — and the locked rate you sign up at is now enforced at checkout, not just recorded.',
+      'Added a usage limit to prevent runaway AI costs on a single account.',
+      'Employee profile pages and our public API now clearly separate which of an employee\'s listed tools can be directly connected and automated versus which are advisory-only based on training knowledge.',
+      'Removed two guarantee claims ("30-day satisfaction," "7-day live") that had no refund process behind them.',
+      'Added a mobile navigation menu, a site icon, and a link-preview image — previously missing entirely.',
+    ],
+  },
+  {
     date: 'August 21, 2026',
     items: [
       'Security hardening pass: closed session-token gaps on subscription, memory, and vault data; locked down database access on five tables that were readable with just the public API key.',

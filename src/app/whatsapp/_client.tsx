@@ -25,8 +25,8 @@ const WA_EMPLOYEES = [
     color: '#128C7E',
     agents: 63,
     price: '$49/mo',
-    tagline: 'Resolves 80% of support tickets inside WhatsApp — before a human sees them',
-    handles: ['Instant query resolution', 'Order and delivery queries', 'Return and refund handling', 'Smart escalation', 'CSAT measurement'],
+    tagline: 'Drafts resolutions for order, delivery, and refund queries inside WhatsApp in seconds',
+    handles: ['Query resolution drafting', 'Order and delivery queries', 'Return and refund handling', 'Escalation flagging', 'CSAT measurement'],
   },
   {
     slug: 'whatsapp-commerce-agent',
@@ -108,8 +108,8 @@ export default function WhatsAppClient() {
         </h1>
 
         <p style={{ fontSize: 'clamp(16px,2.5vw,20px)', color: C.muted, maxWidth: 520, margin: '0 auto 40px', lineHeight: 1.65 }}>
-          Reply to every lead instantly. Book appointments. Handle orders.
-          Follow up automatically. 24/7 — even when you&apos;re asleep.
+          Draft and send replies through your WhatsApp Business account in seconds.
+          Qualify leads, book appointments, handle orders — whenever you trigger it, not tied to a 9-to-5.
         </p>
 
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -142,7 +142,7 @@ export default function WhatsAppClient() {
               </div>
             </div>
           ))}
-          <div style={{ textAlign: 'right', fontSize: 10, color: C.dim, marginTop: 4 }}>3:47 AM · All 47 messages handled ✓✓</div>
+          <div style={{ textAlign: 'right', fontSize: 10, color: C.dim, marginTop: 4 }}>Drafted in 4s ✓✓</div>
         </div>
       </section>
 
@@ -150,9 +150,9 @@ export default function WhatsAppClient() {
       <section style={{ background: C.surface, borderTop: `1px solid ${C.borderMid}`, borderBottom: `1px solid ${C.borderMid}`, padding: '32px 24px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 24, textAlign: 'center' }}>
           {[
-            { stat: '< 3s', label: 'Average reply time' },
-            { stat: '24/7', label: 'Always on — no sick days' },
-            { stat: '12+', label: 'Languages supported' },
+            { stat: '< 3s', label: 'Draft generation time' },
+            { stat: 'Anytime', label: 'No 9-to-5 shift limit' },
+            { stat: 'Multi', label: 'Language replies' },
             { stat: '$49', label: 'Monthly price, locked at signup' },
           ].map(s => (
             <div key={s.stat}>
@@ -242,9 +242,9 @@ export default function WhatsAppClient() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 }}>
           {[
             { icon: '💬', label: 'Incoming lead qualification', desc: 'Asks the right questions, scores intent, routes hot leads to you.' },
-            { icon: '📋', label: 'Price & product inquiries', desc: 'Answers FAQs instantly, 24/7. No human needed.' },
+            { icon: '📋', label: 'Price & product inquiries', desc: 'Drafts FAQ answers in seconds — trigger it whenever, no shift limits.' },
             { icon: '📅', label: 'Appointment booking', desc: 'Syncs with your calendar, books slots, sends reminders.' },
-            { icon: '📦', label: 'Order status & tracking', desc: 'Pulls real-time status from your OMS and replies instantly.' },
+            { icon: '📦', label: 'Order status & tracking', desc: 'Pulls status from your connected OMS and drafts a reply fast.' },
             { icon: '🔄', label: 'Return & refund handling', desc: 'Follows your policy, initiates returns, keeps customers calm.' },
             { icon: '📢', label: 'Broadcast campaigns', desc: 'Sends promotions, reactivates cold leads, drives repeat orders.' },
             { icon: '🌐', label: '12+ languages', desc: 'Responds in the customer\'s language. Hindi, Tamil, Marathi + more.' },

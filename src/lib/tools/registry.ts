@@ -897,6 +897,10 @@ export const TOOL_NAME_TO_SLUG: Record<string, string> = {
   'Monday': 'monday', 'ClickUp': 'clickup', 'Airtable': 'airtable',
   'Google Workspace': 'google-workspace', 'PostHog': 'posthog', 'Hotjar': 'hotjar',
   'Tableau': 'tableau', 'Zoho CRM': 'zoho-crm',
+  // Aliases for real registry entries referenced under a slightly different
+  // name in employee profile prose — without these, a genuinely connectable
+  // tool gets miscategorized as advisory-only purely from copy-editing drift.
+  'WhatsApp Business': 'whatsapp-api',
 }
 
 export function employeeToolSlugs(toolGroups: { tools?: string[] }[]): string[] {
@@ -908,6 +912,27 @@ export function employeeToolSlugs(toolGroups: { tools?: string[] }[]): string[] 
     }
   }
   return [...slugs]
+}
+
+// Splits an employee's claimed tool list into what's actually connectable
+// (real registry entry) vs advisory-only (the employee can strategize/draft
+// about it from training knowledge but can't execute real actions in it).
+// Shared by the MCP server (src/app/api/mcp/route.ts) and the human-facing
+// employee profile page (_workspace.tsx) so both surfaces agree — the
+// profile page previously just hid the tools section entirely when an
+// employee had zero connectable tools, silently, with no honesty note, even
+// though the surrounding "How I Work" prose kept making unqualified
+// automation claims.
+export function splitToolsByConnectability(toolGroups: { category: string; tools: string[] }[]) {
+  const connectable: string[] = []
+  const advisoryOnly: string[] = []
+  for (const group of toolGroups ?? []) {
+    for (const t of group.tools ?? []) {
+      if (TOOL_NAME_TO_SLUG[t]) connectable.push(t)
+      else advisoryOnly.push(t)
+    }
+  }
+  return { connectable, advisoryOnly }
 }
 
 // Clearbit logo URL for a tool slug

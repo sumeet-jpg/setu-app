@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { getStuntTitle } from '@/lib/employees/profiles'
-import { TOOL_REGISTRY, toolLogoUrl, employeeToolSlugs } from '@/lib/tools/registry'
+import { TOOL_REGISTRY, toolLogoUrl, employeeToolSlugs, splitToolsByConnectability } from '@/lib/tools/registry'
 import Link from 'next/link'
 import { authFetch } from '@/lib/manage-token-client'
 
@@ -305,6 +305,11 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
 
   // Employee's expected tools
   const expectedSlugs = employeeToolSlugs(e.tools)
+  // Split so we can be honest when an employee has claimed tool fluency the
+  // platform can't actually back with a real integration — previously this
+  // section just vanished silently when expectedSlugs was empty, while the
+  // "How I Work" copy right below kept making unqualified automation claims.
+  const { advisoryOnly: advisoryOnlyTools } = splitToolsByConnectability(e.tools)
 
   // Load connected tools on mount
   useEffect(() => {
@@ -676,9 +681,9 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
 
         {/* Tools */}
         {expectedSlugs.length > 0 && (
-          <div style={{ marginBottom: 48 }}>
+          <div style={{ marginBottom: advisoryOnlyTools.length > 0 ? 16 : 48 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
-              textTransform: 'uppercase', marginBottom: 16 }}>Tools {e.name} Uses</div>
+              textTransform: 'uppercase', marginBottom: 16 }}>Tools {e.name} Can Connect &amp; Automate</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {expectedSlugs.map(slug => {
                 const toolDef = TOOL_REGISTRY.find(t => t.slug === slug)
@@ -691,6 +696,22 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
                   </div>
                 )
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Advisory-only tools — honesty disclosure. Previously, when an
+            employee had zero connectable tools, this whole area rendered
+            nothing at all while the "How I Work" copy below kept making
+            unqualified automation promises. */}
+        {advisoryOnlyTools.length > 0 && (
+          <div style={{ marginBottom: 48, background: '#FEF9EC', border: '1px solid #F5E3B3', borderRadius: 10, padding: '14px 16px' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#92702A', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+              Advisory only — not yet automatable
+            </div>
+            <div style={{ fontSize: 13, color: '#5C4A1E', lineHeight: 1.6 }}>
+              {e.name} can strategize, draft, and advise on <strong>{advisoryOnlyTools.join(', ')}</strong> using its expertise, but can't yet connect to {advisoryOnlyTools.length === 1 ? 'it' : 'them'} directly or take real automated actions there.
+              {expectedSlugs.length === 0 && ' None of this employee\'s listed tools are connectable through the platform yet — every task is advisory.'}
             </div>
           </div>
         )}

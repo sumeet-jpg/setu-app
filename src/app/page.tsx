@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { EMPLOYEES, EMPLOYEE_COUNT, DEPT_ORDER } from '@/lib/employees/profiles'
+import { currentTierPriceCents, MAX_PRICE_CENTS } from '@/lib/pricing/tiers'
 import EmployeeMatchBox from '@/components/EmployeeMatchBox'
 import VideoHero from '@/components/VideoHero'
 import DeptPicker from '@/components/DeptPicker'
@@ -12,7 +13,7 @@ const BASE = 'https://setuagents.com'
 
 export const metadata: Metadata = {
   title: 'Setu — Hire Your Business Stuntman',
-  description: 'The star gets the credit. Your Stuntman does the work. 100 Stuntmen & Stuntwomen — CMO, CFO, COO and 97 more. Interview free. Go live in days.',
+  description: 'The star gets the credit. Your Stuntman does the work. 100 Stuntmen & Stuntwomen — CMO, CFO, COO and 97 more. Interview free. Go live instantly.',
   openGraph: {
     title: 'Hire Your Business Stuntman — Setu',
     description: '100 Stuntmen & Stuntwomen commanding 10,000+ agents. Interview any of them for free.',
@@ -86,6 +87,9 @@ const homeJsonLd = {
 }
 
 export default function HomePage() {
+  const currentPrice = Math.round(currentTierPriceCents() / 100)
+  const nextPrice = Math.min(currentPrice + 10, MAX_PRICE_CENTS / 100)
+  const atPriceCap = currentTierPriceCents() >= MAX_PRICE_CENTS
   const departments = DEPT_ORDER
     .filter(d => EMPLOYEES.some(e => e.dept === d))
     .map(d => ({
@@ -151,7 +155,7 @@ export default function HomePage() {
               { value: '100', label: 'AI Employees' },
               { value: '10,000+', label: 'Agents deployed' },
               { value: '$0', label: 'To interview' },
-              { value: '48h', label: 'To go live' },
+              { value: '0h', label: 'To go live' },
             ].map(s => (
               <div key={s.label}>
                 <div style={{ fontSize: 26, fontWeight: 800, color: GREEN, letterSpacing: '-0.05em', lineHeight: 1 }}>{s.value}</div>
@@ -259,17 +263,19 @@ export default function HomePage() {
             <div>
               <span style={{ fontSize: 11, fontWeight: 700, color: GREEN, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Pricing</span>
               <h2 style={{ fontSize: 'clamp(26px,3.5vw,40px)', fontWeight: 800, letterSpacing: '-0.05em', margin: '10px 0 0', color: INK }}>
-                One price. $49/month. Lock it in now.
+                One price. ${currentPrice}/month. Lock it in now.
               </h2>
             </div>
-            <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>Price rises $10 every month we ship. Early signups keep their rate forever.</p>
+            <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>
+              {atPriceCap ? `Price is at its $${MAX_PRICE_CENTS / 100}/mo ceiling.` : 'Price rises $10 every month we ship, up to a $' + (MAX_PRICE_CENTS / 100) + '/mo ceiling.'} Early signups keep their rate forever.
+            </p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
             {[
               { tier: '14-day trial', price: 'Free', desc: 'Start immediately. No credit card. Interview first, hire when ready — all employees included.', accent: GREEN_M },
-              { tier: 'Today', price: '$49/month', desc: 'Sign up now and this is your rate forever — any employee, all memory systems, full calibration.', accent: '#1A5C8A' },
-              { tier: 'October onward', price: '$59/month', desc: 'New signups from October pay $10 more. Sign up before then and your rate is locked forever.', accent: '#8B5A1A' },
-              { tier: 'Multiple employees', price: 'Per employee', desc: 'Each employee is a separate subscription. Each locks in the rate at their individual trial start.', accent: MUTED },
+              { tier: 'Today', price: `$${currentPrice}/month`, desc: 'Sign up now and this is your rate forever — any employee, all memory systems, full calibration.', accent: '#1A5C8A' },
+              { tier: 'Next month', price: atPriceCap ? `$${currentPrice}/month` : `$${nextPrice}/month`, desc: atPriceCap ? 'Price has hit its ceiling — this stays the rate for new signups going forward.' : `New signups next month pay $${nextPrice - currentPrice} more. Sign up before then and your rate is locked forever.`, accent: '#8B5A1A' },
+              { tier: 'Multiple employees', price: 'Per employee', desc: 'Each employee is a separate subscription — but hiring more never costs more per seat. Every additional employee locks in at your cheapest existing rate.', accent: MUTED },
             ].map(t => (
               <div key={t.tier} style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 16, padding: '26px 22px', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: t.accent }} />
@@ -315,7 +321,7 @@ export default function HomePage() {
                 ))}
               </div>
               <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.04em', color: INK, margin: '0 0 8px' }}>Each employee commands a team of agents</h3>
-              <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.65 }}>One hire. A fleet of 30–300 specialist agents behind them, executing across every tool you use.</p>
+              <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.65 }}>One hire. A fleet of 30–320 specialist agents behind them, working across your connected tools.</p>
             </div>
 
             {/* Feature 3 */}
@@ -388,7 +394,7 @@ export default function HomePage() {
             Which role do I need?
           </Link>
         </div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 24 }}>100 roles available · BYOK — use your own API keys · Cancel anytime</p>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 24 }}>100 roles available · No credit card to interview · Cancel anytime</p>
       </section>
 
       <Footer theme="light" />

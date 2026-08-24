@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
+import { currentTierPriceCents } from '@/lib/pricing/tiers'
 
 export const metadata: Metadata = {
   title: 'AI Employees vs Human Hires — Real Cost Comparison',
@@ -23,16 +24,16 @@ const COMPARISONS = [
   {
     role: 'Marketing Manager',
     human: { cost: '₹10,00,000', breakdown: ['₹8L base salary', '₹96k PF (12%)', '₹1L+ recruitment', '90 day notice period', 'Leaves after 18 months avg'], risk: 'Quits → 6 months of lost momentum' },
-    ai: { cost: '~₹4,100/mo', breakdown: ['No PF or benefits', 'No recruitment cost', 'Starts in 48 hours', 'Never quits', '208 agents across all channels'] },
+    ai: { cost: '~₹4,100/mo', breakdown: ['No PF or benefits', 'No recruitment cost', 'Live immediately, no call needed', 'Never quits', '208 agents across all channels'] },
     slug: 'marketing-manager',
     verdict: '~20× cheaper per year. Infinitely more capacity.'
   },
   {
     role: 'WhatsApp Sales Rep',
     human: { cost: '₹3,00,000+', breakdown: ['₹2.4L base salary', '₹29k PF', 'Works 9am–6pm only', 'Misses leads after hours', 'Covers 1 channel only'], risk: 'Every unanswered lead = lost revenue' },
-    ai: { cost: '~₹4,100/mo', breakdown: ['24/7 — never sleeps', 'Replies in < 3 seconds', 'Handles 100s of chats simultaneously', 'Hindi, Tamil, Marathi + 9 languages', 'Reports daily'] },
+    ai: { cost: '~₹4,100/mo', breakdown: ['Drafts replies in seconds when you trigger it', 'No 9am-6pm limit — run it whenever leads come in', 'Handles high volume without extra headcount', 'Multi-language replies', 'Reports daily'] },
     slug: 'whatsapp-lead-qualifier',
-    verdict: '~6× cheaper per year. Works while you sleep.'
+    verdict: '~6× cheaper per year. No shift limits.'
   },
   {
     role: 'CFO / Finance Head',
@@ -44,7 +45,7 @@ const COMPARISONS = [
   {
     role: 'CMO',
     human: { cost: '₹40,00,000+', breakdown: ['₹35L+ base salary', 'ESOP/equity stake', 'Team budget needed on top', '6-month search + notice', 'Risk: wrong hire = wrong brand'], risk: 'Bad CMO = 18 months of damage + expensive exit' },
-    ai: { cost: '~₹4,100/mo', breakdown: ['Full marketing strategy on day 1', 'No equity given up', 'Commands 234 specialist agents', 'Interview free before committing', 'Weekly board-ready reports'] },
+    ai: { cost: '~₹4,100/mo', breakdown: ['Full marketing strategy on day 1', 'No equity given up', 'Commands 287 specialist agents', 'Interview free before committing', 'Weekly board-ready reports'] },
     slug: 'cmo-intelligence',
     verdict: '~80× cheaper per year. No ESOP. Interview first.'
   },
@@ -52,7 +53,7 @@ const COMPARISONS = [
 
 const HIDDEN_COSTS = [
   { label: 'Recruitment & interviews', human: '₹50k–₹2L per hire', ai: '₹0' },
-  { label: 'Training & onboarding', human: '3–6 months', ai: '48 hours' },
+  { label: 'Training & onboarding', human: '3–6 months', ai: 'Immediate' },
   { label: 'Benefits & PF', human: '+12–20% of salary', ai: '₹0' },
   { label: 'Downtime (sick, leave, etc.)', human: '15–30 days/year', ai: '0 days' },
   { label: 'Notice period (before they start)', human: '30–90 days', ai: '0 days' },
@@ -71,6 +72,7 @@ const RED = '#EF4444'
 const GREEN = '#22C55E'
 
 export default function ComparePage() {
+  const currentPrice = Math.round(currentTierPriceCents() / 100)
   return (
     <div style={{ minHeight: '100vh', background: BG, color: '#F1F5F9', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', lineHeight: 1.6 }}>
 
@@ -186,7 +188,7 @@ export default function ComparePage() {
             See pricing
           </Link>
         </div>
-        <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>Every employee, $49/mo, locked at signup · No commitment · Cancel anytime</div>
+        <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>Every employee, ${currentPrice}/mo, locked at signup · No commitment · Cancel anytime</div>
       </section>
 
       <Footer theme="dark" />
