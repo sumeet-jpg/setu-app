@@ -9,7 +9,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 
 export async function getDashboardStats() {
   const db = createAdminClient();
-  const [blueprints, leads, approvals, killSwitches, auditLogs, agents, subStats] =
+  const [blueprints, leads, approvals, killSwitches, auditLogs, agents, subStats, pendingHires, cronRuns] =
     await Promise.all([
       db.from("generated_blueprints").select("id", { count: "exact" }).eq("status", "pending_review"),
       db.from("leads").select("id", { count: "exact" }).eq("status", "new"),
@@ -18,6 +18,11 @@ export async function getDashboardStats() {
       db.from("audit_logs").select("id, event_type, severity, description, created_at").order("created_at", { ascending: false }).limit(5),
       db.from("agents").select("id", { count: "exact" }).eq("is_public", true),
       db.from("hired_subscriptions").select("status, monthly_price_cents").catch(() => ({ data: null })),
+      // employee_hires was never queried by the main dashboard at all — a new
+      // hire request was invisible here, findable only by remembering to
+      // separately open /admin/hires.
+      db.from("employee_hires").select("id, created_at").eq("status", "pending").order("created_at", { ascending: true }).catch(() => ({ data: null })),
+      db.from("cron_runs").select("job_name, status, ran_at").order("ran_at", { ascending: false }).limit(20).catch(() => ({ data: null })),
     ]);
 
   // Compute subscription metrics
@@ -27,6 +32,22 @@ export async function getDashboardStats() {
   const mrr = subs
     .filter((s: any) => s.status === 'active')
     .reduce((acc: number, s: any) => acc + (s.monthly_price_cents ?? 4900), 0) / 100
+
+  const pendingHireRows = (pendingHires as any)?.data ?? []
+  const oldestPendingHireAt = pendingHireRows[0]?.created_at ?? null
+
+  // Most recent run (success or failed) per job — surfaces both "cron
+  // stopped running entirely" (no rows / very stale ran_at) and "cron is
+  // running but failing" (latest status === 'failed').
+  const cronRunRows = (cronRuns as any)?.data ?? []
+  const latestByJob = new Map<string, { status: string; ran_at: string }>()
+  for (const r of cronRunRows) {
+    if (!latestByJob.has(r.job_name)) latestByJob.set(r.job_name, { status: r.status, ran_at: r.ran_at })
+  }
+  const cronHealth = ['trials', 'decay'].map(job => ({
+    job_name: job,
+    ...(latestByJob.get(job) ?? { status: 'never_run', ran_at: null }),
+  }))
 
   return {
     blueprints_pending: blueprints.count ?? 0,
@@ -38,6 +59,9 @@ export async function getDashboardStats() {
     sub_trials: trialsCount,
     sub_active: activeCount,
     sub_mrr: mrr,
+    hires_pending: pendingHireRows.length,
+    oldest_pending_hire_at: oldestPendingHireAt,
+    cron_health: cronHealth,
   };
 }
 

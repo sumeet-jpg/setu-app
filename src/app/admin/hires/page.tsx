@@ -192,6 +192,12 @@ export default async function HiresPage({
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {new Date(hire.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                     </p>
+                    {hire.status === 'pending' && (() => {
+                      const ageHours = Math.round((Date.now() - new Date(hire.created_at).getTime()) / 3_600_000)
+                      return ageHours >= 24 ? (
+                        <p className="text-xs font-semibold text-red-600 mt-0.5">⚠ {ageHours}h — SLA missed</p>
+                      ) : null
+                    })()}
                   </td>
 
                 </tr>

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { verifyCronSecret } from '@/lib/cron-auth'
+import { recordCronRun } from '@/lib/cron-heartbeat'
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // /api/cron/decay â€” Ebbinghaus belief decay
@@ -22,11 +23,13 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error('[decay cron] RPC error:', error)
+      await recordCronRun('decay', 'failed', error.message)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     const result = Array.isArray(data) ? data[0] : data
     console.log('[decay cron] Complete:', result)
+    await recordCronRun('decay', 'success', `decayed=${result?.decayed_count ?? 0} at_floor=${result?.zeroed_count ?? 0}`)
 
     return NextResponse.json({
       ok: true,
@@ -37,6 +40,7 @@ export async function POST(req: NextRequest) {
     })
   } catch (err) {
     console.error('[decay cron] Unexpected error:', err)
+    await recordCronRun('decay', 'failed', err instanceof Error ? err.message : 'unknown error')
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

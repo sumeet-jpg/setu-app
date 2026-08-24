@@ -16,6 +16,9 @@ export default async function AdminDashboardPage() {
     sub_trials: 0,
     sub_active: 0,
     sub_mrr: 0,
+    hires_pending: 0,
+    oldest_pending_hire_at: null as string | null,
+    cron_health: [] as Array<{ job_name: string; status: string; ran_at: string | null }>,
   };
 
   try {
@@ -25,13 +28,29 @@ export default async function AdminDashboardPage() {
   }
 
   const statCards = [
+    { label: "Pending hire requests", value: stats.hires_pending, color: "text-amber-600", href: "/admin/hires?status=pending" },
     { label: "Blueprints pending review", value: stats.blueprints_pending, color: "text-purple-600", href: "/admin/blueprints?status=pending_review" },
     { label: "Open approvals", value: stats.approvals_pending, color: "text-amber-600", href: "/admin/approvals" },
     { label: "New leads", value: stats.leads_new, color: "text-blue-600", href: "/admin/leads" },
     { label: "Active kill switches", value: stats.kill_switches_active, color: "text-red-600", href: "/admin/policy" },
     { label: "Catalog agents", value: stats.agents_total, color: "text-emerald-600", href: "/admin/agents" },
-    { label: "Runtime status", value: "Disabled", color: "text-gray-500", href: "/admin/runtime" },
   ];
+
+  const oldestHireAgeHours = stats.oldest_pending_hire_at
+    ? Math.round((Date.now() - new Date(stats.oldest_pending_hire_at).getTime()) / 3_600_000)
+    : null;
+  const staleHireAlert = oldestHireAgeHours !== null && oldestHireAgeHours >= 24;
+
+  // Expected schedule per vercel.json: trials daily, decay weekly (Mondays).
+  // Stale threshold is the expected interval plus a buffer.
+  const CRON_STALE_HOURS: Record<string, number> = { trials: 30, decay: 192 };
+  const now = Date.now();
+  const staleCronJobs = stats.cron_health.filter(c => {
+    if (c.status === 'never_run' || !c.ran_at) return true;
+    if (c.status === 'failed') return true;
+    const staleAfter = CRON_STALE_HOURS[c.job_name] ?? 30;
+    return (now - new Date(c.ran_at).getTime()) / 3_600_000 > staleAfter;
+  });
 
   return (
     <div>
@@ -53,6 +72,34 @@ export default async function AdminDashboardPage() {
           </a>
         ))}
       </div>
+
+      {/* Needs attention — only renders when something's actually stale, so it
+          doesn't become noise the founder learns to ignore. */}
+      {(staleHireAlert || staleCronJobs.length > 0) && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+          <p className="mb-1 text-sm font-semibold text-red-800">Needs attention</p>
+          <ul className="space-y-1 text-sm text-red-700">
+            {staleHireAlert && (
+              <li>
+                <a href="/admin/hires?status=pending" className="underline underline-offset-2">
+                  Oldest pending hire request is {oldestHireAgeHours}h old
+                </a> — the 24h outreach SLA promised to prospects has been missed.
+              </li>
+            )}
+            {staleCronJobs.map(c => (
+              <li key={c.job_name}>
+                <code className="rounded bg-red-100 px-1">{c.job_name}</code> cron{' '}
+                {c.status === 'never_run' || !c.ran_at
+                  ? 'has never recorded a successful run'
+                  : c.status === 'failed'
+                    ? `last run failed (${new Date(c.ran_at).toLocaleString()})`
+                    : `hasn't run successfully since ${new Date(c.ran_at).toLocaleString()}`}
+                — check Vercel cron logs and CRON_SECRET.
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Runtime banner */}
       <div className="mb-6 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
