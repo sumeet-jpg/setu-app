@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 import { SetuLogo } from '@/components/SetuLogo'
 
@@ -27,6 +28,7 @@ const DARK = {
 export function Nav({ theme = 'light', ctaLabel = 'Hire an Employee', ctaHref = '/employees' }: { theme?: 'light' | 'dark'; ctaLabel?: string; ctaHref?: string }) {
   const C = theme === 'dark' ? DARK : LIGHT
   const isDark = theme === 'dark'
+  const [open, setOpen] = useState(false)
 
   return (
     <nav style={{
@@ -40,11 +42,15 @@ export function Nav({ theme = 'light', ctaLabel = 'Hire an Employee', ctaHref = 
         .setu-nav-link:hover { color: ${isDark ? '#a5b4fc' : '#0E5C34'} !important; }
         .setu-nav-cta { transition: transform 0.15s ease, box-shadow 0.15s ease; }
         .setu-nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+        .setu-nav-toggle { display: none; }
+        .setu-nav-mobile-panel { display: none; }
         @media (max-width: 760px) {
           .setu-nav-links { display: none !important; }
+          .setu-nav-toggle { display: flex !important; }
+          .setu-nav-mobile-panel.open { display: flex !important; }
         }
       `}</style>
-      <Link href="/" style={{ textDecoration: 'none' }}>
+      <Link href="/" style={{ textDecoration: 'none' }} onClick={() => setOpen(false)}>
         <SetuLogo size={28} color={isDark ? '#22c55e' : '#0E5C34'} wordColor={C.ink} />
       </Link>
       <div className="setu-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -54,13 +60,58 @@ export function Nav({ theme = 'light', ctaLabel = 'Hire an Employee', ctaHref = 
           </Link>
         ))}
       </div>
-      <Link href={ctaHref} className="setu-nav-cta" style={{
-        fontSize: 13, fontWeight: 700, color: '#fff', textDecoration: 'none',
-        padding: '9px 20px', borderRadius: 100, background: isDark ? 'linear-gradient(135deg,#6366f1,#7c3aed)' : C.ink,
-        letterSpacing: '-0.01em', whiteSpace: 'nowrap', display: 'inline-block',
-      }}>
-        {ctaLabel} →
-      </Link>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Link href={ctaHref} className="setu-nav-cta" style={{
+          fontSize: 13, fontWeight: 700, color: '#fff', textDecoration: 'none',
+          padding: '9px 20px', borderRadius: 100, background: isDark ? 'linear-gradient(135deg,#6366f1,#7c3aed)' : C.ink,
+          letterSpacing: '-0.01em', whiteSpace: 'nowrap', display: 'inline-block',
+        }}>
+          {ctaLabel} →
+        </Link>
+        <button
+          type="button"
+          className="setu-nav-toggle"
+          onClick={() => setOpen(o => !o)}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+          style={{
+            alignItems: 'center', justifyContent: 'center',
+            width: 36, height: 36, borderRadius: 8, border: `1.5px solid ${C.border}`,
+            background: 'transparent', cursor: 'pointer', flexShrink: 0,
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            {open ? (
+              <path d="M3 3L13 13M13 3L3 13" stroke={C.ink} strokeWidth="1.6" strokeLinecap="round" />
+            ) : (
+              <>
+                <path d="M2 4H14" stroke={C.ink} strokeWidth="1.6" strokeLinecap="round" />
+                <path d="M2 8H14" stroke={C.ink} strokeWidth="1.6" strokeLinecap="round" />
+                <path d="M2 12H14" stroke={C.ink} strokeWidth="1.6" strokeLinecap="round" />
+              </>
+            )}
+          </svg>
+        </button>
+      </div>
+
+      <div
+        className={`setu-nav-mobile-panel${open ? ' open' : ''}`}
+        style={{
+          position: 'absolute', top: 60, left: 0, right: 0,
+          background: C.bg, borderBottom: `1px solid ${C.border}`,
+          flexDirection: 'column', padding: '8px 12px 16px',
+          boxShadow: '0 12px 24px rgba(0,0,0,0.12)',
+        }}
+      >
+        {LINKS.map(([label, href]) => (
+          <Link
+            key={href} href={href} onClick={() => setOpen(false)}
+            style={{ fontSize: 15, color: C.ink, textDecoration: 'none', padding: '13px 10px', fontWeight: 600, borderBottom: `1px solid ${C.border}` }}
+          >
+            {label}
+          </Link>
+        ))}
+      </div>
     </nav>
   )
 }
