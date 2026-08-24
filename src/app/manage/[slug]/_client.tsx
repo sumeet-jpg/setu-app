@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { setManageToken, authFetch } from '@/lib/manage-token-client'
+import { MAX_PRICE_CENTS } from '@/lib/pricing/tiers'
 
 const BILLING_EMAIL = 'hello@setuagents.com'
 
@@ -185,7 +186,7 @@ export default function ManageClient({
   const isPaused = sub?.status === 'paused'
   const isCancelled = cancelled || sub?.status === 'cancelled'
   const monthlyPrice = sub?.monthly_price_cents ? (sub.monthly_price_cents / 100).toFixed(0) : '49'
-  const nextMonthPrice = parseInt(monthlyPrice) + 10
+  const nextMonthPrice = Math.min(parseInt(monthlyPrice) + 10, MAX_PRICE_CENTS / 100)
 
   // Trial day calculation
   const trialDayNumber = sub?.trial_started_at
@@ -321,7 +322,7 @@ export default function ManageClient({
                 <div style={{ fontSize: 28, fontWeight: 800, color: C.text, letterSpacing: '-0.04em', lineHeight: 1 }}>
                   ${monthlyPrice}<span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>/mo</span>
                 </div>
-                <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>New signups after Oct: ${nextMonthPrice}/mo</div>
+                <div style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>New signups next month: ${nextMonthPrice}/mo</div>
               </div>
             </div>
 

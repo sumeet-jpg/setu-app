@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { EMPLOYEES } from '@/lib/employees/profiles'
 import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
+import { currentTierPriceCents, MAX_PRICE_CENTS, STEP_CENTS } from '@/lib/pricing/tiers'
 
 /* ─── Design tokens ─── */
 const BG    = '#F6F5F1'
@@ -17,21 +18,18 @@ const GRAY  = '#E3E1DA'
 const MUTED = '#78746E'
 const DIM   = '#9E9891'
 
-// Pricing escalation: $49 base, +$10/month from launch (2026-09-01)
+// Pricing escalation: $49 base, +$10/month from launch (2026-09-01), capped
+// at $99 — see src/lib/pricing/tiers.ts for why the cap exists (a finite
+// tier count is required for Dodo checkout to actually charge the locked
+// price at all).
 const LAUNCH_DATE = new Date('2026-09-01')
-const BASE_PRICE  = 49
-const STEP        = 10
+const STEP        = STEP_CENTS / 100
 
-function currentPrice(): number {
-  const now = new Date()
-  const months = Math.max(0,
-    (now.getFullYear() - LAUNCH_DATE.getFullYear()) * 12
-    + (now.getMonth() - LAUNCH_DATE.getMonth())
-  )
-  return BASE_PRICE + months * STEP
-}
+function currentPrice(): number { return currentTierPriceCents() / 100 }
 
-function nextMonthPrice(): number { return currentPrice() + STEP }
+function nextMonthPrice(): number { return Math.min(currentPrice() + STEP, MAX_PRICE_CENTS / 100) }
+
+function atCap(): boolean { return currentTierPriceCents() >= MAX_PRICE_CENTS }
 
 // Days until the next actual price increase:
 // Before Sept 2026 launch: until Oct 1 (first real step-up)
@@ -113,7 +111,7 @@ export default function PricingPage() {
           padding: '6px 16px', borderRadius: 24, marginBottom: 28, letterSpacing: '0.02em',
         }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b', display: 'inline-block', boxShadow: '0 0 6px rgba(245,158,11,0.6)' }} />
-          Price rises to ${nextPrice}/mo in {days} day{days !== 1 ? 's' : ''}
+          {atCap() ? `Price is at its ceiling — $${price}/mo` : `Price rises to $${nextPrice}/mo in ${days} day${days !== 1 ? 's' : ''}`}
         </div>
 
         <h1 style={{ fontSize: 'clamp(42px,7vw,72px)', fontWeight: 900, letterSpacing: '-0.07em', margin: '0 0 24px', color: INK, lineHeight: 0.95 }}>
@@ -159,9 +157,9 @@ export default function PricingPage() {
           <div style={{ display: 'flex', gap: 0, marginBottom: 20, position: 'relative' }}>
             {[
               { label: 'Today', price: price, current: true },
-              { label: 'Next month', price: nextPrice, current: false },
-              { label: `+2 months`, price: nextPrice + STEP, current: false },
-              { label: `+3 months`, price: nextPrice + STEP * 2, current: false },
+              { label: 'Next month', price: Math.min(nextPrice, MAX_PRICE_CENTS / 100), current: false },
+              { label: `+2 months`, price: Math.min(nextPrice + STEP, MAX_PRICE_CENTS / 100), current: false },
+              { label: `+3 months`, price: Math.min(nextPrice + STEP * 2, MAX_PRICE_CENTS / 100), current: false },
             ].map((item, i) => (
               <div key={i} style={{ flex: 1, textAlign: 'center', position: 'relative' }}>
                 <div style={{

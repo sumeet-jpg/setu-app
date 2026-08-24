@@ -5,6 +5,8 @@ import { Resend } from 'resend'
 import { verifyCronSecret } from '@/lib/cron-auth'
 import { escapeHtml as esc } from '@/lib/email/escape-html'
 import { trackServer } from '@/lib/posthog/server'
+import { MAX_PRICE_CENTS } from '@/lib/pricing/tiers'
+import { recordCronRun } from '@/lib/cron-heartbeat'
 
 // /api/cron/trials â€” daily trial lifecycle management
 // Secured by CRON_SECRET.
@@ -144,7 +146,7 @@ export async function POST(req: NextRequest) {
               Your ${en} trial ends in 4 days
             </h2>
             <p style="color:#94a3b8;font-size:14px;line-height:1.7;margin:0 0 16px">
-              Activate before your trial ends and you keep <strong style="color:#fff">$${p}/month locked in forever</strong>. New signups after October pay $${p + 10}/month â€” and it rises $10 every month after that.
+              Activate before your trial ends and you keep <strong style="color:#fff">$${p}/month locked in forever</strong>. New signups next month pay $${Math.min(p + 10, MAX_PRICE_CENTS / 100)}/month â€” it rises $10 every month we ship, up to $${MAX_PRICE_CENTS / 100}.
             </p>
             <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:18px;margin-bottom:24px">
               <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
@@ -234,6 +236,8 @@ export async function POST(req: NextRequest) {
       console.error(`[trials cron ${job.label}]`, e)
     }
   }
+
+  await recordCronRun('trials', 'success', `expired=${expiredCount} emails_sent=${emailCount}`)
 
   return NextResponse.json({
     ok: true,
