@@ -23,6 +23,42 @@ If picking up this doc again: those five are the actual backlog. Everything else
 
 ---
 
+## SECOND AUDIT — 2026-08-24 (five independent passes: security, billing, frontend, code hygiene, funnel)
+
+The founder asked for a fresh look because the first pass clearly hadn't caught everything. It hadn't. Findings and fixes below; commit follows this doc update.
+
+### Fixed this pass
+- **Conversation data was world-readable.** `conversations`, `conversation_messages`, `conversation_state`, `generated_blueprints` had the exact same "USING(true), no TO service_role" bug migration 012 fixed on 5 other tables — just missed here. Anyone with the public anon key could read every prospect's full interview transcript via the raw Supabase REST API. Fixed in migration 015. **Needs the founder to run this migration against the live DB — it does not apply itself.**
+- **`/api/employees/[slug]/execute` had no auth at all.** Took a bare client-supplied `user_id`, decrypted, and spent that account's real connected-tool credentials (Slack/HubSpot/Mailchimp/etc.) with no approval friction on GET-type actions. Now requires a manage-token.
+- **`/api/checkout/dodo`** trusted a bare `user_id` (an unauthenticated oracle for guessing valid user/employee pairs and their status). Now requires a manage-token.
+- **`/api/manage/recover`** had zero rate limiting despite sending a real email every call — an email-bombing vector against any known address. Added the same limiter used elsewhere.
+- **Timing-unsafe secret comparisons** in `admin-guard.ts` and `cron-auth.ts` (plain `===` on `ADMIN_SECRET`/`CRON_SECRET`) — switched to `crypto.timingSafeEqual`.
+- **Cancel/pause never touched Dodo.** Self-service cancel/pause in the manage hub only ever flipped our own DB status — the Dodo subscription kept billing regardless. Now calls `dodo.subscriptions.update()` for real, using a `dodo_subscription_id` the webhook now actually stores (it never did before).
+- **Webhook only handled activation.** Added `subscription.cancelled` / `subscription.failed` / `subscription.expired` / `subscription.on_hold` so a Dodo-side lapse (failed renewal, dispute, direct cancellation in Dodo's dashboard) updates our status instead of `hired_subscriptions.status` staying `'active'` forever.
+- **Resume-from-pause could grant free `'active'` status** once a trial had expired — the code contradicted its own inline comment saying this must never happen. Fixed: now requires checkout (or a real Dodo unpause if they'd already been billed once).
+- **This session's own team-bundle price-lock fix (#51 above) had a hole**: it pulled the cheapest rate from ANY prior subscription including cancelled ones. Hire a cheap employee, cancel it, hire something unrelated later — that unrelated hire would floor at the cancelled one's rate forever. Scoped to `trial`/`active`/`paused` only.
+- **Hire endpoint could downgrade a paying subscriber.** Hitting `/api/employees/hire` again for an employee already `active`/`paused` (stale tab, replayed request) silently reset them to a fresh 14-day trial at a possibly different price — and could later get them auto-cancelled by the trial-expiry cron for a subscription they were actually paying for. Now guarded.
+
+### Found, deliberately NOT auto-fixed — needs your eyes first
+- **Price lock may not be enforced at the actual charge.** `checkout/dodo` creates a Dodo checkout session against one fixed `DODO_PRODUCT_ID`; the customer's locked `monthly_price_cents` only rides along as `metadata`, never as a price override. Dodo's SDK doesn't obviously support a per-subscription price override on checkout (`amount` override only exists for pay-what-you-want one-time products, not subscriptions) — this may mean the entire price-lock/step-up model is cosmetic in the database and every activation actually charges whatever's configured on that one Dodo product right now. **Verify directly against Dodo's dashboard/docs before trusting the $49→$59→... story in any customer-facing copy.** Two of five independent audit passes flagged this same thing without prompting each other, which raises my confidence it's real.
+- `employee_actions` PATCH/DELETE (approve/reject in the interview demo) still trusts a bare `userId`. Traced deliberately: nothing outside that one file reads `employee_actions.status` to perform a real action — the actual execute loop's approvals live in a separate `task_approvals` table gated by the fix above — so there's no live exploit today. Left open on purpose because it's the same anonymous-pre-hire pattern the product depends on (interview-before-you-pay with no account). Revisit only if a real executor ever gets wired to this table.
+
+### New backlog items surfaced (not yet actioned — pick and prioritize)
+- Hardcoded "October" price-hike copy in two places (`manage/[slug]/_client.tsx`, `cron/trials.ts`) will read as stale once October passes — should compute from `LAUNCH_DATE` like `pricing/page.tsx` already does.
+- Three contradicting onboarding-speed claims across homepage / pSEO / hire success screen ("48 hours" / "2–3 days + call" / "live right now, no call").
+- Two different unimplemented guarantees ("30-day satisfaction," "7-day live") not backed by Terms or any refund code path.
+- Interview-only leads (`interview_leads` table) are captured then never used — no re-engagement, no admin view.
+- No mobile nav menu — Employees/Pricing/Compare/My Team are unreachable from a phone (nav links are just `display:none` under 760px with no hamburger anywhere in the repo).
+- Hire form breaks layout below ~375px (fixed `320px` sidebar column, no media queries).
+- No favicon, no OG image on any page, no `error.tsx`/`loading.tsx`/`not-found.tsx` anywhere in the app.
+- `getServerEnv()` requires 7 undocumented env vars (`SUPABASE_SECRET_KEY`, `DATABASE_URL`, `OPENAI_API_KEY`, etc.) on hot paths including every AI call and every transactional email — one route already had to bypass it after hitting a crash in production (see the comment in `manage/recover/route.ts`).
+- 7 near-identical `getSupabase()` admin-client reimplementations instead of the shared `createAdminClient()` helper — consistent today, but a change-in-7-places risk.
+- Stale "BYOK — use your own API keys" copy on the homepage and `/employees` meta description, contradicting the flat $49/mo model shown everywhere else.
+
+Full detail on all of the above lives in this session's conversation transcript if you want it later — this doc only carries what's actionable.
+
+---
+
 ## P0 — CRITICAL SECURITY (fix before sending the URL to anyone)
 
 ### 1. Webhook accepts unauthenticated requests if env var missing
