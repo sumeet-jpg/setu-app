@@ -68,7 +68,7 @@ const FAQS = [
   },
   {
     q: 'Can I hire multiple AI Employees?',
-    a: "Yes. Each employee is billed separately. You lock in the price for each at the time of their trial start, so adding employees later means they're at a higher rate.",
+    a: "Yes — and building a team doesn't cost you more per seat. Each employee is billed separately, but every additional employee you hire is locked at the same rate as your first, not today's (higher) published price.",
   },
   {
     q: 'Do I need technical setup?',

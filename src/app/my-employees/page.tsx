@@ -277,7 +277,7 @@ export default function MyEmployeesPage() {
         {crossSell.length > 0 && (
           <div style={{ marginTop: 40 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 4 }}>Complete your team</div>
-            <p style={{ fontSize: 13, color: MUTED, margin: '0 0 16px' }}>A few roles that pair well with who you've already hired.</p>
+            <p style={{ fontSize: 13, color: MUTED, margin: '0 0 16px' }}>A few roles that pair well with who you've already hired — locked at your existing rate, not today's published price.</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
               {crossSell.map(e => (
                 <Link key={e.slug} href={`/employees/${e.slug}/interview`} style={{

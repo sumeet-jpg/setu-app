@@ -105,6 +105,22 @@ export async function POST(req: NextRequest) {
       if (typeof priceRow === 'number' && priceRow >= 4900) priceCents = priceRow
     } catch { /* migration not yet applied — use launch price */ }
 
+    // Team bundle: building a team shouldn't get progressively more expensive
+    // per seat. If this user already has another employee hired, lock this one
+    // at their cheapest existing locked rate instead of today's (higher)
+    // published price.
+    const { data: existingSubs } = await supabase
+      .from('hired_subscriptions')
+      .select('monthly_price_cents')
+      .eq('user_id', userId)
+      .neq('employee_slug', employee_slug)
+      .order('monthly_price_cents', { ascending: true })
+      .limit(1)
+
+    if (existingSubs && existingSubs.length > 0) {
+      priceCents = existingSubs[0].monthly_price_cents
+    }
+
     const trialEnd = new Date(Date.now() + 14 * 86400000).toISOString()
     const { error: subErr } = await supabase
       .from('hired_subscriptions')
