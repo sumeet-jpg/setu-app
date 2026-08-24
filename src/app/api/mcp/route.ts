@@ -20,6 +20,27 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { EMPLOYEES, getEmployee, groupByDept, DEPT_ORDER } from '@/lib/employees/profiles'
+import { TOOL_NAME_TO_SLUG } from '@/lib/tools/registry'
+
+// Splits an employee's claimed tool list into what the platform can actually
+// connect and automate today (registered in the tool registry, connectable
+// via /api/tools/connect and callable by the execute loop) versus tools the
+// employee can only advise on from training knowledge. Every employee's
+// system prompt claims broad tool fluency, but only ~60 tools are actually
+// registered — without this split, MCP responses (read by AI agents like
+// Claude/ChatGPT and often repeated verbatim to a prospect) overstate what's
+// automatable for most employees outside the flagship few.
+function splitToolsByConnectability(toolGroups: { category: string; tools: string[] }[]) {
+  const connectable: string[] = []
+  const advisoryOnly: string[] = []
+  for (const group of toolGroups ?? []) {
+    for (const t of group.tools ?? []) {
+      if (TOOL_NAME_TO_SLUG[t]) connectable.push(t)
+      else advisoryOnly.push(t)
+    }
+  }
+  return { connectable, advisoryOnly }
+}
 
 export const runtime = 'nodejs'
 
@@ -180,6 +201,18 @@ function callGetEmployee(args: { slug: string }) {
       scenario_count: c.scenarios.length,
     })),
     tool_categories: e.tools.map(t => ({ category: t.category, tools: t.tools })),
+    ...(() => {
+      const { connectable, advisoryOnly } = splitToolsByConnectability(e.tools)
+      return {
+        automation_support: {
+          connectable_now: connectable,
+          advisory_only: advisoryOnly,
+          _note: advisoryOnly.length > 0
+            ? `This employee can strategize, draft, and advise on ${advisoryOnly.join(', ')} using its training knowledge, but cannot yet directly connect to or execute actions against ${advisoryOnly.length === 1 ? 'that tool' : 'those tools'} through the platform. It CAN directly connect to and take real actions in: ${connectable.join(', ') || '(none registered yet)'}.`
+            : 'All of this employee\'s listed tools can be directly connected and automated through the platform.',
+        },
+      }
+    })(),
     how_it_works: e.howItWorks,
     interview_url: `https://setuagents.com/employees/${e.slug}/interview`,
     hire_url: `https://setuagents.com/employees/${e.slug}/hire`,
@@ -252,7 +285,14 @@ function callGetCapabilities(args: { slug: string }) {
       description: c.blurb,
       specific_scenarios: c.scenarios,
     })),
-    integrated_tools: e.tools.flatMap(t => t.tools),
+    ...(() => {
+      const { connectable, advisoryOnly } = splitToolsByConnectability(e.tools)
+      return {
+        connectable_tools: connectable,
+        advisory_only_tools: advisoryOnly,
+        _tools_note: 'connectable_tools can be linked via the platform and the employee can take real automated actions in them. advisory_only_tools are ones the employee can strategize and draft for using its training knowledge, but cannot directly execute actions in yet.',
+      }
+    })(),
     interview_free: true,
     interview_url: `https://setuagents.com/employees/${e.slug}/interview`,
     hire_url: `https://setuagents.com/employees/${e.slug}/hire`,
@@ -275,16 +315,14 @@ function callGetHiringInfo(args: { slug: string }) {
     },
     what_is_included: [
       `${e.agentCount} pre-trained specialist AI agents`,
-      'Free onboarding call with Setu team',
+      'Direct email access to the Setu founder',
       'Custom workflow configuration for your stack',
       'Email + Slack integration',
       'Weekly performance reports',
-      '30-day satisfaction guarantee',
     ],
     onboarding_timeline: [
-      'Day 1: Sumeet reaches out within 24h of hire request',
-      `Day 2-3: ${e.name}'s agent fleet configured for your specific tech stack`,
-      'Day 4-5: Onboarding call — first agents go live',
+      `Immediately: your 14-day trial starts the moment you submit the hire form — ${e.name} is live right away, no call required`,
+      'Within 24h: the founder follows up by email to help with tool configuration if needed',
     ],
     next_steps: {
       interview_free: `https://setuagents.com/employees/${e.slug}/interview`,

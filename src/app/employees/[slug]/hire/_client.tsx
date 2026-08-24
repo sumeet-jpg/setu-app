@@ -177,6 +177,14 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
 
   return (
     <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: 'var(--font-jakarta)' }}>
+      <style>{`
+        .hire-grid { display: grid; grid-template-columns: 1fr 320px; gap: 40px; align-items: start; }
+        .hire-fields-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 720px) {
+          .hire-grid { grid-template-columns: 1fr !important; padding-left: 20px !important; padding-right: 20px !important; }
+          .hire-fields-2col { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
       <nav style={{
         borderBottom: `1px solid ${GRAY}`, padding: '0 32px', height: 60,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -188,7 +196,7 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
         </Link>
       </nav>
 
-      <div style={{ maxWidth: 980, margin: '0 auto', padding: '56px 32px', display: 'grid', gridTemplateColumns: '1fr 320px', gap: 40, alignItems: 'start' }}>
+      <div className="hire-grid" style={{ maxWidth: 980, margin: '0 auto', padding: '56px 32px' }}>
         <div>
           <div style={{ marginBottom: 36 }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: e.color, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>Hire Request</div>
@@ -197,11 +205,11 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="hire-fields-2col">
               {field('name', 'Your Name', 'Jane Smith', true)}
               {field('email', 'Work Email', 'jane@company.com', true)}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="hire-fields-2col">
               {field('company', 'Company', 'Acme Inc.', true)}
               {field('role', 'Your Role', 'CEO, VP Sales, Founder…')}
             </div>
@@ -271,7 +279,7 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
 
           <div style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 18, padding: 22, marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 14, letterSpacing: '-0.02em' }}>What's included</div>
-            {[`${e.agentCount} pre-trained AI agents`, 'Onboarding call with Sumeet', 'Custom workflow configuration', 'Email + Slack integration', 'Weekly performance reports', '30-day satisfaction guarantee'].map(f => (
+            {[`${e.agentCount} pre-trained AI agents`, 'Direct email access to Sumeet', 'Custom workflow configuration', 'Email + Slack integration', 'Weekly performance reports'].map(f => (
               <div key={f} style={{ display: 'flex', gap: 9, fontSize: 12.5, color: MUTED, marginBottom: 9 }}>
                 <span style={{ color: GREEN, flexShrink: 0, marginTop: 1 }}>✓</span> {f}
               </div>

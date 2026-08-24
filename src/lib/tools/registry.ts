@@ -875,7 +875,7 @@ export function getToolsByCategory(category: ToolCategory): ToolDef[] {
 // needs to know which tools a specific employee actually cares about
 // (moved here from employees/[slug]/_workspace.tsx so the onboarding flow
 // can reuse the exact same mapping instead of guessing at a new one).
-const TOOL_NAME_TO_SLUG: Record<string, string> = {
+export const TOOL_NAME_TO_SLUG: Record<string, string> = {
   'HubSpot': 'hubspot', 'Salesforce': 'salesforce', 'Marketo': 'marketo',
   'ActiveCampaign': 'activecampaign', 'Mailchimp': 'mailchimp', 'Klaviyo': 'klaviyo',
   'Customer.io': 'customer-io', 'SendGrid': 'sendgrid', 'Google Ads': 'google-ads',
@@ -918,6 +918,16 @@ export function toolLogoUrl(slug: string): string {
 }
 
 // Build tool description context for Claude system prompt
+// Every employee's system prompt narrates broad tool fluency in prose
+// (e.g. "You use Modash for creator discovery") regardless of whether that
+// tool is even in the registry, let alone connected by this customer. Without
+// this guardrail the AI will confidently claim to "pull this from Modash"
+// mid-chat even when no real API call to Modash could ever be made. Appended
+// to every system prompt rather than hand-editing ~100 profiles' prose.
+export const TOOL_HONESTY_GUARDRAIL = `
+
+IMPORTANT — tool honesty: your background above may mention tools you're expert in using. You can only take REAL, automated action in a tool if it appears in a "CONNECTED TOOLS" list provided separately in this prompt. For any other tool — including ones you describe yourself as expert in — you can strategize, draft content, and give expert advice using your training knowledge, but you must say plainly that you cannot directly execute or pull live data from it yet (e.g. "I can draft this brief, but I can't pull live data from Modash until it's connected"). Never claim or imply you performed a real action in a tool that isn't connected.`
+
 export function buildToolContext(connectedSlugs: string[]): string {
   if (!connectedSlugs.length) return ''
   const lines = connectedSlugs.map(slug => {

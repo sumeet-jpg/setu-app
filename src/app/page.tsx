@@ -44,7 +44,7 @@ const F       = 'var(--font-jakarta)'
 const HOW_STEPS = [
   { n: '01', title: 'Browse 100 roles', body: 'From a RevOps Lead to an AI CMO — browse every function your business needs. Each employee is deeply specialized.' },
   { n: '02', title: 'Interview for free', body: 'Chat live with any employee. Ask real questions. See exactly how they think before you commit a rupee.' },
-  { n: '03', title: 'Hire with one form', body: 'Fill out the hire form. We configure the employee, connect your tools, and have them working inside 48 hours.' },
+  { n: '03', title: 'Hire with one form', body: 'Fill out the hire form and your 14-day trial starts immediately — no call needed. Connect your tools whenever you\'re ready.' },
   { n: '04', title: 'Or build your own', body: 'Describe any unique workflow in the Blueprint Builder and Setu scopes a custom AI Employee for it — no code, no engineers.' },
 ]
 

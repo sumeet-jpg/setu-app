@@ -233,8 +233,8 @@ export default async function HireRolePage({ params }: { params: Promise<{ role:
           {[
             { step: '01', title: 'Interview free', desc: 'Chat with the employee. Ask real questions about your business.' },
             { step: '02', title: 'Submit hire request', desc: 'Fill a 5-min brief. No technical setup required.' },
-            { step: '03', title: 'We configure', desc: 'Agents are trained on your brand, products, and workflows in 2–3 days.' },
-            { step: '04', title: 'Go live', desc: 'Onboarding call, first tasks completed. Results visible within week 1.' },
+            { step: '03', title: 'Go live immediately', desc: 'Your 14-day trial starts the moment you submit — no waiting, no call required.' },
+            { step: '04', title: 'Connect your tools', desc: 'Add context and connect the tools you use, whenever you\'re ready. Results build as you use it.' },
           ].map(s => (
             <div key={s.step} style={{ background: WHITE, border: `1px solid ${GRAY}`, borderRadius: 16, padding: 22 }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: GREEN, letterSpacing: '0.06em', marginBottom: 10 }}>{s.step}</div>

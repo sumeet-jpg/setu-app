@@ -165,7 +165,7 @@ export default function EnterprisePage() {
         <Link href="/employees" style={{ display: 'inline-block', padding: '14px 32px', borderRadius: 14, background: 'linear-gradient(135deg,#6366f1,#7c3aed)', color: '#fff', fontSize: 15, fontWeight: 800, textDecoration: 'none', boxShadow: '0 8px 32px rgba(99,102,241,0.4)', letterSpacing: '-0.02em' }}>
           Meet the C-Suite →
         </Link>
-        <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>$49/mo, locked at signup · 7-day live guarantee · Cancel anytime</div>
+        <div style={{ marginTop: 14, fontSize: 12, color: DIM }}>$49/mo, locked at signup · Cancel anytime</div>
         <div style={{ marginTop: 20, fontSize: 12, color: DIM }}>
           Procurement need a DPA? <Link href="/legal/dpa" style={{ color: '#a5b4fc', textDecoration: 'underline' }}>Read Setu's standard Data Processing Agreement →</Link>
         </div>
