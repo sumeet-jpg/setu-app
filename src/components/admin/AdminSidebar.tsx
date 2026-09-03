@@ -27,6 +27,11 @@ const NAV_ITEMS = [
     icon: "👤",
   },
   {
+    label: "Interview Leads",
+    href: "/admin/interview-leads",
+    icon: "✉️",
+  },
+  {
     label: "Employee Hires",
     href: "/admin/hires",
     icon: "🤝",

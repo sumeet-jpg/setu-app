@@ -1,18 +1,11 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import DodoPayments from 'dodopayments'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient as getSupabase } from '@/lib/supabase/server'
 import { withManageAuth } from '@/lib/manage-token'
 import { tierProductEnvVar, BASE_PRICE_CENTS } from '@/lib/pricing/tiers'
 
 export const runtime = 'nodejs'
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 // Previously trusted a bare client-supplied user_id — no harm from creating
 // a checkout session itself (someone still has to pay), but the 404-vs-409

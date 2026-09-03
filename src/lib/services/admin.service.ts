@@ -104,6 +104,22 @@ export async function updateLeadStatus(id: string, status: string, notes?: strin
   await db.from("leads").update({ status, admin_notes: notes }).eq("id", id);
 }
 
+// Separate from getLeads() above: interview_leads is the soft, skippable
+// email capture shown mid-interview (src/app/api/employees/capture-email),
+// not the older Blueprint Builder lead source. Captured since migration 013
+// but had no admin view at all until now — every row here was a real,
+// high-intent prospect nobody could see or follow up with.
+export async function getInterviewLeads(opts?: { limit?: number }) {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("interview_leads")
+    .select("id, user_id, employee_slug, email, created_at")
+    .order("created_at", { ascending: false })
+    .limit(opts?.limit ?? 200);
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function getAgents(opts?: { category?: string; tier?: string }) {
   const db = createAdminClient();
   let query = db.from("agents").select("*").order("agent_id", { ascending: true });

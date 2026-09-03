@@ -1,20 +1,10 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import DodoPayments from 'dodopayments'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient as getSupabase } from '@/lib/supabase/server'
 import { trackServer } from '@/lib/posthog/server'
 
 export const runtime = 'nodejs'
-
-// Dodo sends raw JSON body; we must not parse it before signature verification
-export const config = { api: { bodyParser: false } }
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 export async function POST(req: NextRequest) {
   try {

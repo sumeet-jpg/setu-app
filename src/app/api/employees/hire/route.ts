@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient as getSupabase } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 import { signManageToken } from '@/lib/manage-token'
 import { escapeHtml as esc } from '@/lib/email/escape-html'
@@ -8,13 +8,6 @@ import { RATE_LIMITS, getClientIp } from '@/lib/security/rate-limiter'
 import { auditLog } from '@/lib/governance/audit-logger'
 
 export const runtime = 'nodejs'
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY!)
