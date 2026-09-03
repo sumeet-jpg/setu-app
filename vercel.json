@@ -28,6 +28,10 @@
     {
       "path": "/api/cron/pin-check",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/watch-check",
+      "schedule": "0 10 * * *"
     }
   ]
 }

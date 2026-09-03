@@ -58,8 +58,10 @@ export async function checkInterviewCap(userId: string): Promise<CapCheck> {
   }
 }
 
-// Post-hire execute loop: capped per (user_id, employee_slug) — scoped to
-// the specific subscription paying for it — over a rolling 30-day window.
+// Post-hire execute loop (and the read-only monitor pass, migration 020 —
+// same subscription, same budget, so proactive monitoring can't be used to
+// spend past what a customer's plan is actually capped at): capped per
+// (user_id, employee_slug) over a rolling 30-day window.
 export async function checkExecuteCap(userId: string, employeeSlug: string): Promise<CapCheck> {
   const capUsd = HIRED_EMPLOYEE_MONTHLY_CAP_USD
   try {
@@ -70,7 +72,7 @@ export async function checkExecuteCap(userId: string, employeeSlug: string): Pro
       .select('estimated_cost_usd')
       .eq('user_id', userId)
       .eq('employee_slug', employeeSlug)
-      .eq('event_type', 'execute')
+      .in('event_type', ['execute', 'monitor'])
       .gte('created_at', since)
 
     if (error) throw error
@@ -85,7 +87,7 @@ export async function checkExecuteCap(userId: string, employeeSlug: string): Pro
 export async function logUsage(params: {
   userId: string
   employeeSlug: string
-  eventType: 'interview' | 'execute'
+  eventType: 'interview' | 'execute' | 'monitor'
   model: string
   inputTokens: number
   outputTokens: number
