@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 
 interface AdminSidebarProps {
   userEmail: string;
+  pendingApprovals?: number;
 }
 
 const NAV_ITEMS = [
@@ -78,7 +79,7 @@ const NAV_ITEMS = [
   },
 ];
 
-export function AdminSidebar({ userEmail }: AdminSidebarProps) {
+export function AdminSidebar({ userEmail, pendingApprovals = 0 }: AdminSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -130,13 +131,21 @@ export function AdminSidebar({ userEmail }: AdminSidebarProps) {
         </ul>
       </nav>
 
-      {/* Runtime status indicator */}
-      <div className="border-t border-border px-4 py-3">
+      {/* Runtime status indicator — this used to hardcode "Disabled" on
+          every admin page, describing only the old (unused) n8n path while
+          the real execute engine ran live and unmentioned. See /admin/runtime
+          for the full picture. */}
+      <Link href="/admin/runtime" className="border-t border-border px-4 py-3 block hover:bg-muted/50 transition-colors">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <div className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-          Runtime: Disabled
+          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          Execute engine: live
+          {pendingApprovals > 0 && (
+            <span className="ml-auto rounded-full bg-amber-100 text-amber-800 px-1.5 py-0.5 text-[10px] font-semibold">
+              {pendingApprovals} awaiting approval
+            </span>
+          )}
         </div>
-      </div>
+      </Link>
 
       {/* User */}
       <div className="border-t border-border px-4 py-4">

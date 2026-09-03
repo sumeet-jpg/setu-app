@@ -209,6 +209,35 @@ export async function getRuntimeInstances() {
   return data ?? [];
 }
 
+// Stats for the execution engine that's ACTUALLY live —
+// /api/employees/[slug]/execute, a real Claude tool-use loop hitting real
+// connected-tool credentials. This is separate from runtime_instances/n8n
+// above, which this page's copy used to present as the only execution
+// system and describe as fully disabled. It never checked
+// isRuntimeExecutionEnabled() and was never gated by it.
+export async function getExecuteEngineStats() {
+  const db = createAdminClient();
+  const [tasksByStatus, pendingApprovals, connections, recentTasks] = await Promise.all([
+    db.from("employee_tasks").select("status"),
+    db.from("task_approvals").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    db.from("tool_connections").select("user_id", { count: "exact", head: true }),
+    db.from("employee_tasks").select("id, employee_slug, title, status, created_at").order("created_at", { ascending: false }).limit(10),
+  ]);
+
+  const counts: Record<string, number> = {};
+  for (const row of tasksByStatus.data ?? []) {
+    counts[row.status] = (counts[row.status] ?? 0) + 1;
+  }
+
+  return {
+    tasksByStatus: counts,
+    totalTasks: (tasksByStatus.data ?? []).length,
+    pendingApprovals: pendingApprovals.count ?? 0,
+    toolConnections: connections.count ?? 0,
+    recentTasks: recentTasks.data ?? [],
+  };
+}
+
 export async function getSupportTickets(opts?: { status?: string }) {
   const db = createAdminClient();
   let query = db.from("support_tickets").select("*").order("created_at", { ascending: false }).limit(50);
