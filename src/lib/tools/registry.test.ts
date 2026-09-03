@@ -27,11 +27,17 @@ describe('TOOL_REGISTRY integrity', () => {
     }
   })
 
-  it('every baseUrl is a well-formed https URL, even with {placeholder} substituted', () => {
+  it('every baseUrl is a well-formed URL (https, except documented on-prem/local exceptions), even with {placeholder} substituted', () => {
+    // Tally (TallyPrime) genuinely runs on-premise on the customer's own
+    // LAN — its description explicitly documents this as plain HTTP to a
+    // local host, not a cloud API. Faking an https:// URL here would be
+    // less honest than the real exception.
+    const localNetworkExceptions = new Set(['tally'])
     for (const tool of TOOL_REGISTRY) {
       const substituted = tool.baseUrl.replace(/\{(\w+)\}/g, 'x')
       expect(() => new URL(substituted), `${tool.slug}: ${tool.baseUrl}`).not.toThrow()
-      expect(substituted.startsWith('https://'), `${tool.slug}: ${tool.baseUrl}`).toBe(true)
+      const expectedScheme = localNetworkExceptions.has(tool.slug) ? 'http://' : 'https://'
+      expect(substituted.startsWith(expectedScheme), `${tool.slug}: ${tool.baseUrl}`).toBe(true)
     }
   })
 

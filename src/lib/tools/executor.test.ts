@@ -107,4 +107,25 @@ describe('applyToolOverrides', () => {
     expect(headers.Authorization).toBe('API-Key pd-key')
     expect(headers['X-Api-Key']).toBeUndefined()
   })
+
+  // New this session — the second, profile-audit-driven registry expansion.
+  it('discord: "Authorization: Bot {token}" — a raw Bearer header authenticates as nothing', () => {
+    const generic = buildAuthHeaders('bearer', 'bot-token', {})
+    const { headers } = applyToolOverrides('discord', 'bot-token', generic, {})
+    expect(headers.Authorization).toBe('Bot bot-token')
+  })
+
+  it('pagerduty: "Authorization: Token token={key}", and removes the generic X-Api-Key header', () => {
+    const generic = buildAuthHeaders('api_key', 'pd-key', {})
+    const { headers } = applyToolOverrides('pagerduty', 'pd-key', generic, {})
+    expect(headers.Authorization).toBe('Token token=pd-key')
+    expect(headers['X-Api-Key']).toBeUndefined()
+  })
+
+  it('okta: "Authorization: SSWS {token}", and removes the generic X-Api-Key header', () => {
+    const generic = buildAuthHeaders('api_key', 'okta-key', {})
+    const { headers } = applyToolOverrides('okta', 'okta-key', generic, {})
+    expect(headers.Authorization).toBe('SSWS okta-key')
+    expect(headers['X-Api-Key']).toBeUndefined()
+  })
 })

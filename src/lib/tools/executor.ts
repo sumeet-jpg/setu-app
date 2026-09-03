@@ -137,6 +137,22 @@ export function applyToolOverrides(
       const { 'X-Api-Key': _unused, ...rest } = headers
       return { headers: { ...rest, Authorization: `API-Key ${rawKey}` }, query }
     }
+    case 'discord': {
+      // Discord bot tokens are sent as "Authorization: Bot {token}" — a
+      // raw Bearer header (what the bearer authType default produces)
+      // authenticates as nothing and every call 401s.
+      return { headers: { ...headers, Authorization: `Bot ${rawKey}` }, query }
+    }
+    case 'pagerduty': {
+      // "Authorization: Token token={key}" — not Bearer, not Basic.
+      const { 'X-Api-Key': _unused, ...rest } = headers
+      return { headers: { ...rest, Authorization: `Token token=${rawKey}` }, query }
+    }
+    case 'okta': {
+      // "Authorization: SSWS {token}" — Okta's own scheme, not Bearer/Basic.
+      const { 'X-Api-Key': _unused, ...rest } = headers
+      return { headers: { ...rest, Authorization: `SSWS ${rawKey}` }, query }
+    }
     default:
       return { headers, query }
   }
