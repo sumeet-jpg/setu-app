@@ -38,6 +38,14 @@ export interface EmployeeProfile {
   tools: ToolGroup[]
   howItWorks: HowStep[]
   systemPrompt: string
+  // Present on most (not all) profiles — real, specific signals this
+  // employee claims to watch (e.g. "MQL-to-SQL conversion rate dropping
+  // >15%"). Was missing from this interface even though the literal data
+  // has always had it (@ts-nocheck on this file meant nothing caught the
+  // mismatch); seeded into employee_watch_patterns and, since the watch-
+  // pattern monitor (src/lib/employees/monitor.ts), actually checked
+  // against connected-tool data for tool-connected customers.
+  watchPatterns?: string[]
 }
 
 import { EMPLOYEES_PART2 } from './profiles-part2'
