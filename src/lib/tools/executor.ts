@@ -23,12 +23,15 @@ export interface ExecutorResult {
 }
 
 // Parse the stored config: some tools need datacenter, subdomain, store name, etc.
-function buildBaseUrl(baseUrl: string, config: Record<string, string>): string {
+// Exported for testing — the {placeholder} substitution and per-tool auth
+// shape are exactly where a silent wrong-header or wrong-URL bug would
+// live, one connected-tool call at a time, with no compile-time signal.
+export function buildBaseUrl(baseUrl: string, config: Record<string, string>): string {
   return baseUrl.replace(/\{(\w+)\}/g, (_, key) => config[key] ?? '')
 }
 
 // Build auth headers from encrypted key + tool def
-function buildAuthHeaders(
+export function buildAuthHeaders(
   authType: string,
   rawKey: string,
   config: Record<string, string>
@@ -67,7 +70,7 @@ function buildAuthHeaders(
 }
 
 // Special per-tool auth overrides (Mailchimp, Semrush, etc.)
-function applyToolOverrides(
+export function applyToolOverrides(
   slug: string,
   rawKey: string,
   headers: Record<string, string>,
@@ -119,6 +122,20 @@ function applyToolOverrides(
         },
         query,
       }
+    }
+    case 'dropbox-sign': {
+      // API key as Basic auth username, blank password — not the generic
+      // "colon-separated user:pass" shape the basic authType assumes, and
+      // not the "apikey:KEY" shape Mailchimp uses either.
+      const encoded = Buffer.from(`${rawKey}:`).toString('base64')
+      return { headers: { ...headers, Authorization: `Basic ${encoded}` }, query }
+    }
+    case 'pandadoc': {
+      // PandaDoc's api_key header is "Authorization: API-Key {key}", not
+      // the registry's generic api_key default (X-Api-Key: {key}) — strip
+      // that stray header rather than just adding Authorization on top.
+      const { 'X-Api-Key': _unused, ...rest } = headers
+      return { headers: { ...rest, Authorization: `API-Key ${rawKey}` }, query }
     }
     default:
       return { headers, query }

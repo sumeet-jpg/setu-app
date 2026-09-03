@@ -26,6 +26,16 @@ export type ToolCategory =
   | 'Design'
   | 'Content & Docs'
   | 'Marketing Automation'
+  // Scheduling and E-signature didn't exist as categories at all — every
+  // other category ships 3-4 vendors so whichever tool a customer already
+  // uses is covered (CRM: HubSpot/Salesforce/Pipedrive/Zoho; Email:
+  // Mailchimp/Klaviyo/Customer.io/SendGrid). These two had ZERO vendors,
+  // meaning no employee could ever actually book a real meeting or get a
+  // document really signed — only draft one and stop. Not every company
+  // uses Cal.com, so this follows the same multi-vendor pattern rather
+  // than picking a single winner.
+  | 'Scheduling'
+  | 'E-signature'
 
 export interface ToolDef {
   slug: string
@@ -840,6 +850,133 @@ export const TOOL_REGISTRY: ToolDef[] = [
     baseUrl: 'https://www.googleapis.com',
     docsUrl: 'https://developers.google.com/workspace',
   },
+  {
+    slug: 'microsoft-365',
+    name: 'Microsoft 365',
+    domain: 'microsoft.com',
+    category: 'Content & Docs',
+    description: 'Outlook Mail, Outlook Calendar, OneDrive, Teams — via Microsoft Graph. API base: https://graph.microsoft.com/v1.0. Key endpoints: /me/messages, /me/events, /me/drive, /teams. OAuth2 (app registration in Azure AD/Entra ID).',
+    authType: 'bearer',
+    authLabel: 'OAuth2 Access Token',
+    authPlaceholder: 'eyJ0eXAiOiJKV1QiLCJhbGc...',
+    authHint: 'Azure Portal → App registrations → New registration → API permissions (Mail.Send, Calendars.ReadWrite) → Certificates & secrets → generate token',
+    baseUrl: 'https://graph.microsoft.com/v1.0',
+    docsUrl: 'https://learn.microsoft.com/en-us/graph/overview',
+  },
+  // ── Scheduling ─────────────────────────────────────────────────────────────
+  // A customer's own Google/Microsoft Calendar (above) can hold an event, but
+  // that isn't what makes booking feel human: a real availability-aware
+  // booking link, buffer rules, timezone handling, and reschedule/cancel
+  // flows a prospect can self-serve. Four vendors so whichever one a sales,
+  // CS, or recruiting team already has is covered.
+  {
+    slug: 'calendly',
+    name: 'Calendly',
+    domain: 'calendly.com',
+    category: 'Scheduling',
+    description: 'Booking links, real availability, event types, invitee management. API base: https://api.calendly.com. Key endpoints: /scheduled_events, /event_types, /users/me, /scheduling_links (single-use links you can hand a prospect directly).',
+    authType: 'bearer',
+    authLabel: 'Personal Access Token',
+    authPlaceholder: 'eyJraWQiOiIxY2UxZTEzNjE3ZG...',
+    authHint: 'Calendly → Integrations → API & Webhooks → Generate New Token',
+    baseUrl: 'https://api.calendly.com',
+    docsUrl: 'https://developer.calendly.com/api-docs',
+  },
+  {
+    slug: 'cal-com',
+    name: 'Cal.com',
+    domain: 'cal.com',
+    category: 'Scheduling',
+    description: 'Open-source scheduling — self-hosted or cloud. Bookings, event types, availability, slots. API base: https://api.cal.com/v2. Key endpoints: /bookings, /event-types, /slots/available.',
+    authType: 'bearer',
+    authLabel: 'API Key',
+    authPlaceholder: 'cal_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    authHint: 'Cal.com → Settings → Developer → API Keys → Add',
+    baseUrl: 'https://api.cal.com/v2',
+    docsUrl: 'https://cal.com/docs/api-reference/v2/introduction',
+  },
+  {
+    slug: 'acuity-scheduling',
+    name: 'Acuity Scheduling',
+    domain: 'acuityscheduling.com',
+    category: 'Scheduling',
+    description: 'Appointment scheduling common with service businesses (consultants, coaches, clinics). Appointments, availability, appointment types, clients. API base: https://acuityscheduling.com/api/v1.',
+    authType: 'basic',
+    authLabel: 'User ID + API Key',
+    authPlaceholder: 'USER_ID:API_KEY',
+    authHint: 'Acuity → Business Settings → Integrations → API → copy User ID and API Key',
+    baseUrl: 'https://acuityscheduling.com/api/v1',
+    docsUrl: 'https://developers.acuityscheduling.com/reference',
+  },
+  {
+    slug: 'microsoft-bookings',
+    name: 'Microsoft Bookings',
+    domain: 'microsoft.com',
+    category: 'Scheduling',
+    description: 'Booking pages and staff calendars for Microsoft-shop customers. Via Microsoft Graph. API base: https://graph.microsoft.com/v1.0/solutions/bookingBusinesses. Key endpoints: /appointments, /staffMembers, /services. OAuth2.',
+    authType: 'bearer',
+    authLabel: 'OAuth2 Access Token',
+    authPlaceholder: 'eyJ0eXAiOiJKV1QiLCJhbGc...',
+    authHint: 'Same Azure app registration as Microsoft 365 above, with Bookings.Read.All / Bookings.ReadWrite.All permissions granted',
+    baseUrl: 'https://graph.microsoft.com/v1.0/solutions/bookingBusinesses',
+    docsUrl: 'https://learn.microsoft.com/en-us/graph/api/resources/bookingbusiness',
+  },
+  // ── E-signature ────────────────────────────────────────────────────────────
+  // Closes the gap between "drafted a contract" and "got it executed" — the
+  // sales, HR onboarding, and legal/ops employees all claim to close deals
+  // and process paperwork, and none of that was real without this.
+  {
+    slug: 'docusign',
+    name: 'DocuSign',
+    domain: 'docusign.com',
+    category: 'E-signature',
+    description: 'The enterprise e-signature standard. Envelopes, templates, recipient status, signing URLs. API base: https://{server}.docusign.net/restapi/v2.1/accounts/{accountId} — server and accountId come from the OAuth userinfo response, set them as config when connecting.',
+    authType: 'oauth',
+    authLabel: 'OAuth2 Access Token',
+    authPlaceholder: 'eyJ0eXAiOiJNVCIsImFsZ...',
+    authHint: 'DocuSign Admin → Apps and Keys → Add App/Integration Key → JWT Grant or Authorization Code flow',
+    baseUrl: 'https://{server}.docusign.net/restapi/v2.1/accounts/{accountId}',
+    docsUrl: 'https://developers.docusign.com/docs/esign-rest-api/',
+  },
+  {
+    slug: 'dropbox-sign',
+    name: 'Dropbox Sign',
+    domain: 'sign.dropbox.com',
+    category: 'E-signature',
+    description: 'Simpler, SMB-friendly e-signature (formerly HelloSign). Signature requests, templates, status. API base: https://api.hellosign.com/v3. Auth: HTTP Basic with the API key as username and a blank password.',
+    authType: 'basic',
+    authLabel: 'API Key',
+    authPlaceholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    authHint: 'Dropbox Sign → Settings → API → Generate API Key',
+    baseUrl: 'https://api.hellosign.com/v3',
+    docsUrl: 'https://developers.hellosign.com/docs/api/reference/',
+  },
+  {
+    slug: 'pandadoc',
+    name: 'PandaDoc',
+    domain: 'pandadoc.com',
+    category: 'E-signature',
+    description: 'Sales-doc-native e-signature — quotes, proposals, and contracts in one flow, common with SMB sales teams. Documents, templates, recipients. API base: https://api.pandadoc.com/public/v1. Auth header: "Authorization: API-Key {key}" (not Bearer).',
+    authType: 'api_key',
+    authLabel: 'API Key',
+    authPlaceholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    authHint: 'PandaDoc → Settings → Integrations → API → Generate API Key',
+    baseUrl: 'https://api.pandadoc.com/public/v1',
+    docsUrl: 'https://developers.pandadoc.com/reference/about',
+  },
+  {
+    slug: 'adobe-sign',
+    name: 'Adobe Acrobat Sign',
+    domain: 'adobe.com',
+    category: 'E-signature',
+    description: 'Enterprise e-signature, natural fit for Adobe-shop customers. Agreements, transient documents, templates. API base: https://api.{shard}.echosign.com/api/rest/v6 — shard (e.g. na1, eu1) comes from your account, set it as config when connecting.',
+    authType: 'oauth',
+    authLabel: 'OAuth2 Access Token',
+    authPlaceholder: '3AAABLblqZhC2...',
+    authHint: 'Adobe Developer Console → Create Project → Add API → Acrobat Sign API → OAuth Server-to-Server credential',
+    baseUrl: 'https://api.{shard}.echosign.com/api/rest/v6',
+    docsUrl: 'https://opensource.adobe.com/acrobat-sign/developer_guide/',
+  },
   // ── Payments India ────────────────────────────────────────────────────────
   {
     slug: 'payu',
@@ -897,6 +1034,10 @@ export const TOOL_NAME_TO_SLUG: Record<string, string> = {
   'Monday': 'monday', 'ClickUp': 'clickup', 'Airtable': 'airtable',
   'Google Workspace': 'google-workspace', 'PostHog': 'posthog', 'Hotjar': 'hotjar',
   'Tableau': 'tableau', 'Zoho CRM': 'zoho-crm',
+  'Microsoft 365': 'microsoft-365', 'Microsoft Bookings': 'microsoft-bookings',
+  'Calendly': 'calendly', 'Cal.com': 'cal-com', 'Acuity Scheduling': 'acuity-scheduling',
+  'DocuSign': 'docusign', 'Dropbox Sign': 'dropbox-sign', 'HelloSign': 'dropbox-sign',
+  'PandaDoc': 'pandadoc', 'Adobe Sign': 'adobe-sign', 'Adobe Acrobat Sign': 'adobe-sign',
   // Aliases for real registry entries referenced under a slightly different
   // name in employee profile prose — without these, a genuinely connectable
   // tool gets miscategorized as advisory-only purely from copy-editing drift.
