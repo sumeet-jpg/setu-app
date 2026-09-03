@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { withManageAuth } from '@/lib/manage-token'
 
+// Untyped client, not the shared createAdminClient(): the generated
+// Database type predates top_kpis (migration 014) and several other
+// columns from migration 010+, so the typed client resolves them to
+// `never` and fails tsc. Fix properly by rerunning `npm run db:generate`
+// against the live schema, then switch this back.
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

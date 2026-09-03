@@ -6,6 +6,12 @@ import { RATE_LIMITS, getClientIp } from '@/lib/security/rate-limiter'
 // Soft, skippable lead capture shown mid-interview (see interview/_client.tsx)
 // after real engagement, not a pre-chat gate. Best-effort: failures here
 // should never interrupt the chat itself.
+//
+// Uses the untyped client, not the shared createAdminClient(): the
+// generated Database type predates interview_leads (migration 013) and
+// several other tables from migration 010+, so the typed client resolves
+// their columns to `never` and fails tsc. Fix properly by rerunning
+// `npm run db:generate` against the live schema, then switch these back.
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

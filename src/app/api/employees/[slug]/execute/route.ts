@@ -12,6 +12,8 @@ import { executeHttpRequest } from '@/lib/tools/executor'
 import { decrypt } from '@/lib/tools/crypto'
 import { withManageAuth } from '@/lib/manage-token'
 import { checkExecuteCap, logUsage } from '@/lib/usage/cap'
+import { loadEmployeeContext } from '@/lib/employees/context'
+import { autonomyRulesText } from '@/lib/employees/calibration'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -139,10 +141,10 @@ async function runExecute(slug: string, user_id: string, req: NextRequest): Prom
   }
 
   const body = await req.json()
-  const { task, task_id: existingTaskId } = body
+  const { task, task_id: existingTaskId, approval_result } = body
 
-  if (!task) {
-    return NextResponse.json({ error: 'task required' }, { status: 400 })
+  if (!task && !(existingTaskId && approval_result)) {
+    return NextResponse.json({ error: 'task, or task_id + approval_result, required' }, { status: 400 })
   }
 
   // This loop can run up to MAX_LOOPS full Claude calls per request, with no
@@ -170,9 +172,61 @@ async function runExecute(slug: string, user_id: string, req: NextRequest): Prom
     (connections ?? []).map(c => [c.tool_slug, { key: c.encrypted_key, config: c.config ?? {} }])
   )
 
-  // Create or load task record
+  // Create, or resume, the task record.
+  //
+  // Resuming an approval used to just resend the original task text as a
+  // fresh single-turn conversation — no prior messages, no reference to
+  // which tool_use_id was being answered. Claude had no way to actually
+  // continue; it either re-asked for approval on the same step or
+  // hallucinated a new plan. This loads the persisted conversation and
+  // answers the specific pending tool_use with a real tool_result, the way
+  // Anthropic's tool-use protocol expects a pause to be resumed.
   let taskId = existingTaskId
-  if (!taskId) {
+  let messages: Anthropic.MessageParam[]
+
+  if (existingTaskId) {
+    const { data: existingTask } = await supabase
+      .from('employee_tasks')
+      .select('id, messages, status')
+      .eq('id', existingTaskId)
+      .eq('user_id', user_id)
+      .maybeSingle()
+
+    if (!existingTask) {
+      return NextResponse.json({ error: 'Task not found' }, { status: 404 })
+    }
+
+    messages = (existingTask.messages as Anthropic.MessageParam[] | null) ?? []
+
+    if (approval_result?.tool_use_id) {
+      messages.push({
+        role: 'user',
+        content: [{
+          type: 'tool_result',
+          tool_use_id: approval_result.tool_use_id,
+          content: JSON.stringify(
+            approval_result.approved
+              ? { approved: true }
+              : { approved: false, reason: approval_result.reason ?? 'The user rejected this action.' }
+          ),
+        }],
+      })
+
+      // Close out the pending approval row so it doesn't sit at 'pending'
+      // forever — best-effort, doesn't block resuming if the row is
+      // somehow already gone or was already decided.
+      await supabase
+        .from('task_approvals')
+        .update({ status: approval_result.approved ? 'approved' : 'rejected', decided_at: new Date().toISOString() })
+        .eq('task_id', existingTaskId)
+        .eq('tool_use_id', approval_result.tool_use_id)
+        .eq('status', 'pending')
+    } else if (task) {
+      messages.push({ role: 'user', content: task })
+    }
+  } else {
+    messages = [{ role: 'user', content: task }]
+
     const { data: newTask, error } = await supabase
       .from('employee_tasks')
       .insert({
@@ -194,25 +248,41 @@ async function runExecute(slug: string, user_id: string, req: NextRequest): Prom
     taskId = newTask.id
   }
 
-  // Build system prompt with tool context
-  const toolContext = buildToolContext(connectedSlugs)
+  // Build system prompt with tool context, the employee's accumulated
+  // knowledge of this owner (beliefs, vault docs, org intelligence — this
+  // used to be loaded for conversations but silently dropped the moment a
+  // task actually executed), and this owner's real trust/autonomy level
+  // (was computed and stored but never consulted here either — see
+  // src/lib/employees/calibration.ts for the audit note).
+  const [toolContext, knowledgeContext, calibrationRow] = await Promise.all([
+    Promise.resolve(buildToolContext(connectedSlugs)),
+    loadEmployeeContext(user_id, slug, messages.map(m => ({
+      role: m.role as string,
+      content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content),
+    }))),
+    supabase
+      .from('employee_calibration')
+      .select('autonomy_level')
+      .eq('user_id', user_id)
+      .eq('employee_slug', slug)
+      .maybeSingle()
+      .then(({ data }) => data?.autonomy_level ?? 0.3),
+  ])
+
   const systemPrompt = `${employee.systemPrompt}${TOOL_HONESTY_GUARDRAIL}
 
 EXECUTION MODE — you now have real tools connected and are executing a real task.
 
-RULES:
-1. ALWAYS call request_approval before any create/send/publish/delete/spend action.
-2. Use http_request to call APIs. You know the API docs for each connected tool.
-3. After reading data (GET requests), you may proceed to plan or draft without approval.
-4. Call task_complete when the task is fully done.
-5. If a required tool is not connected, tell the user which tool they need to add and what permissions are needed.
-6. Never fabricate API responses — only report what the API actually returned.
-7. If an API call fails, explain the error clearly and suggest the fix.
-${toolContext}`
+${autonomyRulesText(calibrationRow)}
 
-  const messages: Anthropic.MessageParam[] = [
-    { role: 'user', content: task },
-  ]
+RULES:
+1. Use http_request to call APIs. You know the API docs for each connected tool.
+2. After reading data (GET requests), you may proceed to plan or draft without approval.
+3. Call task_complete when the task is fully done.
+4. If a required tool is not connected, tell the user which tool they need to add and what permissions are needed.
+5. Never fabricate API responses — only report what the API actually returned.
+6. If an API call fails, explain the error clearly and suggest the fix.
+${toolContext}${knowledgeContext}`
 
   // ── SSE stream ──────────────────────────────────────────────────────────────
   const encoder = new TextEncoder()
@@ -306,7 +376,15 @@ ${toolContext}`
 
             if (toolBlock.name === 'request_approval') {
               const input = toolBlock.input as any
-              // Store approval request
+              // Known gap: if this same assistant turn also contains OTHER
+              // tool_use blocks (e.g. Claude batched a read alongside the
+              // approval request), those never receive a tool_result before
+              // we pause here — resuming with only the approval's result
+              // leaves the turn API-invalid. Not observed in practice (the
+              // system prompt's rules teach a strictly sequential
+              // read-then-gate pattern), but a real fix would need to
+              // persist those partial results too. Store approval request
+
               await supabase
                 .from('task_approvals')
                 .insert({
@@ -319,6 +397,7 @@ ${toolContext}`
                     reversible: input.reversible,
                   },
                   status: 'pending',
+                  tool_use_id: toolBlock.id,
                 })
 
               await supabase

@@ -13,6 +13,12 @@ function getDodo() {
   })
 }
 
+// Untyped client, not the shared createAdminClient(): the generated
+// Database type predates hired_subscriptions columns like
+// dodo_subscription_id and several other fields from migration 010+, so
+// the typed client resolves them to `never` and fails tsc. Fix properly by
+// rerunning `npm run db:generate` against the live schema, then switch
+// this back.
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -326,12 +326,16 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
 
   // ── Execute task ────────────────────────────────────────────────────────────
 
-  const executeTask = useCallback(async (taskText: string, resumeTaskId?: string) => {
-    if (!taskText.trim() || streaming) return
+  const executeTask = useCallback(async (
+    taskText: string,
+    resumeTaskId?: string,
+    approvalDecision?: { approved: boolean; tool_use_id: string }
+  ) => {
+    if ((!taskText.trim() && !approvalDecision) || streaming) return
     setStreaming(true)
     setPendingApproval(null)
 
-    if (!resumeTaskId) {
+    if (!resumeTaskId && !approvalDecision) {
       setMsgs(m => [...m, { role: 'user', content: taskText }])
     }
 
@@ -345,11 +349,13 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
     abortRef.current = new AbortController()
 
     try {
-      const body: any = { task: taskText }
-      if (resumeTaskId) body.task_id = resumeTaskId
-      if (pendingApproval) {
-        body.approval_result = { approved: true, tool_use_id: pendingApproval.gate.tool_use_id }
-      }
+      // Approving/rejecting a pending action resumes the SAME task from its
+      // persisted conversation server-side — sending a fresh `task` string
+      // here would restart Claude with no memory of what was approved. See
+      // the resume logic in execute/route.ts.
+      const body: any = approvalDecision
+        ? { task_id: resumeTaskId, approval_result: approvalDecision }
+        : { task: taskText, ...(resumeTaskId ? { task_id: resumeTaskId } : {}) }
 
       const res = await authFetch(`/api/employees/${e.slug}/execute`, {
         method: 'POST',
@@ -476,13 +482,13 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
 
   const handleApprovalDecision = (decision: 'approved' | 'rejected') => {
     if (!pendingApproval) return
-    if (decision === 'approved') {
-      // Resume execution with a continuation message
-      executeTask(`[APPROVAL_GRANTED] Continue executing. The user approved: ${pendingApproval.gate.action}`, pendingApproval.taskId)
-    } else {
-      setMsgs(m => [...m, { role: 'system', content: '✕ Action rejected. What would you like to do instead?' }])
-      setPendingApproval(null)
-    }
+    const approved = decision === 'approved'
+    setMsgs(m => [...m, { role: 'system', content: approved ? `✓ Approved: ${pendingApproval.gate.action}` : `✕ Rejected: ${pendingApproval.gate.action}` }])
+    // Both branches call the server so the pending task_approvals row and
+    // employee_tasks.status actually resolve — a reject that only updates
+    // local UI state left the task stuck at 'awaiting_approval' forever
+    // and Claude never learned the action was declined.
+    executeTask('', pendingApproval.taskId, { approved, tool_use_id: pendingApproval.gate.tool_use_id })
   }
 
   const handleKey = (e: React.KeyboardEvent) => {

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { withManageAuth } from '@/lib/manage-token'
+import { autonomyLabel, trustColor, autonomyPolicy } from '@/lib/employees/calibration'
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // /api/employees/calibration â€” S7 Calibration Engine
@@ -17,35 +18,6 @@ import { withManageAuth } from '@/lib/manage-token'
 //   rate_outcome â€” owner rates the quality of a completed action
 //   reset        â€” clear the owner override so system resumes self-management
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-// Map autonomy_level (0â€“1) to a human label
-function autonomyLabel(level: number): string {
-  if (level < 0.2) return 'Supervised'
-  if (level < 0.4) return 'Guided'
-  if (level < 0.6) return 'Collaborative'
-  if (level < 0.8) return 'Trusted'
-  return 'Autonomous'
-}
-
-// Map trust_score to a color
-function trustColor(score: number): string {
-  if (score >= 0.75) return '#22c55e'
-  if (score >= 0.5)  return '#6366f1'
-  if (score >= 0.3)  return '#f59e0b'
-  return '#ef4444'
-}
-
-// What the autonomy level means for each action type's default behavior
-function autonomyPolicy(level: number) {
-  return {
-    draft_document:   level >= 0.3 ? 'can propose freely' : 'propose with justification',
-    create_task:      level >= 0.3 ? 'can propose freely' : 'propose with justification',
-    send_email:       level >= 0.8 ? 'can propose, owner reviews text' : 'always requires explicit approval',
-    schedule_meeting: level >= 0.6 ? 'can propose, fast-track approval' : 'requires approval',
-    update_record:    level >= 0.7 ? 'can propose, fast-track approval' : 'requires approval',
-    external_api:     level >= 0.9 ? 'can propose with full context' : 'always requires explicit approval',
-  }
-}
 
 export async function GET(req: NextRequest) {
   return withManageAuth(req, async (userId) => getCalibration(userId, req))
