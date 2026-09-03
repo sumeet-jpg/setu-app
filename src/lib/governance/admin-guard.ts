@@ -56,7 +56,10 @@ export async function requireAdmin(request: NextRequest): Promise<{ user: AdminU
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 }
 
-function isAllowedAdminEmail(email: string): boolean {
+// Exported for testing — this is the single check standing between "any
+// Google-authenticated visitor" and "admin" (see the file-header incident
+// note). Was private; test coverage matters more than encapsulation here.
+export function isAllowedAdminEmail(email: string): boolean {
   const allowlist = (process.env.ADMIN_EMAIL ?? '')
     .split(',')
     .map(e => e.trim().toLowerCase())
