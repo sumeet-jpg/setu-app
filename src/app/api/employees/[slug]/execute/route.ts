@@ -14,6 +14,7 @@ import { withManageAuth } from '@/lib/manage-token'
 import { checkExecuteCap, logUsage } from '@/lib/usage/cap'
 import { loadEmployeeContext } from '@/lib/employees/context'
 import { autonomyRulesText } from '@/lib/employees/calibration'
+import { getDecryptedCustomerAiKey, touchCustomerAiKeyUsage } from '@/lib/ai-keys'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -147,19 +148,31 @@ async function runExecute(slug: string, user_id: string, req: NextRequest): Prom
     return NextResponse.json({ error: 'task, or task_id + approval_result, required' }, { status: 400 })
   }
 
-  // This loop can run up to MAX_LOOPS full Claude calls per request, with no
-  // prior cap on how much of that a single customer could rack up — see
-  // migration 016. Scoped to this specific (user_id, employee_slug), i.e.
-  // the actual $49/mo subscription paying for it.
-  const cap = await checkExecuteCap(user_id, slug)
-  if (!cap.allowed) {
-    return NextResponse.json(
-      { error: `This employee has reached its usage limit for this billing period ($${cap.capUsd.toFixed(2)}). Contact support to raise it.` },
-      { status: 429 }
-    )
+  const supabase = createAdminClient()
+
+  // Setu is a pipeline, not a custodian of inference cost: if the customer
+  // has connected their own Anthropic key (migration 025), real execution
+  // runs on their account, on their bill — Setu's per-customer spend cap
+  // (below) exists only to bound Setu's OWN exposure on the shared key, so
+  // it doesn't apply once the customer is paying Anthropic directly.
+  const customerApiKey = await getDecryptedCustomerAiKey(supabase, user_id, 'anthropic')
+
+  if (!customerApiKey) {
+    // This loop can run up to MAX_LOOPS full Claude calls per request, with
+    // no prior cap on how much of that a single customer could rack up —
+    // see migration 016. Scoped to this specific (user_id, employee_slug),
+    // i.e. the actual $49/mo subscription paying for it.
+    const cap = await checkExecuteCap(user_id, slug)
+    if (!cap.allowed) {
+      return NextResponse.json(
+        { error: `This employee has reached its usage limit for this billing period ($${cap.capUsd.toFixed(2)}). Contact support to raise it, or connect your own Anthropic API key in Settings to run without a cap.` },
+        { status: 429 }
+      )
+    }
   }
 
-  const supabase = createAdminClient()
+  const anthropicClient = customerApiKey ? new Anthropic({ apiKey: customerApiKey }) : anthropic
+  if (customerApiKey) touchCustomerAiKeyUsage(supabase, user_id, 'anthropic').catch(() => {})
 
   // Load user's connected tools for this employee
   const { data: connections } = await supabase
@@ -312,7 +325,7 @@ ${toolContext}${knowledgeContext}`
           let textBuffer = ''
           const toolUseBlocks: Anthropic.ToolUseBlock[] = []
 
-          const claudeStream = await anthropic.messages.stream({
+          const claudeStream = await anthropicClient.messages.stream({
             model: process.env.FALLBACK_REASONING_MODEL ?? 'claude-sonnet-4-6',
             max_tokens: 4096,
             system: systemPrompt,

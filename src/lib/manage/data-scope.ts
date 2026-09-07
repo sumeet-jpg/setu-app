@@ -50,6 +50,11 @@ export const USER_SCOPED_TABLES: UserScopedTable[] = [
 // never included in an export, and purged immediately (not on the grace
 // window) on account deletion since it's the single highest-risk secret.
 export const TOOL_CONNECTIONS_TABLE = 'tool_connections'
+// Customer-supplied AI provider keys (BYOK, migration 025) — same treatment
+// as tool_connections: a real secret, purged immediately on deletion, never
+// exported. Setu is a pipeline, not a custodian — nothing here is ever kept
+// longer than the customer wants it kept.
+export const CUSTOMER_AI_KEYS_TABLE = 'customer_ai_keys'
 export const TOOL_CONNECTIONS_EXPORT_COLUMNS = 'tool_slug, config, connected_at, last_used_at'
 
 // task_approvals has no user_id column — it's linked via task_id to
@@ -122,6 +127,7 @@ export async function collectUserData(supabase: any, userId: string) {
  */
 export async function purgeCredentialsAndCancel(supabase: any, userId: string) {
   await supabase.from(TOOL_CONNECTIONS_TABLE).delete().eq('user_id', userId)
+  await supabase.from(CUSTOMER_AI_KEYS_TABLE).delete().eq('user_id', userId)
   await supabase
     .from('hired_subscriptions')
     .update({ status: 'cancelled', cancelled_at: new Date().toISOString(), cancel_reason: 'account_deletion' })

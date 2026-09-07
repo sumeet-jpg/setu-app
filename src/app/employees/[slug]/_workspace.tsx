@@ -336,6 +336,17 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
   const [loadingTools, setLoadingTools] = useState(true)
   const [connectingSlug, setConnectingSlug] = useState<string | null>(null)
 
+  // BYOK — customer's own Anthropic key. Setu is a pipeline, not a
+  // custodian: once connected, real execution runs on the customer's own
+  // account and bill instead of Setu's shared, capped key (see migration
+  // 025 and the execute route). Never fetched/shown for unhired visitors —
+  // there's nothing to connect it to until real execution exists.
+  const [aiKeyConnected, setAiKeyConnected] = useState<boolean | null>(null)
+  const [aiKeyInput, setAiKeyInput] = useState('')
+  const [aiKeyBusy, setAiKeyBusy] = useState(false)
+  const [aiKeyError, setAiKeyError] = useState('')
+  const [showAiKeyField, setShowAiKeyField] = useState(false)
+
   // Chat state
   const [msgs, setMsgs] = useState<ChatMsg[]>([
     {
@@ -376,6 +387,48 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
       .then(d => { setConnected(d.connections ?? []); setLoadingTools(false) })
       .catch(() => setLoadingTools(false))
   }, [userId])
+
+  // Load BYOK status — only meaningful once hired, since real execution
+  // (the thing the customer's own key pays for) doesn't exist before that.
+  useEffect(() => {
+    if (!userId || !isHired) return
+    authFetch('/api/manage/ai-key')
+      .then(r => r.json())
+      .then(d => setAiKeyConnected(!!d.connected))
+      .catch(() => {})
+  }, [userId, isHired])
+
+  const connectAiKey = async () => {
+    if (!aiKeyInput.trim()) return
+    setAiKeyBusy(true)
+    setAiKeyError('')
+    try {
+      const res = await authFetch('/api/manage/ai-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: aiKeyInput.trim() }),
+      })
+      const d = await res.json()
+      if (!res.ok) { setAiKeyError(d.error ?? 'Could not connect this key.'); return }
+      setAiKeyConnected(true)
+      setAiKeyInput('')
+      setShowAiKeyField(false)
+    } catch {
+      setAiKeyError('Could not connect this key.')
+    } finally {
+      setAiKeyBusy(false)
+    }
+  }
+
+  const disconnectAiKey = async () => {
+    setAiKeyBusy(true)
+    try {
+      await authFetch('/api/manage/ai-key', { method: 'DELETE' })
+      setAiKeyConnected(false)
+    } finally {
+      setAiKeyBusy(false)
+    }
+  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -1279,8 +1332,53 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
             </>
           )}
 
+          {/* BYOK — Your AI Provider (hired customers only) */}
+          {isHired && (
+            <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1.5px solid #E3E1DA' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#78746E', letterSpacing: '0.08em',
+                textTransform: 'uppercase', marginBottom: 8 }}>Your AI Provider</div>
+              {aiKeyConnected === null ? null : aiKeyConnected ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px',
+                  borderRadius: 8, background: '#EAF5EE', border: '1.5px solid #16A34A30' }}>
+                  <span style={{ color: '#16A34A', fontSize: 14 }}>✓</span>
+                  <div style={{ flex: 1, fontSize: 12, color: '#0D0C09' }}>Your Anthropic key — connected</div>
+                  <button onClick={disconnectAiKey} disabled={aiKeyBusy}
+                    style={{ background: 'none', border: 'none', color: '#78746E', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
+                    {aiKeyBusy ? '…' : 'Remove'}
+                  </button>
+                </div>
+              ) : showAiKeyField ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <input type="password" value={aiKeyInput} onChange={ev => setAiKeyInput(ev.target.value)}
+                    placeholder="sk-ant-..." style={{ fontSize: 12, padding: '7px 9px', borderRadius: 6,
+                      border: '1.5px solid #E3E1DA', fontFamily: 'inherit' }} />
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button onClick={connectAiKey} disabled={aiKeyBusy || !aiKeyInput.trim()}
+                      style={{ flex: 1, background: '#0D0C09', color: '#fff', border: 'none', borderRadius: 6,
+                        padding: '7px 0', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                      {aiKeyBusy ? 'Verifying…' : 'Connect'}
+                    </button>
+                    <button onClick={() => { setShowAiKeyField(false); setAiKeyError('') }}
+                      style={{ background: 'none', border: '1.5px solid #E3E1DA', borderRadius: 6, padding: '7px 10px',
+                        fontSize: 11, color: '#78746E', cursor: 'pointer' }}>Cancel</button>
+                  </div>
+                  {aiKeyError && <div style={{ fontSize: 10.5, color: '#DC2626' }}>{aiKeyError}</div>}
+                </div>
+              ) : (
+                <button onClick={() => setShowAiKeyField(true)}
+                  style={{ width: '100%', background: '#F6F5F1', border: '1.5px solid #E3E1DA', borderRadius: 8,
+                    padding: '8px 10px', fontSize: 12, color: '#78746E', cursor: 'pointer', fontWeight: 600, textAlign: 'left' }}>
+                  + Connect your own Anthropic key
+                </button>
+              )}
+              <div style={{ fontSize: 10, color: '#9E9891', marginTop: 6, lineHeight: 1.5 }}>
+                Optional. Connect your own key and real execution runs on your account, with no usage cap. Without one, execution runs on Setu's shared key up to the plan limit.
+              </div>
+            </div>
+          )}
+
           {/* Employee info */}
-          <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1.5px solid #E3E1DA' }}>
+          <div style={{ marginTop: isHired ? 0 : 'auto', paddingTop: 16, borderTop: '1.5px solid #E3E1DA' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: e.color + '14',
                 border: `1.5px solid ${e.color}25`,
