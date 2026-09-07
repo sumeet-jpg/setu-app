@@ -184,8 +184,13 @@ async function postCalibration(userId: string, req: NextRequest): Promise<NextRe
 
       if (rateErr) return NextResponse.json({ error: rateErr.message }, { status: 500 })
 
-      // Trigger recalibration after a rating
-      await supabase.rpc('recalibrate_employee' as any, { p_user_id: userId, p_slug: slug }).catch(() => {})
+      // Trigger recalibration after a rating. Same fix as distill route:
+      // .catch() chained directly on the query builder isn't a real
+      // function here — it threw and crashed this whole request every time,
+      // instead of the "best-effort, never fatal" behavior intended.
+      try {
+        await supabase.rpc('recalibrate_employee' as any, { p_user_id: userId, p_slug: slug })
+      } catch { /* non-fatal */ }
 
       return NextResponse.json({ ok: true })
     }

@@ -258,7 +258,12 @@ ${toolContext}`
     // rpc() call's builder object directly as a field value in the SAME
     // update payload (the pre-existing pattern in proactive.ts) never
     // actually incremented anything; see migration 021's note.
-    await supabase.rpc('increment_pattern_fire_count' as any, { pattern_id: row.id }).catch(() => {})
+    // .catch() chained directly on the query builder isn't a real function
+    // here — it threw and crashed this whole check every time a pattern
+    // actually fired, instead of the "best-effort" behavior intended.
+    try {
+      await supabase.rpc('increment_pattern_fire_count' as any, { pattern_id: row.id })
+    } catch { /* non-fatal */ }
 
     await supabase.from('employee_watch_patterns').update({
       last_fired_at: new Date().toISOString(),

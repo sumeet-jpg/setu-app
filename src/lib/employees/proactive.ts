@@ -200,7 +200,13 @@ export async function checkPatterns(supabase: Supa, userId: string, slug: string
         // call's builder object directly as a field value here never
         // actually incremented fire_count; the RPC also didn't exist
         // anywhere in the migrations until 021. See its note for detail.
-        await supabase.rpc('increment_pattern_fire_count' as any, { pattern_id: pattern.id }).catch(() => {})
+        // .catch() chained directly on the query builder isn't a real
+        // function here — it threw and crashed this whole check every time
+        // a pattern actually fired, instead of the "best-effort" behavior
+        // intended.
+        try {
+          await supabase.rpc('increment_pattern_fire_count' as any, { pattern_id: pattern.id })
+        } catch { /* non-fatal */ }
 
         await supabase.from('employee_watch_patterns').update({
           last_fired_at: new Date().toISOString(),

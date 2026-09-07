@@ -144,13 +144,17 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    // Audit log
-    await supabase.from('employee_action_log').insert({
-      action_id: data!.id,
-      user_id:   userId,
-      event:     'proposed',
-      note:      `Proposed by ${slug}`,
-    }).catch(() => {})
+    // Audit log — best-effort. .catch() chained directly on the query
+    // builder isn't a real function here — it threw and crashed the whole
+    // request every time, instead of the "best-effort" behavior intended.
+    try {
+      await supabase.from('employee_action_log').insert({
+        action_id: data!.id,
+        user_id:   userId,
+        event:     'proposed',
+        note:      `Proposed by ${slug}`,
+      })
+    } catch { /* non-fatal */ }
 
     return NextResponse.json({ ok: true, id: data!.id })
   } catch (err) {
@@ -223,12 +227,15 @@ export async function PATCH(req: NextRequest) {
 
     if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
 
-    await supabase.from('employee_action_log').insert({
-      action_id: actionId,
-      user_id:   userId,
-      event:     logEvent,
-      note:      decision === 'reject' ? (rejectionReason ?? null) : null,
-    }).catch(() => {})
+    // Same fix as above — .catch() on the query builder directly isn't real.
+    try {
+      await supabase.from('employee_action_log').insert({
+        action_id: actionId,
+        user_id:   userId,
+        event:     logEvent,
+        note:      decision === 'reject' ? (rejectionReason ?? null) : null,
+      })
+    } catch { /* non-fatal */ }
 
     // S7: Recalibrate trust score after every owner decision (fire-and-forget)
     if (decision === 'approve' || decision === 'reject') {

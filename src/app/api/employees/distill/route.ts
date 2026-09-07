@@ -192,8 +192,14 @@ export async function POST(req: NextRequest) {
             updated_at: new Date().toISOString(),
           }).eq('id', prev.id)
 
-          await supabase.rpc('increment_belief_reinforcement', { belief_id: prev.id }).maybeSingle()
-            .catch(() => {}) // best-effort increment; missing RPC is non-fatal
+          // Best-effort increment; missing RPC is non-fatal. Supabase's query
+          // builder is thenable (awaitable) but doesn't expose a real
+          // `.catch()` method — chaining one directly threw "is not a
+          // function" and crashed the whole distillation run every time,
+          // which is exactly backwards for a "best-effort, never fatal" call.
+          try {
+            await supabase.rpc('increment_belief_reinforcement', { belief_id: prev.id }).maybeSingle()
+          } catch { /* non-fatal */ }
 
           updated++
         }
@@ -228,18 +234,25 @@ export async function POST(req: NextRequest) {
       ORG_CATEGORIES[b.category] && b.confidence > 0.75
     )
     for (const b of orgBeliefs) {
-      await supabase.from('org_cortex_entries').insert({
-        user_id:              userId,
-        entry_type:           ORG_CATEGORIES[b.category],
-        title:                b.subject,
-        body:                 b.belief,
-        source_employee_slug: slug,
-        source_session_id:    sessionId,
-        relevant_to:          [],          // visible to all employees
-        consumed_by:          [slug],      // source employee is the publisher â€” skip re-delivering to them
-        confidence:           b.confidence,
-        is_active:            true,
-      }).catch(() => {})  // non-fatal; cortex push never blocks distillation
+      // Same fix as the reinforcement RPC above: .catch() chained on the
+      // query builder isn't a real function here — it threw and crashed
+      // this entire request every time a session produced a high-confidence,
+      // org-relevant belief (business_context/market_signal/domain_update
+      // over 0.75 confidence), which in practice was most real sessions.
+      try {
+        await supabase.from('org_cortex_entries').insert({
+          user_id:              userId,
+          entry_type:           ORG_CATEGORIES[b.category],
+          title:                b.subject,
+          body:                 b.belief,
+          source_employee_slug: slug,
+          source_session_id:    sessionId,
+          relevant_to:          [],          // visible to all employees
+          consumed_by:          [slug],      // source employee is the publisher — skip re-delivering to them
+          confidence:           b.confidence,
+          is_active:            true,
+        })
+      } catch { /* non-fatal; cortex push never blocks distillation */ }
     }
 
     // Mark run complete
