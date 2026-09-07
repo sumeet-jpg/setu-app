@@ -196,7 +196,7 @@ export default function ManageClient({
   const trialUrgent = trialDays !== null && trialDays <= 4
 
   const navLinks = [
-    { href: `/employees/${slug}/interview`, label: 'Chat', icon: '💬', desc: 'Start a session' },
+    { href: `/employees/${slug}`, label: 'Chat', icon: '💬', desc: 'Start a session' },
     { href: `/employees/${slug}/memory`, label: 'Memory', icon: '🧠', desc: 'Beliefs, vault, alerts' },
     { href: `/employees/${slug}/memory#calibration`, label: 'Trust', icon: '⚙', desc: 'Autonomy dial' },
     { href: `/employees/${slug}/onboard`, label: 'Setup', icon: '🚀', desc: 'Context, KPIs, tools' },

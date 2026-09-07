@@ -236,7 +236,7 @@ export default function OnboardClient({
               Everything you set up here — context, KPIs, connected tools — is already live. Start with a real task.
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-              <Link href={`/employees/${slug}/interview`} style={{ padding: '13px 26px', borderRadius: 10, background: employeeColor, color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>
+              <Link href={`/employees/${slug}`} style={{ padding: '13px 26px', borderRadius: 10, background: employeeColor, color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>
                 Start chatting →
               </Link>
               <Link href={`/manage/${slug}`} style={{ padding: '13px 26px', borderRadius: 10, background: 'transparent', border: `1px solid ${C.border}`, color: C.muted, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>

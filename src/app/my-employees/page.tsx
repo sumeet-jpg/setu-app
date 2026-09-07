@@ -210,7 +210,7 @@ export default function MyEmployeesPage() {
                     }}>
                       Manage →
                     </Link>
-                    <Link href={`/employees/${sub.employee_slug}/interview`} style={{
+                    <Link href={`/employees/${sub.employee_slug}`} style={{
                       padding: '7px 14px', borderRadius: 9, background: WHITE, border: `1.5px solid ${GRAY}`,
                       color: MUTED, fontSize: 12, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap',
                     }}>

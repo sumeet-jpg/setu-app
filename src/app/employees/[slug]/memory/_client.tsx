@@ -387,7 +387,7 @@ export default function MemoryClient({
             {employeeName} will begin learning from your conversations once you've exchanged at least 8 messages.
             Every session is distilled into structured beliefs — preferences, decisions, patterns — that compound over time.
           </div>
-          <Link href={`/employees/${slug}/interview`}
+          <Link href={`/employees/${slug}`}
             style={{ display: 'inline-block', marginTop: 28, background: C.accent, color: '#fff',
               padding: '10px 22px', borderRadius: 8, textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>
             Start a conversation →
