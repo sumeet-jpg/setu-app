@@ -54,13 +54,18 @@ export default function OnboardClient({
   }, [userId])
 
   async function uploadDoc() {
-    if (!docName.trim() || !docContent.trim()) return
+    // Was silently discarding real pasted content and advancing to the next
+    // step anyway whenever the name field was left blank — a customer who
+    // filled in real context but skipped naming it lost it with zero
+    // feedback. A real doc always deserves a name over losing it entirely.
+    if (!docContent.trim()) return
+    const name = docName.trim() || 'Company context'
     setUploading(true)
     try {
       const res = await authFetch('/api/employees/vault/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, sourceName: docName.trim(), sourceType: 'text', content: docContent.trim() }),
+        body: JSON.stringify({ slug, sourceName: name, sourceType: 'text', content: docContent.trim() }),
       })
       if (res.ok) setUploaded(true)
     } finally {
@@ -146,7 +151,11 @@ export default function OnboardClient({
               style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: `1px solid ${C.border}`, background: C.card, color: C.text, fontSize: 13, outline: 'none', resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }} />
             {uploaded && <div style={{ fontSize: 12, color: C.green, marginTop: 8 }}>✓ Saved to {employeeName}'s vault</div>}
             <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
-              <button onClick={async () => { await uploadDoc(); setStep(1) }} disabled={uploading} style={btnStyle(uploading)}>
+              <button onClick={async () => {
+                await uploadDoc()
+                if (docContent.trim()) await new Promise(r => setTimeout(r, 500)) // let "✓ Saved" register before advancing
+                setStep(1)
+              }} disabled={uploading} style={btnStyle(uploading)}>
                 {uploading ? 'Saving…' : docContent.trim() ? 'Save & continue →' : 'Continue →'}
               </button>
               <button onClick={() => setStep(1)} style={skipStyle}>Skip for now</button>
