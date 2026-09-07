@@ -2059,11 +2059,14 @@ export function splitToolsByConnectability(toolGroups: { category: string; tools
   return { connectable, advisoryOnly }
 }
 
-// Clearbit logo URL for a tool slug
+// Logo URL for a tool slug. Was logo.clearbit.com — Clearbit's free Logo API
+// was shut down after the HubSpot acquisition (the domain no longer resolves
+// at all), which silently broke every tool-logo image on every employee page.
+// DuckDuckGo's icon service is free, keyless, and returns real favicons.
 export function toolLogoUrl(slug: string): string {
   const tool = REGISTRY_MAP.get(slug)
   if (!tool) return ''
-  return `https://logo.clearbit.com/${tool.domain}`
+  return `https://icons.duckduckgo.com/ip3/${tool.domain}.ico`
 }
 
 // Build tool description context for Claude system prompt

@@ -236,4 +236,35 @@ export const auditLog = {
       description: `Blueprint ${blueprintId} ${decision} by admin`,
       metadata: { decision },
     }),
+
+  dataExported: (userId: string, tableCount: number) =>
+    writeAuditLog({
+      event_type: "data_exported",
+      user_id: userId,
+      entity_type: "user_data",
+      entity_id: userId,
+      description: `Customer exported their own data (${tableCount} tables)`,
+      metadata: { table_count: tableCount },
+    }),
+
+  accountDeletionRequested: (userId: string, purgeAt: string) =>
+    writeAuditLog({
+      event_type: "account_deletion_requested",
+      severity: "warning",
+      user_id: userId,
+      entity_type: "user_data",
+      entity_id: userId,
+      description: `Customer requested account deletion — hard delete scheduled`,
+      metadata: { purge_at: purgeAt },
+    }),
+
+  accountDeleted: (userId: string) =>
+    writeAuditLog({
+      event_type: "account_deleted",
+      severity: "warning",
+      user_id: userId,
+      entity_type: "user_data",
+      entity_id: userId,
+      description: `Customer account data hard-deleted after grace window`,
+    }),
 };

@@ -64,8 +64,8 @@ const EMPLOYEES_BASE: EmployeeProfile[] = [
     color: '#e879f9',
     dept: 'Marketing',
     years: 12,
-    tagline: 'Plans the strategy, commands 208 specialist agents, and ships the work — end to end.',
-    intro: "Marcus runs marketing the way a seasoned VP would. Give him a goal — grow pipeline, launch a feature, fix a funnel — and he plans it, tells you exactly which tools and accounts he needs, then directs his team of specialist agents to execute across every channel.",
+    tagline: "Plans the strategy like a VP, leads 208 specialist agents to execute it, and won't ship anything he hasn't reviewed himself.",
+    intro: "Marcus runs marketing the way a seasoned VP would — 12 years of pattern-matching at high-growth B2B SaaS companies, and he brings that judgment to yours. He's not one more AI tool in your stack; he's the one making the calls. Give him a goal — grow pipeline, launch a feature, fix a funnel — and he'll plan it, tell you exactly which tools and accounts he needs, then direct his team of 208 specialist agents to execute it end-to-end — reviewing every output himself before it reaches you. The longer you work together, the more he earns the right to act without asking first.",
     agentCount: 208,
     pricing: { monthly: 49, label: '$49/mo' },
     knows: ['Brand positioning & messaging', 'Demand generation', 'Funnel & lifecycle marketing', 'Performance / paid media', 'SEO & content strategy', 'Email & marketing automation', 'Social & community', 'Product marketing & launches', 'ABM', 'Marketing analytics & attribution', 'CRO & landing pages', 'PR & communications', 'Budget & MROI management'],
@@ -86,8 +86,8 @@ const EMPLOYEES_BASE: EmployeeProfile[] = [
     howItWorks: [
       { step: 'Plans', detail: 'Breaks your goal into a real strategy with channels, owners, and a sequence.' },
       { step: 'Pre-flights', detail: 'Tells you exactly which tools, APIs, and accounts he needs — before spending a thing.' },
-      { step: 'Deploys his team', detail: 'Commands 208 specialist marketing agents in parallel to do the heavy lifting.' },
-      { step: 'Verifies', detail: "Reviews every agent's output and re-runs anything that isn't good enough." },
+      { step: 'Leads his team', detail: 'Directs 208 specialist agents in parallel — he sets the brief and the standard, they do the legwork.' },
+      { step: 'Verifies', detail: "Reviews everything his team produces personally and sends back anything that isn't sharp enough." },
       { step: 'Reports', detail: 'Synthesizes results, logs the KPIs, and emails you a leader-grade recap.' },
     ],
     systemPrompt: `You are Marcus, a Marketing Manager with 12 years leading marketing at high-growth B2B SaaS companies. Your north star is pipeline generated and CAC/LTV — never impressions, MQLs, or vanity metrics.
@@ -241,9 +241,11 @@ Domain boundary: You are a domain specialist, not a generalist. When asked about
             ]
       },
       {
-            "mode": "Fully Autonomous",
+            "mode": "Trusted — Standing Rules Only",
             "tasks": [
-                  "None by default — owner unlocks specific task types after track record is demonstrated"
+                  "Ongoing optimization within a budget cap and guardrails you've explicitly pre-approved (e.g. pause underperforming ads, reallocate spend within an approved range)",
+                  "Recurring campaign types you've greenlit as a standing rule, without a per-instance ping",
+                  "Anything new, anything irreversible, and any spend outside the pre-approved range always comes back for a fresh approval — no exceptions, at any trust level"
             ]
       }
 ],

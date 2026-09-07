@@ -50,9 +50,7 @@ export function Nav({ theme = 'light', ctaLabel = 'Hire an Employee', ctaHref = 
           .setu-nav-mobile-panel.open { display: flex !important; }
         }
       `}</style>
-      <Link href="/" style={{ textDecoration: 'none' }} onClick={() => setOpen(false)}>
-        <SetuLogo size={28} color={isDark ? '#22c55e' : '#0E5C34'} wordColor={C.ink} />
-      </Link>
+      <SetuLogo size={28} color={isDark ? '#22c55e' : '#0E5C34'} wordColor={C.ink} onClick={() => setOpen(false)} />
       <div className="setu-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         {LINKS.map(([label, href]) => (
           <Link key={href} href={href} className="setu-nav-link" style={{ fontSize: 13, color: C.muted, textDecoration: 'none', padding: '8px 13px', borderRadius: 8, fontWeight: 500 }}>

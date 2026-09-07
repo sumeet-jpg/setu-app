@@ -263,6 +263,55 @@ function ToolEventPill({ event }: { event: ToolEvent }) {
   )
 }
 
+// ── Apprenticeship Architecture detail-panel helpers ─────────────────────────
+// Small, shared building blocks for the tap-to-expand systems map — every
+// system's detail content used the same header/label/grid shapes before,
+// just copy-pasted 11 times; factored out here rather than repeated again.
+
+function SystemHeader({ color, eyebrow, title, desc, badge, badgeColor, badgeBg, badgeBorder }: {
+  color: string; eyebrow: string; title: string; desc: string
+  badge: string; badgeColor: string; badgeBg: string; badgeBorder: string
+}) {
+  const INK = '#0D0C09'
+  const MUTED = '#78746E'
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
+      <div>
+        <div style={{ fontSize: 10, fontWeight: 700, color, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>{eyebrow}</div>
+        <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>{title}</div>
+        <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>{desc}</div>
+      </div>
+      <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: badgeColor,
+        background: badgeBg, padding: '5px 12px', borderRadius: 20, border: `1px solid ${badgeBorder}`, whiteSpace: 'nowrap' }}>{badge}</div>
+    </div>
+  )
+}
+
+function SectionLabel({ children, muted }: { children: React.ReactNode; muted: string }) {
+  return (
+    <div style={{ fontSize: 11, fontWeight: 700, color: muted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>{children}</div>
+  )
+}
+
+function PlaceholderGrid({ items, color, bg, border }: {
+  items: { icon: string; label: string; desc: string }[]
+  color: string; bg?: string; border?: string
+}) {
+  const INK = '#0D0C09'
+  const MUTED = '#78746E'
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
+      {items.map(item => (
+        <div key={item.label} style={{ background: bg ?? color + '08', borderRadius: 10, padding: '14px 16px', border: `1px solid ${border ?? color + '20'}` }}>
+          <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
+          <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── Main workspace ────────────────────────────────────────────────────────────
 
 export default function EmployeeWorkspace({ employee: e }: { employee: Employee }) {
@@ -298,10 +347,18 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
   const [streaming, setStreaming] = useState(false)
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null)
   const [pendingApproval, setPendingApproval] = useState<{ gate: ApprovalGate; taskId: string } | null>(null)
+  // Which node is expanded in the Apprenticeship Architecture systems map below.
+  const [openSystem, setOpenSystem] = useState<number | null>(null)
 
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const abortRef = useRef<AbortController | null>(null)
+  // executeTask's useCallback deps don't include msgs (by design — see the
+  // functional setMsgs updates throughout), so a plain read of msgs inside it
+  // would be stale. This ref gives the interview-mode request body access to
+  // the actual latest conversation without adding msgs as a dependency.
+  const msgsRef = useRef<ChatMsg[]>(msgs)
+  useEffect(() => { msgsRef.current = msgs }, [msgs])
 
   // Employee's expected tools
   const expectedSlugs = employeeToolSlugs(e.tools)
@@ -349,20 +406,55 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
     abortRef.current = new AbortController()
 
     try {
-      // Approving/rejecting a pending action resumes the SAME task from its
-      // persisted conversation server-side — sending a fresh `task` string
-      // here would restart Claude with no memory of what was approved. See
-      // the resume logic in execute/route.ts.
-      const body: any = approvalDecision
-        ? { task_id: resumeTaskId, approval_result: approvalDecision }
-        : { task: taskText, ...(resumeTaskId ? { task_id: resumeTaskId } : {}) }
+      // Not-yet-hired visitors have no manage-token (only issued at hire —
+      // see manage-token.ts) and can't run real tool actions anyway, so this
+      // was previously always calling /execute regardless of hire state:
+      // that route 401s hard for anyone without a token, and the response
+      // was fed straight into the SSE reader below with no status check —
+      // a 401 JSON body doesn't start with "data: ", so every line was
+      // silently skipped and the assistant bubble just stayed empty forever,
+      // with no error ever shown. The free "Interview" promised on this page
+      // has its own real endpoint (/api/employees/interview — plain chat,
+      // no tools, no approval gate, its own daily cap) which never needed a
+      // manage-token; route to it here instead.
+      const url = isHired ? `/api/employees/${e.slug}/execute` : '/api/employees/interview'
+      const body: any = isHired
+        ? (approvalDecision
+            ? { task_id: resumeTaskId, approval_result: approvalDecision }
+            : { task: taskText, ...(resumeTaskId ? { task_id: resumeTaskId } : {}) })
+        : {
+            slug: e.slug,
+            userId,
+            messages: [...msgsRef.current, { role: 'user', content: taskText }]
+              .filter(m => m.role === 'user' || m.role === 'assistant')
+              .map(m => ({ role: m.role, content: m.content })),
+          }
 
-      const res = await authFetch(`/api/employees/${e.slug}/execute`, {
+      const res = await authFetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
         signal: abortRef.current.signal,
       })
+
+      if (!res.ok) {
+        let errMsg = 'Something went wrong. Please try again.'
+        try {
+          const errBody = await res.json()
+          errMsg = res.status === 401
+            ? (isHired ? 'Your session expired — please refresh the page and try again.'
+                       : 'Free interview needs a moment to reconnect — please refresh the page and try again.')
+            : (errBody.error || errMsg)
+        } catch { /* body wasn't JSON — keep the generic message */ }
+        setMsgs(m => {
+          const copy = [...m]
+          const last = copy[copy.length - 1]
+          if (last?.role === 'assistant') last.content = errMsg
+          return copy
+        })
+        setStreaming(false)
+        return
+      }
 
       const reader = res.body!.getReader()
       const decoder = new TextDecoder()
@@ -383,6 +475,24 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
 
           try {
             const event = JSON.parse(raw)
+
+            if (!isHired) {
+              // Interview mode is plain streamed text — no task lifecycle,
+              // no tool calls, no approval gate (there's nothing real to
+              // execute pre-hire). Different wire format from execute's
+              // events: OpenAI-style delta chunks.
+              const delta = event?.choices?.[0]?.delta?.content
+              if (delta) {
+                assistantContent += delta
+                setMsgs(m => {
+                  const copy = [...m]
+                  const last = copy[copy.length - 1]
+                  if (last?.role === 'assistant') last.content = assistantContent
+                  return copy
+                })
+              }
+              continue
+            }
 
             if (event.type === 'task_created') {
               resolvedTaskId = event.task_id
@@ -472,7 +582,7 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
     } finally {
       setStreaming(false)
     }
-  }, [streaming, userId, e.slug, pendingApproval])
+  }, [streaming, userId, e.slug, pendingApproval, isHired])
 
   const handleSend = () => {
     const text = input.trim()
@@ -722,586 +832,348 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
           </div>
         )}
 
-        {/* ── Apprenticeship Architecture ── */}
+        {/* ── Apprenticeship Architecture — interactive systems map ── */}
         <div style={{ marginBottom: 56 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 6 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
               textTransform: 'uppercase' }}>The Apprenticeship Architecture</div>
-            <div style={{ fontSize: 11, color: DIM }}>how {e.name} thinks, learns, and acts — 11 connected systems</div>
           </div>
+          <div style={{ fontSize: 11, color: DIM, marginBottom: 24 }}>how {e.name} thinks, learns, and acts — tap a node to see how it works</div>
 
-          {/* ─ GROUP A: WHO ─ */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <div style={{ height: 1, width: 24, background: GRAY }} />
-            <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>WHO {e.name.toUpperCase()} IS</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
+          {(() => {
+            const SYSTEMS = [
+              { id: 0, group: 'WHO', icon: '🧬', color: e.color, title: 'Character Core', status: 'live' },
+              { id: 1, group: 'WHO', icon: '📚', color: e.color, title: 'Domain Mastery', status: 'live' },
+              { id: 2, group: 'WHO', icon: '🗄️', color: '#F59E0B', title: 'Intelligence Vault', status: 'live' },
+              { id: 3, group: 'MEMORY', icon: '⚗️', color: '#4F46E5', title: 'Distillation Engine', status: 'live' },
+              { id: 4, group: 'MEMORY', icon: '🕸️', color: '#7C3AED', title: 'Knowledge Graph', status: 'live' },
+              { id: 5, group: 'MEMORY', icon: '💞', color: '#EC4899', title: 'Relationship Memory', status: 'soon' },
+              { id: 6, group: 'DOES', icon: '📡', color: '#06B6D4', title: 'Proactive Network', status: 'live' },
+              { id: 7, group: 'DOES', icon: '🪜', color: '#16A34A', title: 'Trust Ladder', status: 'live' },
+              { id: 8, group: 'DOES', icon: '📅', color: '#059669', title: 'Meeting Intelligence', status: 'soon' },
+              { id: 9, group: 'GROWS', icon: '🎯', color: '#D97706', title: 'Outcome Attribution', status: 'live' },
+              { id: 10, group: 'GROWS', icon: '🧠', color: '#8B5CF6', title: 'Cross-Employee Cortex', status: 'live' },
+            ]
+            const GROUPS: [string, string][] = [
+              ['WHO', `WHO ${e.name.toUpperCase()} IS`],
+              ['MEMORY', `WHAT ${e.name.toUpperCase()} REMEMBERS`],
+              ['DOES', `WHAT ${e.name.toUpperCase()} DOES`],
+              ['GROWS', `HOW ${e.name.toUpperCase()} GROWS`],
+            ]
+            const active = SYSTEMS.find(s => s.id === openSystem)
 
-          {/* ─ System 0: Character Core ─ */}
-          <div style={{ background: '#fff', border: `2px solid ${e.color}30`,
-            borderRadius: '16px 16px 4px 4px', padding: '28px 32px',
-            position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: e.color }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 0 · Character Core (PIC)</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Immutable identity — opinions, convictions, and the lines {e.name} won't cross
-                </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  Not a system prompt you can override. {e.name}'s character is architectural — baked in before they see your company context. They push back. They refuse. That's the point.
-                </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#16A34A',
-                background: '#DCFCE7', padding: '5px 12px', borderRadius: 20, border: '1px solid #BBF7D0' }}>● Immutable</div>
-            </div>
-
-            {e.characterCore ? (<>
-              <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, letterSpacing: '0.08em',
-                textTransform: 'uppercase', marginBottom: 10 }}>3 opinions {e.name} holds with conviction</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
-                {e.characterCore.opinions.map((op, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start',
-                    background: e.color + '08', border: `1px solid ${e.color}20`, borderRadius: 10, padding: '14px 16px' }}>
-                    <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: '#DC2626',
-                      background: '#FEE2E2', padding: '3px 8px', borderRadius: 6, marginTop: 2, letterSpacing: '0.04em' }}>MYTH</div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 4 }}>{op.belief}</div>
-                      <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.55 }}>{op.reality}</div>
-                    </div>
+            return (<>
+              {GROUPS.map(([key, label]) => (
+                <div key={key} style={{ marginBottom: 18 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                    <div style={{ height: 1, width: 24, background: GRAY }} />
+                    <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{label}</div>
+                    <div style={{ flex: 1, height: 1, background: GRAY }} />
                   </div>
-                ))}
-              </div>
-
-              <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, letterSpacing: '0.08em',
-                textTransform: 'uppercase', marginBottom: 10 }}>3 lines {e.name} will not cross</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 20 }}>
-                {e.characterCore.nonNegotiables.map((nn, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start',
-                    background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 8, padding: '12px 14px' }}>
-                    <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: '#C2410C', marginTop: 1 }}>#{i + 1}</div>
-                    <div style={{ fontSize: 12, color: INK, lineHeight: 1.55 }}>{nn}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                    {SYSTEMS.filter(s => s.group === key).map(s => {
+                      const isOpen = openSystem === s.id
+                      const isSoon = s.status === 'soon'
+                      return (
+                        <button key={s.id} onClick={() => setOpenSystem(isOpen ? null : s.id)}
+                          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                            width: 92, padding: '12px 6px 8px', borderRadius: 14, cursor: 'pointer',
+                            fontFamily: 'inherit', background: isOpen ? s.color + '12' : '#fff',
+                            border: isOpen ? `2px solid ${s.color}` : `1.5px ${isSoon ? 'dashed' : 'solid'} ${isSoon ? GRAY : s.color + '35'}`,
+                            transition: 'transform 0.12s, border-color 0.12s', transform: isOpen ? 'scale(1.04)' : 'scale(1)' }}>
+                          <div style={{ width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 18, background: isSoon ? '#F8F7F4' : s.color + '15', border: `1.5px solid ${isSoon ? GRAY : s.color + '30'}`,
+                            opacity: isSoon ? 0.7 : 1 }}>
+                            {s.icon}
+                          </div>
+                          <div style={{ fontSize: 10.5, fontWeight: 700, color: isSoon ? MUTED : INK, textAlign: 'center', lineHeight: 1.25 }}>{s.title}</div>
+                          {isSoon && (
+                            <div style={{ fontSize: 8, fontWeight: 700, color: MUTED, letterSpacing: '0.04em', textTransform: 'uppercase',
+                              background: GRAY, padding: '1px 6px', borderRadius: 8 }}>Coming soon</div>
+                          )}
+                        </button>
+                      )
+                    })}
                   </div>
-                ))}
-              </div>
-
-              <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, letterSpacing: '0.08em',
-                textTransform: 'uppercase', marginBottom: 10 }}>2 operating modes</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
-                {e.characterCore.modes.map((m, i) => (
-                  <div key={i} style={{ background: i === 0 ? e.color + '0D' : '#F8F7F4',
-                    border: `1px solid ${i === 0 ? e.color + '30' : GRAY}`, borderRadius: 10, padding: '14px 16px' }}>
-                    <div style={{ fontSize: 12, fontWeight: 800, color: INK, marginBottom: 6 }}>{m.name}</div>
-                    <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.55 }}>{m.desc}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, letterSpacing: '0.08em',
-                textTransform: 'uppercase', marginBottom: 10 }}>5 narrative cases — tacit knowledge encoded</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {e.characterCore.cases.map((c, i) => (
-                  <div key={i} style={{ background: '#F8F7F4', border: `1px solid ${GRAY}`,
-                    borderRadius: 10, padding: '12px 14px', flex: '1 1 200px', minWidth: 180 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{c.title}</div>
-                    <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{c.summary}</div>
-                  </div>
-                ))}
-              </div>
-            </>) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 8 }}>
-                {[
-                  { icon: '🧠', label: '3 core opinions', desc: 'Held with conviction — will push back on the conventional wisdom in their field' },
-                  { icon: '🚫', label: '3 non-negotiables', desc: 'Hard stops: will refuse rather than violate, every time' },
-                  { icon: '⚡', label: '2 operating modes', desc: 'Strategic vs Execution — context-switches cleanly between them' },
-                  { icon: '📖', label: '5 narrative cases', desc: 'Tacit knowledge from years of real work, encoded as judgment' },
-                ].map(item => (
-                  <div key={item.label} style={{ background: e.color + '08', borderRadius: 10, padding: '14px 16px', border: `1px solid ${e.color}20` }}>
-                    <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
-                    <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* connector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
-            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  drawing on</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
-
-          {/* ─ System 1: Domain Mastery ─ */}
-          <div style={{ background: '#fff', border: `1.5px solid ${e.color}30`,
-            borderRadius: 4, padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: e.color }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: e.color, letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 1 · Domain Mastery</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  {e.years} years of {e.dept} expertise — baked in at deploy
-                </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  Named frameworks, tools at feature depth, hard-won judgment from {e.years} years in the field. What {e.name} knows without you telling them anything.
-                </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#16A34A',
-                background: '#DCFCE7', padding: '5px 12px', borderRadius: 20, border: '1px solid #BBF7D0' }}>● Live</div>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {e.knows.slice(0, 12).map((k: string) => (
-                <span key={k} style={{ fontSize: 11, padding: '5px 11px', borderRadius: 8,
-                  background: e.color + '0D', border: `1px solid ${e.color}25`, color: e.color, fontWeight: 600 }}>{k}</span>
-              ))}
-            </div>
-          </div>
-
-          {/* connector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
-            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  grounded in your business via</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
-
-          {/* ─ System 2: Company Intelligence Vault ─ */}
-          <div style={{ background: '#fff', border: '1.5px solid #FEF3C7',
-            borderRadius: 4, padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#F59E0B' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#B45309', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 2 · Company Intelligence Vault (CIV)</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Documents cited, never blindly absorbed — your context, always available
-                </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  Feed {e.name} your SOPs, product catalog, website, and org chart. Every citation is traceable to source. Documents are held as an untrusted channel — referenced, not merged into core beliefs, so a bad document can't corrupt {e.name}'s judgment.
-                </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#B45309',
-                background: '#FFFBEB', padding: '5px 12px', borderRadius: 20, border: '1px solid #FDE68A' }}>Configure after hire</div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 8 }}>
-              {[
-                { icon: '📄', label: 'Documents', desc: 'PDFs, Notion, Google Docs — chunked and indexed' },
-                { icon: '🌐', label: 'Website', desc: 'Your site, read each session for current context' },
-                { icon: '📋', label: 'SOPs & playbooks', desc: 'Standard processes, always on' },
-                { icon: '🏢', label: 'Org structure', desc: 'Who is who, roles and reporting lines' },
-                { icon: '📦', label: 'Product catalog', desc: "What you sell, how it's positioned" },
-              ].map(item => (
-                <div key={item.label} style={{ background: '#FFFBEB', borderRadius: 10, padding: '14px 16px', border: '1px solid #FDE68A50' }}>
-                  <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
-                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
                 </div>
               ))}
-            </div>
-          </div>
 
-          {/* ─ GROUP B: MEMORY ─ */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16, marginBottom: 12 }}>
-            <div style={{ height: 1, width: 24, background: GRAY }} />
-            <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>WHAT {e.name.toUpperCase()} REMEMBERS</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
+              {/* ── Detail panel — shows whichever node is tapped ── */}
+              {active ? (
+                <div style={{ background: '#fff', border: `2px solid ${active.color}30`, borderRadius: 16,
+                  padding: '28px 32px', position: 'relative', overflow: 'hidden', marginTop: 20 }}>
+                  <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: active.color }} />
+                  <button onClick={() => setOpenSystem(null)}
+                    style={{ position: 'absolute', top: 20, right: 24, background: 'none', border: 'none', cursor: 'pointer',
+                      fontSize: 13, color: MUTED, fontWeight: 600 }}>✕ close</button>
 
-          {/* ─ System 3: Distillation Engine ─ */}
-          <div style={{ background: '#fff', border: '1.5px solid #E0E7FF',
-            borderRadius: '16px 16px 4px 4px', padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#4F46E5' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#4338CA', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 3 · Distillation Engine</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Sessions compressed into wisdom — raw conversations never stored
-                </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  After every session, a background job distills what was learned: preferences revealed, decisions made, beliefs updated. The raw transcript is discarded. Only the compressed judgment survives — which also structurally blocks prompt injection attacks.
-                </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#4338CA',
-                background: '#EEF2FF', padding: '5px 12px', borderRadius: 20, border: '1px solid #C7D2FE' }}>After every session</div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 8 }}>
-              {[
-                { icon: '⚗️', label: 'Preference extraction', desc: 'Communication style, format preferences, quality standards — extracted, not copied' },
-                { icon: '🔒', label: 'Injection barrier', desc: 'Schema-level protection — injected instructions structurally cannot survive distillation' },
-                { icon: '📐', label: 'Decision capture', desc: 'What was approved, rejected, or escalated — and why' },
-                { icon: '🔄', label: 'Belief updates', desc: 'What was learned this session, and how it updates the working model' },
-              ].map(item => (
-                <div key={item.label} style={{ background: '#EEF2FF', borderRadius: 10, padding: '14px 16px', border: '1px solid #E0E7FF' }}>
-                  <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
-                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* connector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
-            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  structured into</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
-
-          {/* ─ System 4: Compounding Knowledge Graph ─ */}
-          <div style={{ background: '#fff', border: '1.5px solid #EDE9FE',
-            borderRadius: 4, padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#7C3AED' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 4 · Compounding Knowledge Graph (CKG)</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Beliefs that decay, compound, and never silently overwrite each other
-                </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  Bitemporal storage — every belief has an event_time and ingestion_time, so you can replay {e.name}'s state at any past moment. Ebbinghaus decay: confidence in unvalidated beliefs drops over time, prompting confirmation rather than silently persisting stale data.
-                </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#7C3AED',
-                background: '#F5F3FF', padding: '5px 12px', borderRadius: 20, border: '1px solid #DDD6FE' }}>Compounds over time</div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 8 }}>
-              {[
-                { icon: '🕰️', label: 'Bitemporal storage', desc: 'Time-travel debugging — replay any past belief state' },
-                { icon: '📉', label: 'Confidence decay', desc: 'Stale beliefs lose confidence until re-validated by new sessions' },
-                { icon: '⚠️', label: 'Conflict detection', desc: 'New beliefs flag contradictions — never a silent overwrite' },
-                { icon: '🧬', label: 'Belief evolution', desc: 'Full audit of how the working model changed over months' },
-              ].map(item => (
-                <div key={item.label} style={{ background: '#F5F3FF', borderRadius: 10, padding: '14px 16px', border: '1px solid #EDE9FE' }}>
-                  <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
-                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* connector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
-            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  alongside</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
-
-          {/* ─ System 5: Relationship Memory ─ */}
-          <div style={{ background: '#fff', border: '1.5px solid #FCE7F3',
-            borderRadius: 4, padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#EC4899' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#BE185D', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 5 · Relationship Memory + Emotional Intelligence</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Knows everyone in your world — and never forgets the context that matters
-                </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  Every customer, lead, partner, and stakeholder accumulates context over time. Communication style preferences, interaction history, implicit commitments, relationship dynamics — all retained so {e.name} never re-introduces anyone.
-                </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#BE185D',
-                background: '#FDF2F8', padding: '5px 12px', borderRadius: 20, border: '1px solid #FBCFE8' }}>Builds after hire</div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 8 }}>
-              {[
-                { icon: '🎯', label: 'Leads & prospects', desc: 'Qualification history, interaction log, next steps' },
-                { icon: '🤝', label: 'Customers', desc: 'Deal context, preferences, relationship health' },
-                { icon: '🔗', label: 'Partners', desc: 'Context, agreements, relationship dynamics' },
-                { icon: '💭', label: 'Communication style', desc: 'How each person prefers to be spoken with' },
-              ].map(item => (
-                <div key={item.label} style={{ background: '#FDF2F8', borderRadius: 10, padding: '14px 16px', border: '1px solid #FBCFE850' }}>
-                  <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
-                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ─ GROUP C: DOES ─ */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16, marginBottom: 12 }}>
-            <div style={{ height: 1, width: 24, background: GRAY }} />
-            <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>WHAT {e.name.toUpperCase()} DOES</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
-
-          {/* ─ System 6: Proactive Intelligence Network ─ */}
-          <div style={{ background: '#fff', border: '1.5px solid #CFFAFE',
-            borderRadius: '16px 16px 4px 4px', padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#06B6D4' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#0E7490', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 6 · Proactive Intelligence Network (PIN)</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  {e.name} watches specific signals — and briefs you before you ask
-                </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  Event subscriptions, not cron polls. {e.name} watches domain-specific signals that actually matter for their function. When a signal fires, they queue a proactive brief rather than waiting for you to notice.
-                </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#0E7490',
-                background: '#ECFEFF', padding: '5px 12px', borderRadius: 20, border: '1px solid #A5F3FC' }}>Always watching</div>
-            </div>
-            {e.watchPatterns ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, letterSpacing: '0.08em',
-                  textTransform: 'uppercase', marginBottom: 4 }}>{e.name}'s {e.watchPatterns.length} active watch patterns</div>
-                {e.watchPatterns.map((wp, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start',
-                    background: '#ECFEFF', border: '1px solid #A5F3FC50', borderRadius: 8, padding: '10px 14px' }}>
-                    <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: '#0E7490',
-                      background: '#CFFAFE', padding: '2px 7px', borderRadius: 4, marginTop: 1, letterSpacing: '0.04em' }}>WATCH</div>
-                    <div style={{ fontSize: 12, color: INK, lineHeight: 1.55 }}>{wp}</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
-                {[
-                  { icon: '📡', label: 'Domain signals', desc: 'Industry news filtered for what matters to this function' },
-                  { icon: '🏴', label: 'Competitor moves', desc: 'Tracked and summarized proactively' },
-                  { icon: '⚡', label: 'Trigger events', desc: 'Signals that mean the moment to act is now' },
-                  { icon: '📊', label: 'Performance alerts', desc: 'Metrics that deviate from expected range' },
-                ].map(item => (
-                  <div key={item.label} style={{ background: '#ECFEFF', borderRadius: 10, padding: '14px 16px', border: '1px solid #A5F3FC50' }}>
-                    <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
-                    <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* connector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
-            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  acts through</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
-
-          {/* ─ System 7: Action Layer — Trust Ladder ─ */}
-          <div style={{ background: '#fff', border: '1.5px solid #DCFCE7',
-            borderRadius: 4, padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#16A34A' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#15803D', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 7 · Action Layer — Trust Ladder</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Four autonomy modes — capabilities earn trust, not time
-                </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  {e.name} starts at Research Only. Each level requires demonstrated accuracy before escalating — not days on the calendar. You can also grant or revoke autonomy per-task type at any time.
-                </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#15803D',
-                background: '#F0FDF4', padding: '5px 12px', borderRadius: 20, border: '1px solid #BBF7D0' }}>Starts: Research Only</div>
-            </div>
-            {e.autonomyModes ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {e.autonomyModes.map((am, i) => {
-                  const colors = [
-                    { bg: '#F0FDF4', border: '#BBF7D0', label: '#15803D', dot: '#16A34A' },
-                    { bg: '#EEF2FF', border: '#C7D2FE', label: '#4338CA', dot: '#6366F1' },
-                    { bg: '#FFFBEB', border: '#FDE68A', label: '#92400E', dot: '#D97706' },
-                    { bg: '#FFF1F2', border: '#FECDD3', label: '#9F1239', dot: '#E11D48' },
-                  ]
-                  const c = colors[i] || colors[0]
-                  return (
-                    <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start',
-                      background: c.bg, border: `1px solid ${c.border}`, borderRadius: 10, padding: '14px 16px' }}>
-                      <div style={{ flexShrink: 0, textAlign: 'center' }}>
-                        <div style={{ fontSize: 10, fontWeight: 800, color: c.label, marginBottom: 4, letterSpacing: '0.04em' }}>L{i + 1}</div>
-                        <div style={{ fontSize: 9, color: MUTED, letterSpacing: '0.02em' }}>{'●'.repeat(i + 1)}{'○'.repeat(3 - i)}</div>
+                  {active.id === 0 && (<>
+                    <SystemHeader color={active.color} eyebrow="Character Core (PIC)"
+                      title={`Immutable identity — opinions, convictions, and the lines ${e.name} won't cross`}
+                      desc={`Not a system prompt you can override. ${e.name}'s character is architectural — baked in before they see your company context. They push back. They refuse. That's the point.`}
+                      badge="● Immutable" badgeColor="#16A34A" badgeBg="#DCFCE7" badgeBorder="#BBF7D0" />
+                    {e.characterCore ? (<>
+                      <SectionLabel muted={MUTED}>3 opinions {e.name} holds with conviction</SectionLabel>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+                        {e.characterCore.opinions.map((op, i) => (
+                          <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start',
+                            background: active.color + '08', border: `1px solid ${active.color}20`, borderRadius: 10, padding: '14px 16px' }}>
+                            <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: '#DC2626',
+                              background: '#FEE2E2', padding: '3px 8px', borderRadius: 6, marginTop: 2, letterSpacing: '0.04em' }}>MYTH</div>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 4 }}>{op.belief}</div>
+                              <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.55 }}>{op.reality}</div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 8 }}>{am.mode}</div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                          {am.tasks.map((t, j) => (
-                            <span key={j} style={{ fontSize: 11, padding: '3px 9px', borderRadius: 6,
-                              background: 'rgba(0,0,0,0.05)', color: MUTED }}>{t}</span>
-                          ))}
+                      <SectionLabel muted={MUTED}>3 lines {e.name} will not cross</SectionLabel>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 20 }}>
+                        {e.characterCore.nonNegotiables.map((nn, i) => (
+                          <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start',
+                            background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 8, padding: '12px 14px' }}>
+                            <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: '#C2410C', marginTop: 1 }}>#{i + 1}</div>
+                            <div style={{ fontSize: 12, color: INK, lineHeight: 1.55 }}>{nn}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <SectionLabel muted={MUTED}>2 operating modes</SectionLabel>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
+                        {e.characterCore.modes.map((m, i) => (
+                          <div key={i} style={{ background: i === 0 ? active.color + '0D' : '#F8F7F4',
+                            border: `1px solid ${i === 0 ? active.color + '30' : GRAY}`, borderRadius: 10, padding: '14px 16px' }}>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: INK, marginBottom: 6 }}>{m.name}</div>
+                            <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.55 }}>{m.desc}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <SectionLabel muted={MUTED}>5 narrative cases — tacit knowledge encoded</SectionLabel>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {e.characterCore.cases.map((c, i) => (
+                          <div key={i} style={{ background: '#F8F7F4', border: `1px solid ${GRAY}`,
+                            borderRadius: 10, padding: '12px 14px', flex: '1 1 200px', minWidth: 180 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{c.title}</div>
+                            <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{c.summary}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </>) : <PlaceholderGrid color={active.color} items={[
+                      { icon: '🧠', label: '3 core opinions', desc: 'Held with conviction — will push back on the conventional wisdom in their field' },
+                      { icon: '🚫', label: '3 non-negotiables', desc: 'Hard stops: will refuse rather than violate, every time' },
+                      { icon: '⚡', label: '2 operating modes', desc: 'Strategic vs Execution — context-switches cleanly between them' },
+                      { icon: '📖', label: '5 narrative cases', desc: 'Tacit knowledge from years of real work, encoded as judgment' },
+                    ]} />}
+                  </>)}
+
+                  {active.id === 1 && (<>
+                    <SystemHeader color={active.color} eyebrow="Domain Mastery"
+                      title={`${e.years} years of ${e.dept} expertise — baked in at deploy`}
+                      desc={`Named frameworks, tools at feature depth, hard-won judgment from ${e.years} years in the field. What ${e.name} knows without you telling them anything.`}
+                      badge="● Live" badgeColor="#16A34A" badgeBg="#DCFCE7" badgeBorder="#BBF7D0" />
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {e.knows.slice(0, 12).map((k: string) => (
+                        <span key={k} style={{ fontSize: 11, padding: '5px 11px', borderRadius: 8,
+                          background: active.color + '0D', border: `1px solid ${active.color}25`, color: active.color, fontWeight: 600 }}>{k}</span>
+                      ))}
+                    </div>
+                  </>)}
+
+                  {active.id === 2 && (<>
+                    <SystemHeader color={active.color} eyebrow="Company Intelligence Vault (CIV)"
+                      title="Documents cited, never blindly absorbed — your context, always available"
+                      desc={`Feed ${e.name} your SOPs, product catalog, website, and org chart. Every citation is traceable to source. Documents are held as an untrusted channel — referenced, not merged into core beliefs, so a bad document can't corrupt ${e.name}'s judgment.`}
+                      badge="Configure after hire" badgeColor="#B45309" badgeBg="#FFFBEB" badgeBorder="#FDE68A" />
+                    <PlaceholderGrid color={active.color} bg="#FFFBEB" border="#FDE68A50" items={[
+                      { icon: '📄', label: 'Documents', desc: 'PDFs, Notion, Google Docs — chunked and indexed' },
+                      { icon: '🌐', label: 'Website', desc: 'Your site, read each session for current context' },
+                      { icon: '📋', label: 'SOPs & playbooks', desc: 'Standard processes, always on' },
+                      { icon: '🏢', label: 'Org structure', desc: 'Who is who, roles and reporting lines' },
+                      { icon: '📦', label: 'Product catalog', desc: "What you sell, how it's positioned" },
+                    ]} />
+                  </>)}
+
+                  {active.id === 3 && (<>
+                    <SystemHeader color={active.color} eyebrow="Distillation Engine"
+                      title="Sessions compressed into wisdom — raw conversations never stored"
+                      desc="After every session, a background job distills what was learned: preferences revealed, decisions made, beliefs updated. The raw transcript is discarded. Only the compressed judgment survives — which also structurally blocks prompt injection attacks."
+                      badge="After every session" badgeColor="#4338CA" badgeBg="#EEF2FF" badgeBorder="#C7D2FE" />
+                    <PlaceholderGrid color={active.color} bg="#EEF2FF" border="#E0E7FF" items={[
+                      { icon: '⚗️', label: 'Preference extraction', desc: 'Communication style, format preferences, quality standards — extracted, not copied' },
+                      { icon: '🔒', label: 'Injection barrier', desc: 'Schema-level protection — injected instructions structurally cannot survive distillation' },
+                      { icon: '📐', label: 'Decision capture', desc: 'What was approved, rejected, or escalated — and why' },
+                      { icon: '🔄', label: 'Belief updates', desc: 'What was learned this session, and how it updates the working model' },
+                    ]} />
+                  </>)}
+
+                  {active.id === 4 && (<>
+                    <SystemHeader color={active.color} eyebrow="Compounding Knowledge Graph (CKG)"
+                      title="Beliefs that decay, compound, and never silently overwrite each other"
+                      desc={`Bitemporal storage — every belief has an event_time and ingestion_time, so you can replay ${e.name}'s state at any past moment. Ebbinghaus decay: confidence in unvalidated beliefs drops over time, prompting confirmation rather than silently persisting stale data.`}
+                      badge="Compounds over time" badgeColor="#7C3AED" badgeBg="#F5F3FF" badgeBorder="#DDD6FE" />
+                    <PlaceholderGrid color={active.color} bg="#F5F3FF" border="#EDE9FE" items={[
+                      { icon: '🕰️', label: 'Bitemporal storage', desc: 'Time-travel debugging — replay any past belief state' },
+                      { icon: '📉', label: 'Confidence decay', desc: 'Stale beliefs lose confidence until re-validated by new sessions' },
+                      { icon: '⚠️', label: 'Conflict detection', desc: 'New beliefs flag contradictions — never a silent overwrite' },
+                      { icon: '🧬', label: 'Belief evolution', desc: 'Full audit of how the working model changed over months' },
+                    ]} />
+                  </>)}
+
+                  {active.id === 5 && (<>
+                    <SystemHeader color={active.color} eyebrow="Relationship Memory + Emotional Intelligence"
+                      title="Knows everyone in your world — and never forgets the context that matters"
+                      desc={`Every customer, lead, partner, and stakeholder will accumulate context over time — communication style, interaction history, relationship dynamics — so ${e.name} never re-introduces anyone. On the roadmap, not yet live: no build has shipped for this one, so it's shown honestly as coming soon rather than claimed as active.`}
+                      badge="Coming soon" badgeColor={MUTED} badgeBg="#F8F7F4" badgeBorder={GRAY} />
+                    <PlaceholderGrid color={active.color} bg="#FDF2F8" border="#FBCFE850" items={[
+                      { icon: '🎯', label: 'Leads & prospects', desc: 'Qualification history, interaction log, next steps' },
+                      { icon: '🤝', label: 'Customers', desc: 'Deal context, preferences, relationship health' },
+                      { icon: '🔗', label: 'Partners', desc: 'Context, agreements, relationship dynamics' },
+                      { icon: '💭', label: 'Communication style', desc: 'How each person prefers to be spoken with' },
+                    ]} />
+                  </>)}
+
+                  {active.id === 6 && (<>
+                    <SystemHeader color={active.color} eyebrow="Proactive Intelligence Network (PIN)"
+                      title={`${e.name} watches specific signals — and briefs you before you ask`}
+                      desc={`Event subscriptions, not cron polls. ${e.name} watches domain-specific signals that actually matter for their function. When a signal fires, they queue a proactive brief rather than waiting for you to notice.`}
+                      badge="Always watching" badgeColor="#0E7490" badgeBg="#ECFEFF" badgeBorder="#A5F3FC" />
+                    {e.watchPatterns ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <SectionLabel muted={MUTED}>{e.name}'s {e.watchPatterns.length} active watch patterns</SectionLabel>
+                        {e.watchPatterns.map((wp, i) => (
+                          <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start',
+                            background: '#ECFEFF', border: '1px solid #A5F3FC50', borderRadius: 8, padding: '10px 14px' }}>
+                            <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: '#0E7490',
+                              background: '#CFFAFE', padding: '2px 7px', borderRadius: 4, marginTop: 1, letterSpacing: '0.04em' }}>WATCH</div>
+                            <div style={{ fontSize: 12, color: INK, lineHeight: 1.55 }}>{wp}</div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : <PlaceholderGrid color={active.color} bg="#ECFEFF" border="#A5F3FC50" items={[
+                      { icon: '📡', label: 'Domain signals', desc: 'Industry news filtered for what matters to this function' },
+                      { icon: '🏴', label: 'Competitor moves', desc: 'Tracked and summarized proactively' },
+                      { icon: '⚡', label: 'Trigger events', desc: 'Signals that mean the moment to act is now' },
+                      { icon: '📊', label: 'Performance alerts', desc: 'Metrics that deviate from expected range' },
+                    ]} />}
+                  </>)}
+
+                  {active.id === 7 && (<>
+                    <SystemHeader color={active.color} eyebrow="Action Layer — Trust Ladder"
+                      title="Autonomy modes — capabilities earn trust, not time"
+                      desc={`${e.name} starts at Research Only. Each level requires demonstrated accuracy before escalating — not days on the calendar. Even at the highest level, anything irreversible or spending real money always comes back for your approval — no exceptions, ever. You can also grant or revoke autonomy per-task type at any time.`}
+                      badge="Starts: Research Only" badgeColor="#15803D" badgeBg="#F0FDF4" badgeBorder="#BBF7D0" />
+                    {e.autonomyModes ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {e.autonomyModes.map((am, i) => {
+                          const colors = [
+                            { bg: '#F0FDF4', border: '#BBF7D0', label: '#15803D' },
+                            { bg: '#EEF2FF', border: '#C7D2FE', label: '#4338CA' },
+                            { bg: '#FFFBEB', border: '#FDE68A', label: '#92400E' },
+                            { bg: '#FFF1F2', border: '#FECDD3', label: '#9F1239' },
+                          ]
+                          const c = colors[i] || colors[0]
+                          return (
+                            <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start',
+                              background: c.bg, border: `1px solid ${c.border}`, borderRadius: 10, padding: '14px 16px' }}>
+                              <div style={{ flexShrink: 0, textAlign: 'center' }}>
+                                <div style={{ fontSize: 10, fontWeight: 800, color: c.label, marginBottom: 4, letterSpacing: '0.04em' }}>L{i + 1}</div>
+                                <div style={{ fontSize: 9, color: MUTED, letterSpacing: '0.02em' }}>{'●'.repeat(i + 1)}{'○'.repeat(Math.max(0, e.autonomyModes.length - 1 - i))}</div>
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 8 }}>{am.mode}</div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                                  {am.tasks.map((t, j) => (
+                                    <span key={j} style={{ fontSize: 11, padding: '3px 9px', borderRadius: 6,
+                                      background: 'rgba(0,0,0,0.05)', color: MUTED }}>{t}</span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                        {['Research Only', 'Draft for Approval', 'Act with Notification', 'Trusted — Standing Rules Only'].map((m, i) => (
+                          <div key={m} style={{ background: i === 0 ? '#F0FDF4' : '#F8F7F4',
+                            border: `1px solid ${i === 0 ? '#BBF7D0' : GRAY}`, borderRadius: 10, padding: '14px 12px',
+                            opacity: i > 0 ? 0.55 : 1 }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, marginBottom: 6 }}>{'●'.repeat(i + 1)}{'○'.repeat(3 - i)}</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: INK }}>{m}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>)}
+
+                  {active.id === 8 && (<>
+                    <SystemHeader color={active.color} eyebrow="Meeting Intelligence Loop"
+                      title="Pre-brief → live notes → action items owned to completion"
+                      desc={`The goal: most AI tools stop at the meeting. ${e.name} would brief you before, capture decisions during, extract action items after, and follow each item to completion. This is a real, designed feature — the database schema for it already exists — but it isn't wired up yet, so it's shown honestly as coming soon rather than claimed as live.`}
+                      badge="Coming soon" badgeColor={MUTED} badgeBg="#F8F7F4" badgeBorder={GRAY} />
+                    <div style={{ display: 'flex', alignItems: 'stretch', gap: 6, flexWrap: 'wrap' }}>
+                      {[
+                        { step: 'Before', icon: '📋', title: 'Pre-brief', desc: 'Agenda, context, objectives — in your inbox before you walk in' },
+                        { step: 'During', icon: '✍️', title: 'Live notes', desc: 'Structured notes with decision markers and open questions flagged' },
+                        { step: 'After', icon: '✅', title: 'Action items', desc: 'Extracted decisions, assigned owners, deadlines — pushed to your tools' },
+                        { step: 'Until done', icon: '🔄', title: 'Follow-through', desc: 'Tracks each item to closure. Flags stalled items before they become forgotten commitments' },
+                      ].map((s, i) => (
+                        <div key={i} style={{ flex: '1 1 160px', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                          <div style={{ flex: 1, background: '#F8F7F4', borderRadius: 10, padding: '14px 12px', border: `1px dashed ${GRAY}`, opacity: 0.8 }}>
+                            <div style={{ fontSize: 9, fontWeight: 700, color: MUTED, marginBottom: 4, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{s.step}</div>
+                            <div style={{ fontSize: 16, marginBottom: 6 }}>{s.icon}</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{s.title}</div>
+                            <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{s.desc}</div>
+                          </div>
+                          {i < 3 && <div style={{ fontSize: 12, color: DIM, alignSelf: 'center', flexShrink: 0 }}>→</div>}
                         </div>
+                      ))}
+                    </div>
+                  </>)}
+
+                  {active.id === 9 && (<>
+                    <SystemHeader color={active.color} eyebrow="Outcome Attribution"
+                      title="Tracks what worked, what failed, and why — so mistakes don't repeat"
+                      desc={`${e.name} owns their KPIs. Every outcome — good or bad — feeds back into their judgment. Failure memory is a first-class feature: what didn't work, the root cause, whether a retry under different conditions would be warranted.`}
+                      badge="Self-reporting" badgeColor="#92400E" badgeBg="#FFFBEB" badgeBorder="#FDE68A" />
+                    {e.kpis ? (<>
+                      <SectionLabel muted={MUTED}>{e.name}'s {e.kpis.length} owned KPIs</SectionLabel>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {e.kpis.map((kpi, i) => (
+                          <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center',
+                            background: '#FFFBEB', border: '1px solid #FDE68A50', borderRadius: 8, padding: '10px 14px' }}>
+                            <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: '#92400E',
+                              background: '#FEF3C7', padding: '2px 7px', borderRadius: 4, letterSpacing: '0.04em' }}>KPI</div>
+                            <div style={{ fontSize: 12, color: INK, lineHeight: 1.55 }}>{kpi}</div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-                {['Research Only', 'Draft for Approval', 'Act with Notification', 'Fully Autonomous'].map((m, i) => (
-                  <div key={m} style={{ background: i === 0 ? '#F0FDF4' : '#F8F7F4',
-                    border: `1px solid ${i === 0 ? '#BBF7D0' : GRAY}`, borderRadius: 10, padding: '14px 12px',
-                    opacity: i > 0 ? 0.55 : 1 }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, marginBottom: 6 }}>
-                      {'●'.repeat(i + 1)}{'○'.repeat(3 - i)}
-                    </div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: INK }}>{m}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                    </>) : <PlaceholderGrid color={active.color} bg="#FFFBEB" border="#FDE68A50" items={[
+                      { icon: '📊', label: 'KPI ownership', desc: 'Specific metrics tied to function outcomes, not activity volume' },
+                      { icon: '🧠', label: 'Failure memory', desc: "What didn't work, why, and whether to retry under different conditions" },
+                      { icon: '📈', label: 'Performance trend', desc: 'Week 10 is measurably better than week 1 — verifiable, not claimed' },
+                    ]} />}
+                  </>)}
 
-          {/* connector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
-            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  follows through via</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
-
-          {/* ─ System 8: Meeting Intelligence Loop ─ */}
-          <div style={{ background: '#fff', border: '1.5px solid #D1FAE5',
-            borderRadius: 4, padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#059669' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#065F46', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 8 · Meeting Intelligence Loop</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Pre-brief → live notes → action items owned to completion
+                  {active.id === 10 && (<>
+                    <SystemHeader color={active.color} eyebrow="Cross-Employee Cortex (CEC)"
+                      title="Persistent shared intelligence across every employee you hire"
+                      desc={`When ${e.name} discovers something that changes how the business should operate, that organizational intelligence is available to every other employee — without a meeting, without a memo, without anyone remembering to tell anyone.`}
+                      badge="Grows with team" badgeColor="#6D28D9" badgeBg="#F5F3FF" badgeBorder="#DDD6FE" />
+                    <PlaceholderGrid color={active.color} bg="#F5F3FF" border="#EDE9FE" items={[
+                      { icon: '🧠', label: 'Shared org memory', desc: 'What the business knows — not what one employee knows' },
+                      { icon: '🤝', label: 'Handoff intelligence', desc: 'Pipeline context passed automatically to the next employee who needs it' },
+                      { icon: '⚡', label: 'No duplicate work', desc: 'Research done once is available to all employees on the team' },
+                      { icon: '📡', label: 'Team-aware decisions', desc: 'Each employee knows what the rest of the team is working on' },
+                    ]} />
+                  </>)}
                 </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  The gap no competitor fills. Most AI tools stop at the meeting. {e.name} briefs you before, captures decisions during, extracts action items after, and follows each item to completion — no decisions lost, no follow-through broken.
+              ) : (
+                <div style={{ textAlign: 'center', color: DIM, fontSize: 12, padding: '18px 0' }}>
+                  Tap any node above to see how it works.
                 </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#065F46',
-                background: '#ECFDF5', padding: '5px 12px', borderRadius: 20, border: '1px solid #A7F3D0' }}>The gap closed</div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'stretch', gap: 6, flexWrap: 'wrap' }}>
-              {[
-                { step: 'Before', icon: '📋', title: 'Pre-brief', desc: 'Agenda, context, objectives — in your inbox before you walk in' },
-                { step: 'During', icon: '✍️', title: 'Live notes', desc: 'Structured notes with decision markers and open questions flagged' },
-                { step: 'After', icon: '✅', title: 'Action items', desc: 'Extracted decisions, assigned owners, deadlines — pushed to your tools' },
-                { step: 'Until done', icon: '🔄', title: 'Follow-through', desc: 'Tracks each item to closure. Flags stalled items before they become forgotten commitments' },
-              ].map((s, i) => (
-                <div key={i} style={{ flex: '1 1 160px', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                  <div style={{ flex: 1, background: '#ECFDF5', borderRadius: 10, padding: '14px 12px',
-                    border: '1px solid #A7F3D050' }}>
-                    <div style={{ fontSize: 9, fontWeight: 700, color: '#059669', marginBottom: 4,
-                      letterSpacing: '0.06em', textTransform: 'uppercase' }}>{s.step}</div>
-                    <div style={{ fontSize: 16, marginBottom: 6 }}>{s.icon}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{s.title}</div>
-                    <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{s.desc}</div>
-                  </div>
-                  {i < 3 && <div style={{ fontSize: 12, color: DIM, alignSelf: 'center', flexShrink: 0 }}>→</div>}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ─ GROUP D: GROWS ─ */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16, marginBottom: 12 }}>
-            <div style={{ height: 1, width: 24, background: GRAY }} />
-            <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>HOW {e.name.toUpperCase()} GROWS</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
-
-          {/* ─ System 9: Outcome Attribution ─ */}
-          <div style={{ background: '#fff', border: '1.5px solid #FEF3C7',
-            borderRadius: '16px 16px 4px 4px', padding: '28px 32px', position: 'relative', overflow: 'hidden', marginBottom: 2 }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#D97706' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#92400E', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 9 · Outcome Attribution</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Tracks what worked, what failed, and why — so mistakes don't repeat
-                </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  {e.name} owns their KPIs. Every outcome — good or bad — feeds back into their judgment. Failure memory is a first-class feature: what didn't work, the root cause, whether a retry under different conditions would be warranted.
-                </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#92400E',
-                background: '#FFFBEB', padding: '5px 12px', borderRadius: 20, border: '1px solid #FDE68A' }}>Self-reporting</div>
-            </div>
-            {e.kpis ? (<>
-              <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, letterSpacing: '0.08em',
-                textTransform: 'uppercase', marginBottom: 10 }}>{e.name}'s {e.kpis.length} owned KPIs</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {e.kpis.map((kpi, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center',
-                    background: '#FFFBEB', border: '1px solid #FDE68A50', borderRadius: 8, padding: '10px 14px' }}>
-                    <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, color: '#92400E',
-                      background: '#FEF3C7', padding: '2px 7px', borderRadius: 4, letterSpacing: '0.04em' }}>KPI</div>
-                    <div style={{ fontSize: 12, color: INK, lineHeight: 1.55 }}>{kpi}</div>
-                  </div>
-                ))}
-              </div>
-            </>) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
-                {[
-                  { icon: '📊', label: 'KPI ownership', desc: 'Specific metrics tied to function outcomes, not activity volume' },
-                  { icon: '🧠', label: 'Failure memory', desc: "What didn't work, why, and whether to retry under different conditions" },
-                  { icon: '📈', label: 'Performance trend', desc: 'Week 10 is measurably better than week 1 — verifiable, not claimed' },
-                  { icon: '📋', label: 'Self-reporting', desc: 'Proactive weekly summary without you asking' },
-                ].map(item => (
-                  <div key={item.label} style={{ background: '#FFFBEB', borderRadius: 10, padding: '14px 16px', border: '1px solid #FDE68A50' }}>
-                    <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
-                    <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* connector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', height: 28, background: BG,
-            borderLeft: `1.5px solid ${GRAY}`, borderRight: `1.5px solid ${GRAY}` }}>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-            <div style={{ fontSize: 10, color: DIM, whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>↓  shared across</div>
-            <div style={{ flex: 1, height: 1, background: GRAY }} />
-          </div>
-
-          {/* ─ System 10: Cross-Employee Cortex ─ */}
-          <div style={{ background: '#fff', border: '1.5px solid #EDE9FE',
-            borderRadius: '4px 4px 16px 16px', padding: '28px 32px', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#8B5CF6' }} />
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#6D28D9', letterSpacing: '0.1em',
-                  textTransform: 'uppercase', marginBottom: 6 }}>System 10 · Cross-Employee Cortex (CEC)</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: INK, letterSpacing: '-0.04em', lineHeight: 1.1 }}>
-                  Persistent shared intelligence across every employee you hire
-                </div>
-                <div style={{ fontSize: 13, color: MUTED, marginTop: 8, lineHeight: 1.65, maxWidth: 560 }}>
-                  When {e.name} discovers something that changes how the business should operate, that organizational intelligence is available to every other employee — without a meeting, without a memo, without anyone remembering to tell anyone.
-                </div>
-              </div>
-              <div style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#6D28D9',
-                background: '#F5F3FF', padding: '5px 12px', borderRadius: 20, border: '1px solid #DDD6FE' }}>Grows with team</div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
-              {[
-                { icon: '🧠', label: 'Shared org memory', desc: 'What the business knows — not what one employee knows' },
-                { icon: '🤝', label: 'Handoff intelligence', desc: 'Pipeline context passed automatically to the next employee who needs it' },
-                { icon: '⚡', label: 'No duplicate work', desc: 'Research done once is available to all employees on the team' },
-                { icon: '📡', label: 'Team-aware decisions', desc: 'Each employee knows what the rest of the team is working on' },
-              ].map(item => (
-                <div key={item.label} style={{ background: '#F5F3FF', borderRadius: 10, padding: '14px 16px', border: '1px solid #EDE9FE' }}>
-                  <div style={{ fontSize: 18, marginBottom: 8 }}>{item.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: INK, marginBottom: 4 }}>{item.label}</div>
-                  <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>{item.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+              )}
+            </>)
+          })()}
         </div>
 
         {/* Interview CTA banner */}

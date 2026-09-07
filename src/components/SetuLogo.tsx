@@ -7,6 +7,7 @@ interface SetuLogoProps {
   color?: string     // bridge line color
   wordColor?: string // wordmark color
   animate?: boolean  // play the build-up animation
+  onClick?: () => void
 }
 
 // Viewbox 40×36 — suspension bridge mark, no background box
@@ -17,12 +18,13 @@ export function SetuLogo({
   color = '#0E5C34',
   wordColor = '#0D0C09',
   animate = true,
+  onClick,
 }: SetuLogoProps) {
   const w = Math.round(size * (40 / 36))
   const fs = Math.round(size * 0.57)
 
   return (
-    <Link href={href} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+    <Link href={href} onClick={onClick} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
       <svg
         width={w}
         height={size}

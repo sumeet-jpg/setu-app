@@ -222,6 +222,9 @@ export default function ManageClient({
           <Link href="/my-employees" style={{ fontSize: 12, color: C.muted, textDecoration: 'none', padding: '5px 10px', borderRadius: 7, border: `1px solid ${C.border}` }}>
             ← My Employees
           </Link>
+          <Link href="/manage/account" style={{ fontSize: 12, color: C.muted, textDecoration: 'none', padding: '5px 10px', borderRadius: 7, border: `1px solid ${C.border}` }}>
+            Account & data
+          </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 34, height: 34, borderRadius: 10, background: `${employeeColor}18`, border: `1.5px solid ${employeeColor}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>
               {employeeEmoji}

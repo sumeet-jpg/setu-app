@@ -55,7 +55,10 @@ export type AuditEventType =
   | "subscription_cancelled"
   | "subscription_paused"
   | "subscription_resumed"
-  | "subscription_admin_override";
+  | "subscription_admin_override"
+  | "data_exported"
+  | "account_deletion_requested"
+  | "account_deleted";
 
 export type AuditSeverity = "info" | "warning" | "critical";
 
