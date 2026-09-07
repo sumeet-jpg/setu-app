@@ -286,6 +286,10 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
             ))}
           </div>
 
+          <div style={{ padding: '13px 16px', borderRadius: 13, background: '#FFF7ED', border: '1px solid #FED7AA', fontSize: 12, color: '#9A3412', lineHeight: 1.6, marginBottom: 12 }}>
+            <strong>Real task execution runs on a shared, capped AI budget</strong> — enough for normal day-to-day use. If you need more, connect your own Anthropic API key anytime from {e.name}'s workspace and execution runs on your own account instead, with no cap. Entirely optional, and you can add it later — just flagging it now so it's never a surprise.
+          </div>
+
           <div style={{ padding: '13px 16px', borderRadius: 13, background: 'rgba(14,92,52,0.06)', border: '1px solid rgba(14,92,52,0.18)', fontSize: 12.5, color: MUTED, lineHeight: 1.65 }}>
             Not sure yet? <Link href={`/employees/${e.slug}/interview`} style={{ color: GREEN, fontWeight: 700, textDecoration: 'none' }}>Interview {e.name} free</Link> — no commitment.
           </div>

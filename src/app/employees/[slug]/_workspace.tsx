@@ -781,8 +781,11 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
             <div style={{ fontSize: 12, color: '#0E5C34', fontWeight: 700, marginBottom: 4 }}>
               Price locked at hire — rises $10/month for new signups
             </div>
-            <div style={{ fontSize: 13, color: MUTED, marginBottom: 20, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 13, color: MUTED, marginBottom: 8, lineHeight: 1.6 }}>
               14-day free trial · No credit card needed
+            </div>
+            <div style={{ fontSize: 11.5, color: '#9A3412', marginBottom: 20, lineHeight: 1.55 }}>
+              Real execution runs on a shared, capped AI budget — connect your own Anthropic key anytime for no cap.
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {isHired ? (
