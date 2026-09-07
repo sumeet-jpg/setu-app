@@ -277,8 +277,8 @@ export async function POST(req: NextRequest) {
       skill_beliefs_extracted: skillCount,
       summary: extraction.summary,
     })
-  } catch (err: any) {
+  } catch (err) {
     console.error('[distill] Unexpected error:', err)
-    return NextResponse.json({ error: 'Internal error', detail: err?.message, code: err?.code }, { status: 500 })
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }
