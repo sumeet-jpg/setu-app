@@ -33,7 +33,15 @@ export async function verifyAnthropicKey(apiKey: string): Promise<{ ok: boolean;
     })
     return { ok: true }
   } catch (err: any) {
-    return { ok: false, error: err?.message ?? 'Could not verify this key with Anthropic.' }
+    // Anthropic's SDK errors carry the raw API error body as `.message` —
+    // e.g. `{"type":"error","error":{"type":"authentication_error",...}}` —
+    // which is not something to show a customer who just pasted a typo'd key.
+    const status = err?.status
+    let error = 'Could not verify this key with Anthropic. Please check it and try again.'
+    if (status === 401) error = 'That key looks invalid — double-check for typos or an extra space.'
+    else if (status === 429) error = 'That key is valid but rate-limited or out of credit on your Anthropic account.'
+    else if (status === 403) error = 'That key is valid but not authorized for this model — check your Anthropic account permissions.'
+    return { ok: false, error }
   }
 }
 

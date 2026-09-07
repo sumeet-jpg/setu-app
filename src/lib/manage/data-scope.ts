@@ -40,11 +40,19 @@ export const USER_SCOPED_TABLES: UserScopedTable[] = [
   { table: 'employee_calibration',       label: 'Trust/autonomy calibration per employee' },
   { table: 'action_outcomes',            label: 'Outcomes recorded for calibration' },
   { table: 'employee_usage_events',      label: 'Usage and cost history' },
-  { table: 'employee_hires',             label: 'Hire records' },
   { table: 'distillation_runs',          label: 'Memory-distillation job history' },
   { table: 'org_cortex_entries',         label: 'Shared intelligence across your hired employees' },
-  { table: 'runtime_instances',          label: 'Deployed employee runtime records' },
 ]
+// Deliberately NOT included, despite looking like customer data at a glance:
+// - employee_hires: keyed by email, not user_id — a legacy hire-request log
+//   from before the anonymous-userId identity model, not this customer's
+//   subscription record (that's hired_subscriptions, already included).
+// - runtime_instances: keyed by tenant_id — the old n8n-per-tenant runtime
+//   architecture (confirmed dead/unused elsewhere in this codebase), not
+//   part of the current product's data model at all.
+// Querying either with `.eq('user_id', ...)` — the mistake this comment is
+// here to prevent repeating — fails with "column does not exist", caught
+// by collectUserData's per-table error handling but never actually useful.
 
 // tool_connections holds encrypted third-party credentials (encrypted_key) —
 // never included in an export, and purged immediately (not on the grace
