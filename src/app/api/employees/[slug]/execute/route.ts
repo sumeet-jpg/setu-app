@@ -279,7 +279,8 @@ async function runExecute(slug: string, user_id: string, req: NextRequest): Prom
       .single()
 
     if (error || !newTask) {
-      return NextResponse.json({ error: 'Failed to create task' }, { status: 500 })
+      console.error('[execute] task insert failed', error)
+      return NextResponse.json({ error: 'Failed to create task', detail: error?.message, code: error?.code }, { status: 500 })
     }
     taskId = newTask.id
   }
