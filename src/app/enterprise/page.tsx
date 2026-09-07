@@ -24,7 +24,7 @@ const ENTERPRISE_BENEFITS = [
   { icon: '📊', title: 'Board-level reporting', desc: 'Weekly and monthly reports in the format your board expects. Investor-ready by default.' },
   { icon: '⚡', title: '240+ agents each', desc: 'Each C-Suite employee commands a fleet of specialist agents — no task too complex.' },
   { icon: '🎯', title: 'Custom playbooks', desc: 'Trained on your strategy, brand, values, and workflows. Acts like an insider, not a generalist.' },
-  { icon: '🤝', title: 'White-glove onboarding', desc: 'Dedicated onboarding with Sumeet. Live in under 7 days. Ongoing support included.' },
+  { icon: '🤝', title: 'White-glove onboarding', desc: 'Dedicated onboarding with our team. Live in under 7 days. Ongoing support included.' },
 ]
 
 export default function EnterprisePage() {

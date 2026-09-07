@@ -208,7 +208,7 @@ export default function McpPage() {
               Browse AI Employees →
             </Link>
             <a href="mailto:sumeet@setuagents.com" style={{ padding: '12px 24px', borderRadius: 12, background: SURFACE, border: `1px solid ${BORDER}`, color: '#a1a1aa', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
-              Contact Sumeet
+              Contact Us
             </a>
           </div>
         </div>

@@ -620,7 +620,7 @@ export default function ManageClient({
                 {checkingOut ? 'Opening checkout…' : `Pay $${monthlyPrice}/mo — activate now →`}
               </button>
               <a
-                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '918951066630'}?text=${encodeURIComponent(`Hi Sumeet, I'd like to activate ${employeeName} at my locked rate of $${monthlyPrice}/month. Employee: ${slug}`)}`}
+                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '918951066630'}?text=${encodeURIComponent(`Hi, I'd like to activate ${employeeName} at my locked rate of $${monthlyPrice}/month. Employee: ${slug}`)}`}
                 target="_blank" rel="noopener noreferrer"
                 style={{
                   display: 'block', textAlign: 'center', padding: '11px 20px', borderRadius: 11,

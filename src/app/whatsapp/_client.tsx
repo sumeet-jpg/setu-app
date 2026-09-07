@@ -173,7 +173,7 @@ export default function WhatsAppClient() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 16 }}>
           {[
             { num: '01', title: 'Interview free', desc: 'Chat with your future AI employee. See how they think, how they handle tough questions. No commitment.' },
-            { num: '02', title: 'Tell us your setup', desc: 'Fill a 5-min brief — your products, prices, tone of voice, FAQs. Sumeet reviews it personally.' },
+            { num: '02', title: 'Tell us your setup', desc: 'Fill a 5-min brief — your products, prices, tone of voice, FAQs. Our team reviews it personally.' },
             { num: '03', title: 'We connect WhatsApp', desc: 'We set up your WhatsApp Business API and connect your AI employee. Typically 2–3 business days.' },
             { num: '04', title: 'Go live', desc: 'Onboarding call. First messages handled. You watch your AI employee work — and tweak if needed.' },
           ].map(s => (

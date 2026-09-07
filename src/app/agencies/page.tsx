@@ -28,8 +28,8 @@ const BENEFITS = [
   },
   {
     icon: '🤝',
-    title: 'Direct line to the founder',
-    desc: 'You deal directly with Sumeet — not a ticketing system. Onboarding, escalations, and custom deals go straight to the person who can say yes.',
+    title: 'Direct line to the team',
+    desc: 'You deal directly with our team — not a ticketing system. Onboarding, escalations, and custom deals go straight to the people who can say yes.',
   },
   {
     icon: '📋',

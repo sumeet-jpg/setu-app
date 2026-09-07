@@ -273,7 +273,7 @@ export async function POST(req: NextRequest) {
             `).join('')}
 
             <p style="font-size:12px;color:#475569;margin:20px 0 0;line-height:1.6">
-              Questions? Reply to this email. Sumeet reads every one.<br>
+              Questions? Reply to this email. We read every one.<br>
               Setu · setuagents.com
             </p>
           </div>

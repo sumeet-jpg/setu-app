@@ -279,7 +279,7 @@ export default function HireClient({ slug, currentPriceCents = 4900 }: { slug: s
 
           <div style={{ background: WHITE, border: `1.5px solid ${GRAY}`, borderRadius: 18, padding: 22, marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 14, letterSpacing: '-0.02em' }}>What's included</div>
-            {[`${e.agentCount} pre-trained AI agents`, 'Direct email access to Sumeet', 'Custom workflow configuration', 'Email + Slack integration', 'Weekly performance reports'].map(f => (
+            {[`${e.agentCount} pre-trained AI agents`, 'Direct email support', 'Custom workflow configuration', 'Email + Slack integration', 'Weekly performance reports'].map(f => (
               <div key={f} style={{ display: 'flex', gap: 9, fontSize: 12.5, color: MUTED, marginBottom: 9 }}>
                 <span style={{ color: GREEN, flexShrink: 0, marginTop: 1 }}>✓</span> {f}
               </div>
