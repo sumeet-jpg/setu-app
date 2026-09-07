@@ -1076,7 +1076,7 @@ export default function EmployeeWorkspace({ employee: e }: { employee: Employee 
                               background: c.bg, border: `1px solid ${c.border}`, borderRadius: 10, padding: '14px 16px' }}>
                               <div style={{ flexShrink: 0, textAlign: 'center' }}>
                                 <div style={{ fontSize: 10, fontWeight: 800, color: c.label, marginBottom: 4, letterSpacing: '0.04em' }}>L{i + 1}</div>
-                                <div style={{ fontSize: 9, color: MUTED, letterSpacing: '0.02em' }}>{'●'.repeat(i + 1)}{'○'.repeat(Math.max(0, e.autonomyModes.length - 1 - i))}</div>
+                                <div style={{ fontSize: 9, color: MUTED, letterSpacing: '0.02em' }}>{'●'.repeat(i + 1)}{'○'.repeat(Math.max(0, (e.autonomyModes?.length ?? 4) - 1 - i))}</div>
                               </div>
                               <div style={{ flex: 1 }}>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: INK, marginBottom: 8 }}>{am.mode}</div>
