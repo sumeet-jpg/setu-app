@@ -21,6 +21,29 @@ export const maxDuration = 60
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
+// Fire distillation + PIN pattern-check after a task genuinely completes.
+// interview/route.ts (the free, pre-hire chat) already did this after 8+
+// messages — but this, the real execute loop a hired customer actually
+// uses, never called either, so real paid usage never generated new
+// memory: employee_beliefs and employee_memories only ever grew from the
+// free interview widget. Fired here on every completed task rather than
+// gated by message count — a finished real task, with a real outcome, is
+// higher-signal than an arbitrary turn count, and execute tasks are often
+// shorter than a free-form chat.
+function triggerLearning(userId: string, slug: string, taskId: string, messages: any[]) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  fetch(`${baseUrl}/api/employees/distill`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, slug, sessionId: taskId, messages: messages.slice(-20) }),
+  }).catch(() => {})
+  fetch(`${baseUrl}/api/employees/pin`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'check', userId, slug }),
+  }).catch(() => {})
+}
+
 // ── Claude tool definitions ──────────────────────────────────────────────────
 
 const APPROVAL_TOOL: Anthropic.Tool = {
@@ -376,6 +399,7 @@ ${toolContext}${knowledgeContext}`
               .from('employee_tasks')
               .update({ status: 'complete', messages, updated_at: new Date().toISOString() })
               .eq('id', taskId)
+            triggerLearning(user_id, slug, taskId, messages)
             send(sseEvent('complete', { task_id: taskId, message: textBuffer }))
             break
           }
@@ -446,6 +470,7 @@ ${toolContext}${knowledgeContext}`
                 })
                 .eq('id', taskId)
 
+              triggerLearning(user_id, slug, taskId, messages)
               send(sseEvent('complete', { task_id: taskId, summary: input.summary, results: input.results }))
               controller.close()
               return
