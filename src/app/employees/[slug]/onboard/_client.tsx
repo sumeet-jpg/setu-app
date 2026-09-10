@@ -37,6 +37,7 @@ export default function OnboardClient({
   const [kpis, setKpis] = useState(['', '', ''])
   const [savingKpis, setSavingKpis] = useState(false)
   const [kpisSaved, setKpisSaved] = useState(false)
+  const [kpisError, setKpisError] = useState('')
 
   // Step 3 — tools
   const relevantSlugs = employeeToolSlugs(tools).slice(0, 6)
@@ -74,7 +75,12 @@ export default function OnboardClient({
   }
 
   async function saveKpis() {
+    // Was swallowing a failed save completely — the wizard advanced to the
+    // next step regardless, with no error shown, same silent-data-loss
+    // pattern as the Context step's doc upload had.
+    if (!kpis.some(Boolean)) return
     setSavingKpis(true)
+    setKpisError('')
     try {
       const res = await authFetch('/api/manage/kpis', {
         method: 'PATCH',
@@ -82,6 +88,9 @@ export default function OnboardClient({
         body: JSON.stringify({ slug, kpis: kpis.filter(Boolean) }),
       })
       if (res.ok) setKpisSaved(true)
+      else setKpisError("Couldn't save these KPIs — you can re-add them later from the Memory page.")
+    } catch {
+      setKpisError("Couldn't save these KPIs — you can re-add them later from the Memory page.")
     } finally {
       setSavingKpis(false)
     }
@@ -176,6 +185,7 @@ export default function OnboardClient({
                 style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: `1px solid ${C.border}`, background: C.card, color: C.text, fontSize: 13, outline: 'none', marginBottom: 10, boxSizing: 'border-box' }} />
             ))}
             {kpisSaved && <div style={{ fontSize: 12, color: C.green, marginTop: 4 }}>✓ Saved</div>}
+            {kpisError && <div style={{ fontSize: 12, color: C.amber, marginTop: 4 }}>{kpisError}</div>}
             <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
               <button onClick={async () => { await saveKpis(); setStep(2) }} disabled={savingKpis} style={btnStyle(savingKpis)}>
                 {savingKpis ? 'Saving…' : 'Continue →'}
