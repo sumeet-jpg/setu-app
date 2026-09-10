@@ -141,6 +141,7 @@ export default function MyEmployeesPage() {
               const profile = EMPLOYEE_BY_SLUG[sub.employee_slug]
               const isTrial = sub.status === 'trial'
               const isActive = sub.status === 'active'
+              const isCancelled = sub.status === 'cancelled'
               const trialDays = sub.trial_ends_at ? daysRemaining(sub.trial_ends_at) : null
               const price = sub.monthly_price_cents ? Math.round(sub.monthly_price_cents / 100) : 49
 
@@ -181,6 +182,11 @@ export default function MyEmployeesPage() {
                             Paused
                           </span>
                         )}
+                        {sub.status === 'cancelled' && (
+                          <span style={{ fontSize: 11, fontWeight: 600, color: '#991b1b', background: '#fee2e2', padding: '3px 9px', borderRadius: 12 }}>
+                            Cancelled
+                          </span>
+                        )}
                         <span style={{ fontSize: 11, color: DIM, padding: '3px 9px', borderRadius: 12, border: `1px solid ${GRAY}` }}>
                           ${price}/mo{isTrial ? ' (locked)' : ''}
                         </span>
@@ -210,12 +216,14 @@ export default function MyEmployeesPage() {
                     }}>
                       Manage →
                     </Link>
-                    <Link href={`/employees/${sub.employee_slug}`} style={{
-                      padding: '7px 14px', borderRadius: 9, background: WHITE, border: `1.5px solid ${GRAY}`,
-                      color: MUTED, fontSize: 12, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap',
-                    }}>
-                      Chat
-                    </Link>
+                    {!isCancelled && (
+                      <Link href={`/employees/${sub.employee_slug}`} style={{
+                        padding: '7px 14px', borderRadius: 9, background: WHITE, border: `1.5px solid ${GRAY}`,
+                        color: MUTED, fontSize: 12, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap',
+                      }}>
+                        Chat
+                      </Link>
+                    )}
                   </div>
                 </div>
               )
