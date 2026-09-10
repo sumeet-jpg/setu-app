@@ -30,12 +30,36 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 // gated by message count — a finished real task, with a real outcome, is
 // higher-signal than an arbitrary turn count, and execute tasks are often
 // shorter than a free-form chat.
+// distill/route.ts's DISTILLATION_PROMPT assumes message.content is always a
+// plain string (it calls .substring() directly) — true for
+// interview/route.ts's messages (built by accumulating a text delta into a
+// string) but not for execute's: assistant turns here carry Anthropic's
+// native content-block array (finalMsg.content, e.g.
+// [{type:'text', text:'...'}, {type:'tool_use', ...}]), which has no
+// .substring. Confirmed live: every real distillation run from execute
+// failed with "e.content.substring is not a function" until this
+// normalized it at the source.
+function flattenContent(content: unknown): string {
+  if (typeof content === 'string') return content
+  if (Array.isArray(content)) {
+    return content
+      .map((block: any) => block?.type === 'text' ? block.text : block?.type === 'tool_use' ? `[used tool: ${block.name}]` : '')
+      .filter(Boolean)
+      .join(' ')
+  }
+  return ''
+}
+
 function triggerLearning(userId: string, slug: string, taskId: string, messages: any[]) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const flatMessages = messages
+    .slice(-20)
+    .map(m => ({ role: m.role, content: flattenContent(m.content) }))
+    .filter(m => m.content.trim().length > 0)
   fetch(`${baseUrl}/api/employees/distill`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId, slug, sessionId: taskId, messages: messages.slice(-20) }),
+    body: JSON.stringify({ userId, slug, sessionId: taskId, messages: flatMessages }),
   }).catch(() => {})
   fetch(`${baseUrl}/api/employees/pin`, {
     method: 'POST',
