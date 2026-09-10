@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
 
       // Seed watch patterns on first message (idempotent, fire-and-forget)
       if (messages.length <= 1) {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+        const baseUrl = req.nextUrl.origin
         fetch(`${baseUrl}/api/employees/pin`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -255,7 +255,7 @@ export async function POST(req: NextRequest) {
               try {
                 const proposal = JSON.parse(actionMatch[1])
                 if (proposal.type && proposal.title && proposal.description) {
-                  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+                  const baseUrl = req.nextUrl.origin
                   fetch(`${baseUrl}/api/employees/actions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -287,7 +287,7 @@ export async function POST(req: NextRequest) {
                   { role: 'assistant', content: assistantResponse },
                 ],
               }
-              const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+              const baseUrl = req.nextUrl.origin
               fetch(`${baseUrl}/api/employees/distill`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

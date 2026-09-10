@@ -50,8 +50,7 @@ function flattenContent(content: unknown): string {
   return ''
 }
 
-function triggerLearning(userId: string, slug: string, taskId: string, messages: any[]) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+function triggerLearning(userId: string, slug: string, taskId: string, messages: any[], baseUrl: string) {
   const flatMessages = messages
     .slice(-20)
     .map(m => ({ role: m.role, content: flattenContent(m.content) }))
@@ -424,7 +423,7 @@ ${toolContext}${knowledgeContext}`
               .from('employee_tasks')
               .update({ status: 'complete', messages, updated_at: new Date().toISOString() })
               .eq('id', taskId)
-            triggerLearning(user_id, slug, taskId, messages)
+            triggerLearning(user_id, slug, taskId, messages, req.nextUrl.origin)
             send(sseEvent('complete', { task_id: taskId, message: textBuffer }))
             break
           }
@@ -495,7 +494,7 @@ ${toolContext}${knowledgeContext}`
                 })
                 .eq('id', taskId)
 
-              triggerLearning(user_id, slug, taskId, messages)
+              triggerLearning(user_id, slug, taskId, messages, req.nextUrl.origin)
               send(sseEvent('complete', { task_id: taskId, summary: input.summary, results: input.results }))
               controller.close()
               return
